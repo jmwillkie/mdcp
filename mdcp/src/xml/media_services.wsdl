@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="MediaServices"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/media"
+    xmlns:media="http://www.smpte-ra.org/schemas/st2071/2014/media"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/media" 
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2n.wsdl" />
+    
+    <wsdl:service name="DeviceService">
+        <wsdl:port name="MediaDirectoryPort" binding="media:MediaDirectoryHTTPBinding">
+            <soap11:address location="http://localhost:8088/MediaDirectory"/>
+        </wsdl:port>
+        <wsdl:port name="MediaAccessPort" binding="media:MediaAccessHTTPBinding">
+            <soap11:address location="http://localhost:8088/MediaAccess"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

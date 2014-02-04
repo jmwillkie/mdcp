@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="14.2">
+    <meta>
+        <filters directoryPatterns="" filePatterns="" positiveFilePatterns="" showHiddenFiles="false"/>
+        <options>
+            <serialized version="14.2" xml:space="preserve">
+                <map>
+                    <entry>
+                        <String>enable.project.master.files.support</String>
+                        <Boolean>true</Boolean>
+                    </entry>
+                    <entry>
+                        <String>validation.scenario.associations</String>
+                        <scenarioAssociation-array>
+                            <scenarioAssociation>
+                                <field name="url">
+                                    <String>types.xsd</String>
+                                </field>
+                                <field name="scenarioIds">
+                                    <list>
+                                        <String>Default_engine_scenario_name_1254902349626</String>
+                                    </list>
+                                </field>
+                                <field name="scenarioTypes">
+                                    <list>
+                                        <String>Default_engine_scenario_type_1254902349626</String>
+                                    </list>
+                                </field>
+                            </scenarioAssociation>
+                        </scenarioAssociation-array>
+                    </entry>
+                    <entry>
+                        <String>validation.scenarios</String>
+                        <validationScenario-array>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list/>
+                                </field>
+                                <field name="type">
+                                    <String>Default_engine_scenario_type_1254902349626</String>
+                                </field>
+                                <field name="name">
+                                    <String>Default_engine_scenario_name_1254902349626</String>
+                                </field>
+                            </validationScenario>
+                        </validationScenario-array>
+                    </entry>
+                    <entry>
+                        <String>validation.scenarios.load.from.project</String>
+                        <Boolean>true</Boolean>
+                    </entry>
+                </map>
+            </serialized>
+        </options>
+    </meta>
+    <projectTree name="MDCF.xpr">
+        <folder masterFiles="true" name="Master Files">
+            <file name="st2071-2a.xsd"/>
+            <file name="st2071-2b.xsd"/>
+            <file name="st2071-2c.xsd"/>
+            <file name="st2071-2d.xsd"/>
+            <file name="st2071-2e.xsd"/>
+            <file name="st2071-2f.xsd"/>
+            <file name="st2071-2g.xsd"/>
+            <file name="st2071-2h.xsd"/>
+            <file name="st2071-2i.xsd"/>
+        </folder>
+        <file name="device.control_services.wsdl"/>
+        <file name="device.event_services.wsdl"/>
+        <file name="device.mode_services.wsdl"/>
+        <file name="device_services.wsdl"/>
+        <file name="media_services.wsdl"/>
+        <file name="security_services.wsdl"/>
+        <file name="service_services.wsdl"/>
+        <file name="st2071-2a.xsd"/>
+        <file name="st2071-2b.xsd"/>
+        <file name="st2071-2c.xsd"/>
+        <file name="st2071-2d.xsd"/>
+        <file name="st2071-2e.xsd"/>
+        <file name="st2071-2f.xsd"/>
+        <file name="st2071-2g.xsd"/>
+        <file name="st2071-2h.xsd"/>
+        <file name="st2071-2i.xsd"/>
+        <file name="st2071-2j.wsdl"/>
+        <file name="st2071-2k.wsdl"/>
+        <file name="st2071-2l.wsdl"/>
+        <file name="st2071-2m.wsdl"/>
+        <file name="st2071-2n.wsdl"/>
+        <file name="st2071-2o.wsdl"/>
+        <file name="st2071-2p.wsdl"/>
+        <file name="st2071-2q.xsd"/>
+        <file name="st2071-2r.wsdl"/>
+    </projectTree>
+</project>

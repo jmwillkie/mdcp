@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Query"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/query"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <wsdl:types>
+        <xs:schema
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/query" 
+            xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/query"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2h.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="InvalidQueryFault">
+        <wsdl:part name="InvalidQueryFault" element="tns:InvalidQuery" />
+    </wsdl:message>
+</wsdl:definitions>

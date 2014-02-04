@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Media"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/media"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/media"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:query="http://www.smpte-ra.org/schemas/st2071/2014/query"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2o.wsdl" />
+    
+    <wsdl:types>
+        <xs:schema
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/media" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2g.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="MediaContainerRequest">
+        <wsdl:part name="getMediaContainer" element="tns:getMediaContainer" />
+    </wsdl:message>
+    
+    <wsdl:message name="MediaContainerResponse">
+        <wsdl:part name="getMediaContainerResponse" element="tns:getMediaContainerResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="createRequest">
+        <wsdl:part name="create" element="tns:create" />
+    </wsdl:message>
+    
+    <wsdl:message name="createResponse">
+        <wsdl:part name="createResponse" element="tns:createResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="deleteRequest">
+        <wsdl:part name="delete" element="tns:delete" />
+    </wsdl:message>
+    
+    <wsdl:message name="deleteResponse">
+        <wsdl:part name="deleteResponse" element="tns:deleteResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="listRequest">
+        <wsdl:part name="list" element="tns:list" />
+    </wsdl:message>
+    
+    <wsdl:message name="listResponse">
+        <wsdl:part name="listResponse" element="tns:listResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupRequest">
+        <wsdl:part name="lookup" element="tns:lookup" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupResponse">
+        <wsdl:part name="lookupResponse" element="tns:lookupResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupAssetRequest">
+        <wsdl:part name="lookupAsset" element="tns:lookupAsset" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupAssetResponse">
+        <wsdl:part name="lookupAssetResponse" element="tns:lookupAssetResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="searchRequest">
+        <wsdl:part name="search" element="tns:search" />
+    </wsdl:message>
+    
+    <wsdl:message name="searchResponse">
+        <wsdl:part name="searchResponse" element="tns:searchResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="updateRequest">
+        <wsdl:part name="update" element="tns:update" />
+    </wsdl:message>
+    
+    <wsdl:message name="updateResponse">
+        <wsdl:part name="updateResponse" element="tns:updateResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupURLsRequest">
+        <wsdl:part name="lookupURLs" element="tns:lookupURLs" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupURLsResponse">
+        <wsdl:part name="lookupURLsResponse" element="tns:lookupURLsResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="MediaNotFoundFault">
+        <wsdl:part name="MediaNotFoundFault" element="tns:MediaNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="MediaCreationFailedFault">
+        <wsdl:part name="MediaCreationFailedFault" element="tns:MediaCreationFailed" />
+    </wsdl:message>
+    
+    <wsdl:message name="MediaDeletionFailedFault">
+        <wsdl:part name="MediaDeletionFailedFault" element="tns:MediaDeletionFailed" />
+    </wsdl:message>
+    
+    <wsdl:message name="MediaUpdateFailedFault">
+        <wsdl:part name="MediaUpdateFailedFault" element="tns:MediaUpdateFailed" />
+    </wsdl:message>
+    
+    <wsdl:portType name="MediaDirectory">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:media_directory_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getMediaContainer">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/MediaContainer" name="MediaContainerRequest" message="tns:MediaContainerRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/MediaContainerResponse" name="MediaContainerResponse" message="tns:MediaContainerResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="create">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/create" name="createRequest" message="tns:createRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/createResponse" name="createResponse" message="tns:createResponse" />
+            <wsdl:fault name="createMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="createMediaCreationFailed" message="tns:MediaCreationFailedFault" />
+            <wsdl:fault name="createSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="delete">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/delete" name="deleteRequest" message="tns:deleteRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/deleteResponse" name="deleteResponse" message="tns:deleteResponse" />
+            <wsdl:fault name="deleteMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="deleteMediaDeletionFailed" message="tns:MediaDeletionFailedFault" />
+            <wsdl:fault name="deleteSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="list">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/list" name="listRequest" message="tns:listRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/listResponse" name="listResponse" message="tns:listResponse" />
+            <wsdl:fault name="listMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="listInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="listSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="lookup">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookup" name="lookupRequest" message="tns:lookupRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupResponse" name="lookupResponse" message="tns:lookupResponse" />
+            <wsdl:fault name="lookupMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="lookupSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="lookupAsset">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupAsset" name="lookupAssetRequest" message="tns:lookupAssetRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupAssetResponse" name="lookupAssetResponse" message="tns:lookupAssetResponse" />
+            <wsdl:fault name="lookupAssetMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="lookupAssetSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/search" name="searchRequest" message="tns:searchRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/searchResponse" name="searchResponse" message="tns:searchResponse" />
+            <wsdl:fault name="searchMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="searchInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="searchSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="update">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/update" name="updateRequest" message="tns:updateRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/updateResponse" name="updateResponse" message="tns:updateResponse" />
+            <wsdl:fault name="updateMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="updateMediaUpdateFailed" message="tns:MediaUpdateFailedFault" />
+            <wsdl:fault name="updateSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="MediaAccess">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:media_access_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="lookupURLs">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupURLs" name="lookupURLsRequest" message="tns:lookupURLsRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupURLsResponse" name="lookupURLsResponse" message="tns:lookupURLsResponse" />
+            <wsdl:fault name="lookupURLsMediaNotFound" message="tns:MediaNotFoundFault" />
+            <wsdl:fault name="lookupURLsSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="MediaDirectoryHTTPBinding" type="tns:MediaDirectory">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getMediaContainer">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/MediaContainer"/>
+            <wsdl:input name="MediaContainerRequest"><soap11:body parts="getMediaContainer" use="literal"/></wsdl:input>
+            <wsdl:output name="MediaContainerResponse"><soap11:body parts="getMediaContainerResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="create">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/create"/>
+            <wsdl:input name="createRequest"><soap11:body parts="create" use="literal"/></wsdl:input>
+            <wsdl:output name="createResponse"><soap11:body parts="createResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="createMediaNotFound"><soap11:fault name="createMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="createMediaCreationFailed"><soap11:fault name="createMediaCreationFailed" use="literal"/></wsdl:fault>
+            <wsdl:fault name="createSecurityException"><soap11:fault name="createSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="delete">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/delete"/>
+            <wsdl:input name="deleteRequest"><soap11:body parts="delete" use="literal"/></wsdl:input>
+            <wsdl:output name="deleteResponse"><soap11:body parts="deleteResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="deleteMediaNotFound"><soap11:fault name="deleteMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="deleteMediaDeletionFailed"><soap11:fault name="deleteMediaDeletionFailed" use="literal"/></wsdl:fault>
+            <wsdl:fault name="deleteSecurityException"><soap11:fault name="deleteSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="list">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/list"/>
+            <wsdl:input name="listRequest"><soap11:body parts="list" use="literal"/></wsdl:input>
+            <wsdl:output name="listResponse"><soap11:body parts="listResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="listMediaNotFound"><soap11:fault name="listMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="listInvalidQuery"><soap11:fault name="listInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="listSecurityException"><soap11:fault name="listSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="lookup">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookup"/>
+            <wsdl:input name="lookupRequest"><soap11:body parts="lookup" use="literal"/></wsdl:input>
+            <wsdl:output name="lookupResponse"><soap11:body parts="lookupResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="lookupMediaNotFound"><soap11:fault name="lookupMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lookupSecurityException"><soap11:fault name="lookupSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="lookupAsset">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupAsset"/>
+            <wsdl:input name="lookupAssetRequest"><soap11:body parts="lookupAsset" use="literal"/></wsdl:input>
+            <wsdl:output name="lookupAssetResponse"><soap11:body parts="lookupAssetResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="lookupAssetMediaNotFound"><soap11:fault name="lookupAssetMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lookupAssetSecurityException"><soap11:fault name="lookupAssetSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/search"/>
+            <wsdl:input name="searchRequest"><soap11:body parts="search" use="literal"/></wsdl:input>
+            <wsdl:output name="searchResponse"><soap11:body parts="searchResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="searchMediaNotFound"><soap11:fault name="searchMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="searchInvalidQuery"><soap11:fault name="searchInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="searchSecurityException"><soap11:fault name="searchSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="update">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/update"/>
+            <wsdl:input name="updateRequest"><soap11:body parts="update" use="literal"/></wsdl:input>
+            <wsdl:output name="updateResponse"><soap11:body parts="updateResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="updateMediaNotFound"><soap11:fault name="updateMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="updateMediaUpdateFailed"><soap11:fault name="updateMediaUpdateFailed" use="literal"/></wsdl:fault>
+            <wsdl:fault name="updateSecurityException"><soap11:fault name="updateSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="MediaAccessHTTPBinding" type="tns:MediaAccess">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="lookupURLs">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaAccess/lookupURLs"/>
+            <wsdl:input name="lookupURLsRequest"><soap11:body parts="lookupURLs" use="literal"/></wsdl:input>
+            <wsdl:output name="lookupURLsResponse"><soap11:body parts="lookupURLsResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="lookupURLsMediaNotFound"><soap11:fault name="lookupURLsMediaNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lookupURLsSecurityException"><soap11:fault name="lookupURLsSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

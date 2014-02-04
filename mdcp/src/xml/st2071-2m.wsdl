@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DeviceMode"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/mode"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/mode"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+    
+    <wsdl:types>
+        <xs:schema 
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/mode" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2f.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="ModesRequest">
+        <wsdl:part name="getModes" element="tns:getModes" />
+    </wsdl:message>
+    
+    <wsdl:message name="ModesResponse">
+        <wsdl:part name="getModesResponse" element="tns:getModesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="ActiveModeRequest">
+        <wsdl:part name="getActiveMode" element="tns:getActiveMode" />
+    </wsdl:message>
+    
+    <wsdl:message name="ActiveModeResponse">
+        <wsdl:part name="getActiveModeResponse" element="tns:getActiveModeResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="changeModeRequest">
+        <wsdl:part name="changeMode" element="tns:changeMode" />
+    </wsdl:message>
+    
+    <wsdl:message name="changeModeResponse">
+        <wsdl:part name="changeModeResponse" element="tns:changeModeResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="InvalidModeFault">
+        <wsdl:part name="InvalidModeFault" element="tns:InvalidMode" />
+    </wsdl:message>
+    
+    <wsdl:message name="ModeExceptionFault">
+        <wsdl:part name="ModeExceptionFault" element="tns:ModeException" />
+    </wsdl:message>
+    
+    <wsdl:portType name="ModeSupport">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:mode_support_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getModes">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/Modes" name="ModesRequest" message="tns:ModesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/ModesResponse" name="ModesResponse" message="tns:ModesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getActiveMode">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/ActiveMode" name="ActiveModeRequest" message="tns:ActiveModeRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/ActiveModeResponse" name="ActiveModeResponse" message="tns:ActiveModeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="changeMode">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/changeMode" name="changeModeRequest" message="tns:changeModeRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/changeModeResponse" name="changeModeResponse" message="tns:changeModeResponse" />
+            <wsdl:fault name="changeModeInvalidMode" message="tns:InvalidModeFault" />
+            <wsdl:fault name="changeModeModeException" message="tns:ModeExceptionFault" />
+            <wsdl:fault name="changeModeSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="ModeSupportHTTPBinding" type="tns:ModeSupport">
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getModes">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/Modes"/>
+            <wsdl:input name="ModesRequest"><soap11:body parts="getModes" use="literal"/></wsdl:input>
+            <wsdl:output name="ModesResponse"><soap11:body parts="getModesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveMode">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/ActiveMode"/>
+            <wsdl:input name="ActiveModeRequest"><soap11:body parts="getActiveMode" use="literal"/></wsdl:input>
+            <wsdl:output name="ActiveModeResponse"><soap11:body parts="getActiveModeResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="changeMode">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/changeMode"/>
+            <wsdl:input name="changeModeRequest"><soap11:body parts="changeMode" use="literal"/></wsdl:input>
+            <wsdl:output name="changeModeResponse"><soap11:body parts="changeModeResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="changeModeInvalidMode"><soap11:fault name="changeModeInvalidMode" use="literal"/></wsdl:fault>
+            <wsdl:fault name="changeModeModeException"><soap11:fault name="changeModeModeException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="changeModeSecurityException"><soap11:fault name="changeModeSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

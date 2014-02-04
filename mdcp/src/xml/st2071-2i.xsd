@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/security" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:types="http://www.smpte-ra.org/schemas/st2071/2014/types"
+    xmlns:identity="http://www.smpte-ra.org/schemas/st2071/2014/identity"
+    elementFormDefault="qualified">
+    
+    <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
+        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2a.xsd" />
+    <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
+        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2b.xsd" />
+    
+    <xs:simpleType name="EXCEPTION_TYPE">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="AUTHENTICATION" />
+            <xs:enumeration value="AUTHORIZATION" />
+            <xs:enumeration value="SECURITY_LAYER" />
+        </xs:restriction>
+    </xs:simpleType>
+        
+    <xs:simpleType name="EXCEPTION_STATUS">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="REQUIRED" />
+            <xs:enumeration value="FAILED" />
+            <xs:enumeration value="ABORTED" />
+            <xs:enumeration value="ERROR" />
+            <xs:enumeration value="EXPIRED" />
+        </xs:restriction>
+    </xs:simpleType>
+        
+    <xs:simpleType name="PERMISSION_TYPE">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="READ" />
+            <xs:enumeration value="WRITE" />
+            <xs:enumeration value="EXECUTE" />
+            <xs:enumeration value="DELETE" />
+            <xs:enumeration value="ADMINISTER" />
+        </xs:restriction>
+    </xs:simpleType>
+        
+    <xs:complexType name="Subject">
+        <xs:sequence>
+            <xs:element ref="tns:Name" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Principals" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="Role">
+        <xs:sequence>
+            <xs:element ref="tns:Parent" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Name" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="Roles">
+        <xs:sequence>
+            <xs:element ref="tns:Role" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="Principal">
+        <xs:sequence>
+            <xs:element ref="tns:Realm" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Identifier" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Roles" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Tokens" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="Principals">
+        <xs:sequence>
+            <xs:element ref="tns:Principal" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="SecurityToken">
+        <xs:sequence>
+            <xs:element ref="tns:Mechanism" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Data" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:ValidTill" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="SecurityTokens">
+        <xs:sequence>
+            <xs:element ref="tns:SecurityToken" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="Permission">
+        <xs:sequence>
+            <xs:element ref="tns:Roles" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Allow" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Permissions" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Resource" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="SecurityException">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+                <xs:sequence>
+                    <xs:element ref="tns:Type"  minOccurs="1" maxOccurs="1" />
+                    <xs:element ref="tns:Status" minOccurs="1" maxOccurs="1" />
+                    <xs:element ref="tns:Resource" />
+                    <xs:element ref="tns:Subject" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="Permissions">
+        <xs:sequence>
+            <xs:element ref="tns:PERMISSION_TYPE" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="Mechanisms">
+        <xs:sequence>
+            <xs:element ref="tns:Mechanism" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="Mechanisms" type="tns:Mechanisms" />
+
+    <xs:element name="ValidTill" type="types:DateTime" />
+    <xs:element name="PERMISSION_TYPE" type="tns:PERMISSION_TYPE" />
+    <xs:element name="Allow" type="xs:boolean" />
+    <xs:element name="Permissions" type="tns:Permissions" />
+    <xs:element name="Parent" type="tns:Role" />
+    <xs:element name="Mechanism" type="xs:string" />
+    <xs:element name="Realm" type="xs:string" />
+    <xs:element name="Identifier" type="xs:string" />
+    <xs:element name="Name" type="xs:string" />
+    <xs:element name="Data" type="xs:base64Binary" />
+    <xs:element name="Type" type="tns:EXCEPTION_TYPE" />
+    <xs:element name="Status" type="tns:EXCEPTION_STATUS" />
+    <xs:element name="Resource" type="identity:URI" />
+    <xs:element name="Tokens" type="tns:SecurityTokens" />
+    
+    <xs:element name="Role" type="tns:Principal" />
+    <xs:element name="Roles" type="tns:Principals" />
+    <xs:element name="Principal" type="tns:Principal" />
+    <xs:element name="Principals" type="tns:Principals" />
+    <xs:element name="Subject" type="tns:Subject" />
+    <xs:element name="SecurityToken" type="tns:SecurityToken" />
+    <xs:element name="SecurityTokens" type="tns:SecurityTokens" />
+    <xs:element name="EXCEPTION_TYPE" type="tns:EXCEPTION_TYPE" />
+    <xs:element name="EXCEPTION_STATUS" type="tns:EXCEPTION_STATUS" />
+    <xs:element name="SecurityException" type="tns:SecurityException" substitutionGroup="types:Exception" />
+    
+    <!-- WSDL Elements and Types -->
+    <xs:complexType name="getMechanisms">
+        <xs:sequence/>
+    </xs:complexType>
+    
+    <xs:element name="getMechanisms" type="tns:getMechanisms" />
+    
+    <xs:complexType name="getMechanismsResponse">
+        <xs:sequence>
+            <xs:element ref="tns:Mechanisms" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="getMechanismsResponse" type="tns:getMechanismsResponse" />
+    
+    <xs:complexType name="authorize">
+        <xs:sequence>
+            <xs:element ref="tns:Subject" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="identity:URI" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="authorize" type="tns:authorize" />
+    
+    <xs:complexType name="authorizeResponse">
+        <xs:sequence>
+            <xs:element ref="tns:Subject" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="authorizeResponse" type="tns:authorizeResponse" />
+    
+    <xs:complexType name="authenticate">
+        <xs:sequence>
+            <xs:element ref="tns:Subject" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="authenticate" type="tns:authenticate" />
+    
+    <xs:complexType name="authenticateResponse">
+        <xs:sequence>
+            <xs:element ref="tns:Subject" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="authenticateResponse" type="tns:authenticateResponse" />
+    
+    <xs:complexType name="logout">
+        <xs:sequence>
+            <xs:element ref="tns:Subject" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="logout" type="tns:logout" />
+    
+    <xs:complexType name="logoutResponse">
+        <xs:sequence>
+            <xs:element ref="tns:Subject" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="logoutResponse" type="tns:logoutResponse" />
+</xs:schema>

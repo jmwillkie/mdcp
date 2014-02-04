@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DeviceEvent"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/event"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+    
+    <wsdl:types>
+        <xs:schema 
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/event" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2e.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="StatusRequest">
+        <wsdl:part name="getStatus" element="tns:getStatus" />
+    </wsdl:message>
+    
+    <wsdl:message name="StatusResponse">
+        <wsdl:part name="getStatusResponse" element="tns:getStatusResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="pollRequest">
+        <wsdl:part name="poll" element="tns:poll" />
+    </wsdl:message>
+    
+    <wsdl:message name="pollResponse">
+        <wsdl:part name="pollResponse" element="tns:pollResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="registerCallbackRequest">
+        <wsdl:part name="registerCallback" element="tns:registerCallback" />
+    </wsdl:message>
+    
+    <wsdl:message name="registerCallbackResponse">
+        <wsdl:part name="registerCallbackResponse" element="tns:registerCallbackResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="unregisterCallbackRequest">
+        <wsdl:part name="unregisterCallback" element="tns:unregisterCallback" />
+    </wsdl:message>
+    
+    <wsdl:message name="unregisterCallbackResponse">
+        <wsdl:part name="unregisterCallbackResponse" element="tns:unregisterCallbackResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="callbackRequest">
+        <wsdl:part name="callback" element="tns:callback" />
+    </wsdl:message>
+    
+    <wsdl:message name="registeredRequest">
+        <wsdl:part name="registered" element="tns:registered" />
+    </wsdl:message>
+    
+    <wsdl:message name="unregisteredRequest">
+        <wsdl:part name="unregistered" element="tns:unregistered" />
+    </wsdl:message>
+    
+    <wsdl:message name="heartbeatRequest">
+        <wsdl:part name="heartbeat" element="tns:heartbeat" />
+    </wsdl:message>
+    
+    <wsdl:message name="heartbeatResponse">
+        <wsdl:part name="heartbeatResponse" element="tns:heartbeatResponse" />
+    </wsdl:message>
+    
+    <wsdl:portType name="StatusSupport">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:status_support_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getStatus">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/StatusSupport/Status" name="StatusRequest" message="tns:StatusRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/StatusSupport/StatusResponse" name="StatusResponse" message="tns:StatusResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="Eventer">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:eventer_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="poll">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/Eventer/poll" name="pollRequest" message="tns:pollRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/Eventer/pollResponse" name="pollResponse" message="tns:pollResponse" />
+            <wsdl:fault name="pollSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="EventBroadcaster">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:event_broadcaster_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="registerCallback">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/EventBroadcaster/registerCallback" name="registerCallbackRequest" message="tns:registerCallbackRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/EventBroadcaster/registerCallbackResponse" name="registerCallbackResponse" message="tns:registerCallbackResponse" />
+            <wsdl:fault name="registerCallbackSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="unregisterCallback">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/EventBroadcaster/unregisterCallback" name="unregisterCallbackRequest" message="tns:unregisterCallbackRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/EventBroadcaster/unregisterCallbackResponse" name="unregisterCallbackResponse" message="tns:unregisterCallbackResponse" />
+            <wsdl:fault name="unregisterCallbackSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="CallbackHandler">
+        <wsdl:documentation>
+            The CallbackHandler Interface is a Client Side Interface Used to Receive Asynchronous Events
+        </wsdl:documentation>
+        <wsdl:operation name="callback">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/callback" name="callbackRequest" message="tns:callbackRequest" />
+            <!-- wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/callbackResponse" name="callbackResponse" message="tns:callbackResponse" / -->
+        </wsdl:operation>
+        <wsdl:operation name="registered">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/registered" name="registeredRequest" message="tns:registeredRequest" />
+            <!-- wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/registeredesponse" name="registeredesponse" message="tns:registeredResponse" / -->
+        </wsdl:operation>
+        <wsdl:operation name="unregistered">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/unregistered" name="unregisteredRequest" message="tns:unregisteredRequest" />
+            <!-- wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/unregisteredesponse" name="unregisteredesponse" message="tns:unregisteredResponse" / -->
+        </wsdl:operation>
+        <wsdl:operation name="heartbeat">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/heartbeat" name="heartbeatRequest" message="tns:heartbeatRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/event/CallbackHandler/heartbeatResponse" name="heartbeatResponse" message="tns:heartbeatResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="StatusSupportHTTPBinding" type="tns:StatusSupport">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getStatus">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/event/StatusSupport/Status" style="document" />
+            <wsdl:input name="StatusRequest"><soap11:body parts="getStatus" use="literal"/></wsdl:input>
+            <wsdl:output name="StatusResponse"><soap11:body parts="getStatusResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="EventerHTTPBinding" type="tns:Eventer">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="poll">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/eventer/poll" style="document" />
+            <wsdl:input name="pollRequest"><soap11:body parts="poll" use="literal"/></wsdl:input>
+            <wsdl:output name="pollResponse"><soap11:body parts="pollResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="pollSecurityException"><soap11:fault name="pollSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="EventBroadcasterHTTPBinding" type="tns:EventBroadcaster">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="registerCallback">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/eventBroadcaster/registerCallback" style="document" />
+            <wsdl:input name="registerCallbackRequest"><soap11:body parts="registerCallback" use="literal"/></wsdl:input>
+            <wsdl:output name="registerCallbackResponse"><soap11:body parts="registerCallbackResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="registerCallbackSecurityException"><soap11:fault name="registerCallbackSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="unregisterCallback">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/eventBroadcaster/unregisterCallback" style="document" />
+            <wsdl:input name="unregisterCallbackRequest"><soap11:body parts="unregisterCallback" use="literal"/></wsdl:input>
+            <wsdl:output name="unregisterCallbackResponse"><soap11:body parts="unregisterCallbackResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="unregisterCallbackSecurityException"><soap11:fault name="unregisterCallbackSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="CallbackHandlerHTTPBinding" type="tns:CallbackHandler">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="callback">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/event/CallbackHandler/callback" style="document" />
+            <wsdl:input name="callbackRequest"><soap11:body parts="callback" use="literal"/></wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="registered">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/event/CallbackHandler/registered" style="document" />
+            <wsdl:input name="registeredRequest"><soap11:body parts="registered" use="literal"/></wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="unregistered">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/event/CallbackHandler/unregistered" style="document" />
+            <wsdl:input name="unregisteredRequest"><soap11:body parts="unregistered" use="literal"/></wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>
