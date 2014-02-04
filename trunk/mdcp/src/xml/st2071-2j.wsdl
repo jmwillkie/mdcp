@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Device"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/device"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/device"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:query="http://www.smpte-ra.org/schemas/st2071/2014/query"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2o.wsdl" />
+    
+    <wsdl:types>
+        <xs:schema
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/device" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2c.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="bindRequest">
+        <wsdl:part name="bind" element="tns:bind" />
+    </wsdl:message>
+    
+    <wsdl:message name="unbindRequest">
+        <wsdl:part name="unbind" element="tns:unbind" />
+    </wsdl:message>
+    
+    <wsdl:message name="setOnlineRequest">
+        <wsdl:part name="setOnline" element="tns:setOnline" />
+    </wsdl:message>
+    
+    <wsdl:message name="UDNRequest">
+        <wsdl:part name="getUDN" element="tns:getUDN" />
+    </wsdl:message>
+    
+    <wsdl:message name="URLsRequest">
+        <wsdl:part name="getURLs" element="tns:getURLs" />
+    </wsdl:message>
+    
+    <wsdl:message name="NameRequest">
+        <wsdl:part name="getName" element="tns:getName" />
+    </wsdl:message>
+    
+    <wsdl:message name="OnlineRequest">
+        <wsdl:part name="getOnline" element="tns:getOnline" />
+    </wsdl:message>
+    
+    <wsdl:message name="AttributesRequest">
+        <wsdl:part name="getAttributes" element="tns:getAttributes" />
+    </wsdl:message>
+    
+    <wsdl:message name="CapabilitiesRequest">
+        <wsdl:part name="getCapabilities" element="tns:getCapabilities" />
+    </wsdl:message>
+    
+    <wsdl:message name="ParentDeviceDirectoryRequest">
+        <wsdl:part name="getParentDeviceDirectory" element="tns:getParentDeviceDirectory" />
+    </wsdl:message>
+    
+    <wsdl:message name="NamespacesRequest">
+        <wsdl:part name="getNamespaces" element="tns:getNamespaces" />
+    </wsdl:message>
+    
+    <wsdl:message name="ancestorsRequest">
+        <wsdl:part name="ancestors" element="tns:ancestors" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupRequest">
+        <wsdl:part name="lookup" element="tns:lookup" />
+    </wsdl:message>
+    
+    <wsdl:message name="parentRequest">
+        <wsdl:part name="parent" element="tns:parent" />
+    </wsdl:message>
+    
+    <wsdl:message name="childrenRequest">
+        <wsdl:part name="children" element="tns:children" />
+    </wsdl:message>
+    
+    <wsdl:message name="siblingsRequest">
+        <wsdl:part name="siblings" element="tns:siblings" />
+    </wsdl:message>
+    
+    <wsdl:message name="searchRequest">
+        <wsdl:part name="search" element="tns:search" />
+    </wsdl:message>
+    
+    <wsdl:message name="UDNResponse">
+        <wsdl:part name="getUDNResponse" element="tns:getUDNResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="URLsResponse">
+        <wsdl:part name="getURLsResponse" element="tns:getURLsResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="NameResponse">
+        <wsdl:part name="getNameResponse" element="tns:getNameResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="OnlineResponse">
+        <wsdl:part name="getOnlineResponse" element="tns:getOnlineResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="AttributesResponse">
+        <wsdl:part name="getAttributesResponse" element="tns:getAttributesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="CapabilitiesResponse">
+        <wsdl:part name="getCapabilitiesResponse" element="tns:getCapabilitiesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="ParentDeviceDirectoryResponse">
+        <wsdl:part name="getParentDeviceDirectoryResponse" element="tns:getParentDeviceDirectoryResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="NamespacesResponse">
+        <wsdl:part name="getNamespacesResponse" element="tns:getNamespacesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="ancestorsResponse">
+        <wsdl:part name="ancestorsResponse" element="tns:ancestorsResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupResponse">
+        <wsdl:part name="lookupResponse" element="tns:lookupResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="parentResponse">
+        <wsdl:part name="parentResponse" element="tns:parentResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="childrenResponse">
+        <wsdl:part name="childrenResponse" element="tns:childrenResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="siblingsResponse">
+        <wsdl:part name="siblingsResponse" element="tns:siblingsResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="searchResponse">
+        <wsdl:part name="searchResponse" element="tns:searchResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="bindResponse">
+        <wsdl:part name="bindResponse" element="tns:bindResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="unbindResponse">
+        <wsdl:part name="unbindResponse" element="tns:unbindResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="setOnlineResponse">
+        <wsdl:part name="setOnlineResponse" element="tns:setOnlineResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="DeviceNotFoundFault">
+        <wsdl:part name="DeviceNotFoundFault" element="tns:DeviceNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="DeviceNotBoundFault">
+        <wsdl:part name="DeviceNotBoundFault" element="tns:DeviceNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="DeviceNotUnboundFault">
+        <wsdl:part name="DeviceNotUnboundFault" element="tns:DeviceNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="DeviceAlreadyBoundFault">
+        <wsdl:part name="DeviceAlreadyBoundFault" element="tns:DeviceNotFound" />
+    </wsdl:message>
+    
+    <wsdl:portType name="Device">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:device_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getUDN">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/UDN" name="UDNRequest" message="tns:UDNRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/UDNResponse" name="UDNResponse" message="tns:UDNResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getURLs">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/URLs" name="URLsRequest" message="tns:URLsRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/URLsResponse" name="URLsResponse" message="tns:URLsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getName">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Name" name="NameRequest" message="tns:NameRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/NameResponse" name="NameResponse" message="tns:NameResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getOnline">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Online" name="OnlineRequest" message="tns:OnlineRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/OnlineResponse" name="OnlineResponse" message="tns:OnlineResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getAttributes">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Attributes" name="AttributesRequest" message="tns:AttributesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/AttributesResponse" name="AttributesResponse" message="tns:AttributesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getCapabilities">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Capabilities" name="CapabilitiesRequest" message="tns:CapabilitiesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/CapabilitiesResponse" name="CapabilitiesResponse" message="tns:CapabilitiesResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="DeviceDirectory">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:device_directory_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getParentDeviceDirectory">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/ParentDeviceDirectory" name="ParentDeviceDirectoryRequest" message="tns:ParentDeviceDirectoryRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/ParentDeviceDirectoryResponse" name="ParentDeviceDirectoryResponse" message="tns:ParentDeviceDirectoryResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getNamespaces">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/Namespaces" name="NamespacesRequest" message="tns:NamespacesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/NamespacesResponse" name="NamespacesResponse" message="tns:NamespacesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ancestors">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/ancestors" name="ancestorsRequest" message="tns:ancestorsRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/ancestorsResponse" name="ancestorsResponse" message="tns:ancestorsResponse" />
+            <wsdl:fault name="ancestorsDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="ancestorsSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="lookup">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/lookup" name="lookupRequest" message="tns:lookupRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/lookupResponse" name="lookupResponse" message="tns:lookupResponse" />
+            <wsdl:fault name="lookupDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="lookupSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="parent">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/parent" name="parentRequest" message="tns:parentRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/parentResponse" name="parentResponse" message="tns:parentResponse" />
+            <wsdl:fault name="parentDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="parentSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="children">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/children" name="childrenRequest" message="tns:childrenRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/childrenResponse" name="childrenResponse" message="tns:childrenResponse" />
+            <wsdl:fault name="childrenDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="childrenInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="childrenSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="siblings">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/siblings" name="siblingsRequest" message="tns:siblingsRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/siblingsResponse" name="siblingsResponse" message="tns:siblingsResponse" />
+            <wsdl:fault name="siblingsDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="siblingsInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="siblingsSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/search" name="searchRequest" message="tns:searchRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceDirectory/searchResponse" name="searchResponse" message="tns:searchResponse"  />
+            <wsdl:fault name="searchDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="searchInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="searchSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="DeviceRegistry">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:device_registry_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="bind">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceRegistry/bind" name="bindRequest" message="tns:bindRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceRegistry/bindResponse" name="bindResponse" message="tns:bindResponse" />
+            <wsdl:fault name="bindDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="bindDeviceNotBound" message="tns:DeviceNotBoundFault" />
+            <wsdl:fault name="bindDeviceAlreadyBound" message="tns:DeviceAlreadyBoundFault" />
+            <wsdl:fault name="bindSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="unbind">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceRegistry/unbind" name="unbindRequest" message="tns:unbindRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceRegistry/unbindResponse" name="unbindResponse" message="tns:unbindResponse" />
+            <wsdl:fault name="unbindDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="unbindDeviceNotUnbound" message="tns:DeviceNotUnboundFault" />
+            <wsdl:fault name="unbindSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="setOnline">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceRegistry/setOnline" name="setOnlineRequest" message="tns:setOnlineRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/device/DeviceRegistry/setOnlineResponse" name="setOnlineResponse" message="tns:setOnlineResponse" />
+            <wsdl:fault name="setOnlineDeviceNotFound" message="tns:DeviceNotFoundFault" />
+            <wsdl:fault name="setOnlineSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="DeviceHTTPBinding" type="tns:Device">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getUDN">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/Device/UDN" style="document" />
+            <wsdl:input name="UDNRequest"><soap11:body parts="getUDN" use="literal"/></wsdl:input>
+            <wsdl:output name="UDNResponse"><soap11:body parts="getUDNResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getURLs">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/Device/URLs" style="document" />
+            <wsdl:input name="URLsRequest"><soap11:body parts="getURLs" use="literal"/></wsdl:input>
+            <wsdl:output name="URLsResponse"><soap11:body parts="getURLsResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getName">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Name" style="document" />
+            <wsdl:input name="NameRequest"><soap11:body parts="getName" use="literal"/></wsdl:input>
+            <wsdl:output name="NameResponse"><soap11:body parts="getNameResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOnline">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Online" style="document" />
+            <wsdl:input name="OnlineRequest"><soap11:body parts="getOnline" use="literal"/></wsdl:input>
+            <wsdl:output name="OnlineResponse"><soap11:body parts="getOnlineResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAttributes">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Attributes" style="document" />
+            <wsdl:input name="AttributesRequest"><soap11:body parts="getAttributes" use="literal"/></wsdl:input>
+            <wsdl:output name="AttributesResponse"><soap11:body parts="getAttributesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCapabilities">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Capabilities" style="document" />
+            <wsdl:input name="CapabilitiesRequest"><soap11:body parts="getCapabilities" use="literal"/></wsdl:input>
+            <wsdl:output name="CapabilitiesResponse"><soap11:body parts="getCapabilitiesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="DeviceDirectoryHTTPBinding" type="tns:DeviceDirectory">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getParentDeviceDirectory">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/ParentDeviceDirectory" style="document" />
+            <wsdl:input name="ParentDeviceDirectoryRequest"><soap11:body parts="getParentDeviceDirectory" use="literal"/></wsdl:input>
+            <wsdl:output name="ParentDeviceDirectoryResponse"><soap11:body parts="getParentDeviceDirectoryResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getNamespaces">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/Namespaces" style="document" />
+            <wsdl:input name="NamespacesRequest"><soap11:body parts="getNamespaces" use="literal"/></wsdl:input>
+            <wsdl:output name="NamespacesResponse"><soap11:body parts="getNamespacesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ancestors">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/ancestors" style="document" />
+            <wsdl:input name="ancestorsRequest"><soap11:body parts="ancestors" use="literal"/></wsdl:input>
+            <wsdl:output name="ancestorsResponse"><soap11:body parts="ancestorsResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="ancestorsDeviceNotFound"><soap11:fault name="ancestorsDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="ancestorsSecurityException"><soap11:fault name="ancestorsSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="lookup">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/lookup" style="document" />
+            <wsdl:input name="lookupRequest"><soap11:body parts="lookup" use="literal"/></wsdl:input>
+            <wsdl:output name="lookupResponse"><soap11:body parts="lookupResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="lookupDeviceNotFound"><soap11:fault name="lookupDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lookupSecurityException"><soap11:fault name="lookupSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="parent">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/parent" style="document" />
+            <wsdl:input name="parentRequest"><soap11:body parts="parent" use="literal"/></wsdl:input>
+            <wsdl:output name="parentResponse"><soap11:body parts="parentResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="parentDeviceNotFound"><soap11:fault name="parentDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="parentSecurityException"><soap11:fault name="parentSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="children">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/children" style="document" />
+            <wsdl:input name="childrenRequest"><soap11:body parts="children" use="literal"/></wsdl:input>
+            <wsdl:output name="childrenResponse"><soap11:body parts="childrenResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="childrenDeviceNotFound"><soap11:fault name="childrenDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="childrenInvalidQuery"><soap11:fault name="childrenInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="childrenSecurityException"><soap11:fault name="childrenSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="siblings">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/siblings" style="document" />
+            <wsdl:input name="siblingsRequest"><soap11:body parts="siblings" use="literal"/></wsdl:input>
+            <wsdl:output name="siblingsResponse"><soap11:body parts="siblingsResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="siblingsDeviceNotFound"><soap11:fault name="siblingsDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="siblingsInvalidQuery"><soap11:fault name="siblingsInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="siblingsSecurityException"><soap11:fault name="siblingsSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/search" style="document" />
+            <wsdl:input name="searchRequest"><soap11:body parts="search" use="literal"/></wsdl:input>
+            <wsdl:output name="searchResponse"><soap11:body parts="searchResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="searchDeviceNotFound"><soap11:fault name="searchDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="searchInvalidQuery"><soap11:fault name="searchInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="searchSecurityException"><soap11:fault name="searchSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="DeviceRegistryHTTPBinding" type="tns:DeviceRegistry">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="bind">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/bind" style="document" />
+            <wsdl:input name="bindRequest"><soap11:body parts="bind" use="literal"/></wsdl:input>
+            <wsdl:output name="bindResponse"><soap11:body parts="bindResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="bindDeviceNotFound"><soap11:fault name="bindDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="bindDeviceNotBound"><soap11:fault name="bindDeviceNotBound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="bindDeviceAlreadyBound"><soap11:fault name="bindDeviceAlreadyBound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="bindSecurityException"><soap11:fault name="bindSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="unbind">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/unbind" style="document" />
+            <wsdl:input name="unbindRequest"><soap11:body parts="unbind" use="literal"/></wsdl:input>
+            <wsdl:output name="unbindResponse"><soap11:body parts="unbindResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="unbindDeviceNotFound"><soap11:fault name="unbindDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unbindDeviceNotUnbound"><soap11:fault name="unbindDeviceNotUnbound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unbindSecurityException"><soap11:fault name="unbindSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setOnline">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/setOnline" style="document" />
+            <wsdl:input name="setOnlineRequest"><soap11:body parts="setOnline" use="literal"/></wsdl:input>
+            <wsdl:output name="setOnlineResponse"><soap11:body parts="setOnlineResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="setOnlineDeviceNotFound"><soap11:fault name="setOnlineDeviceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="setOnlineSecurityException"><soap11:fault name="setOnlineSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

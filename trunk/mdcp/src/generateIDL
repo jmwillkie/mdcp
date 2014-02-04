@@ -1,0 +1,31 @@
+#!/bin/sh
+BASE=`dirname $0`
+SOURCE=$BASE/src;
+IDL_SOURCE=$SOURCE/idl;
+GENERATED=$BASE/generated;
+GENERATED_SOURCE=$GENERATED/src;
+GENERATED_JAVA_SOURCE=$GENERATED_SOURCE/java;
+CLASSES=$BASE/classes
+
+if [ -d $GENERATED ]; then
+    echo $GENERATED directory already exists;
+else
+    echo creating directory $GENERATED;
+    mkdir $GENERATED
+fi
+
+if [ -d $GENERATED_SOURCE ]; then
+    echo $GENERATED_SOURCE directory already exists;
+else
+    echo creating directory $GENERATED_SOURCE;
+    mkdir $GENERATED_SOURCE
+fi
+
+if [ -d $GENERATED_JAVA_SOURCE ]; then
+    echo $GENERATED_JAVA_SOURCE directory already exists;
+else
+    echo creating directory $GENERATED_JAVA_SOURCE;
+    mkdir $GENERATED_JAVA_SOURCE
+fi
+
+idlj -v -td $GENERATED_JAVA_SOURCE $IDL_SOURCE/MDCF.idl

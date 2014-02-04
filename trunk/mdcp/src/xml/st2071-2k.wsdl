@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DeviceControl"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/session"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/session"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+    
+    <wsdl:types>
+        <xs:schema 
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/session" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2d.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="getAcquiredRequest">
+        <wsdl:part name="getAcquired" element="tns:getAcquired" />
+    </wsdl:message>
+    
+    <wsdl:message name="getAcquiredResponse">
+        <wsdl:part name="getAcquiredResponse" element="tns:getAcquiredResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="getAcquiredByRequest">
+        <wsdl:part name="getAcquiredBy" element="tns:getAcquiredBy" />
+    </wsdl:message>
+    
+    <wsdl:message name="getAcquiredByResponse">
+        <wsdl:part name="getAcquiredByResponse" element="tns:getAcquiredByResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="acquireRequest">
+        <wsdl:part name="acquire" element="tns:acquire" />
+    </wsdl:message>
+    
+    <wsdl:message name="acquireResponse">
+        <wsdl:part name="acquireResponse" element="tns:acquireResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="approveRequest">
+        <wsdl:part name="approve" element="tns:approve" />
+    </wsdl:message>
+    
+    <wsdl:message name="approveResponse">
+        <wsdl:part name="approveResponse" element="tns:approveResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="denyRequest">
+        <wsdl:part name="deny" element="tns:deny" />
+    </wsdl:message>
+    
+    <wsdl:message name="denyResponse">
+        <wsdl:part name="denyResponse" element="tns:denyResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="requestRequest">
+        <wsdl:part name="request" element="tns:request" />
+    </wsdl:message>
+    
+    <wsdl:message name="requestResponse">
+        <wsdl:part name="requestResponse" element="tns:requestResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="takeRequest">
+        <wsdl:part name="take" element="tns:take" />
+    </wsdl:message>
+    
+    <wsdl:message name="takeResponse">
+        <wsdl:part name="takeResponse" element="tns:takeResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="releaseRequest">
+        <wsdl:part name="release" element="tns:release" />
+    </wsdl:message>
+    
+    <wsdl:message name="releaseResponse">
+        <wsdl:part name="releaseResponse" element="tns:releaseResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="getLockedRequest">
+        <wsdl:part name="getLocked" element="tns:getLocked" />
+    </wsdl:message>
+    
+    <wsdl:message name="getLockedResponse">
+        <wsdl:part name="getLockedResponse" element="tns:getLockedResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="getLockedByRequest">
+        <wsdl:part name="getLockedBy" element="tns:getLockedBy" />
+    </wsdl:message>
+    
+    <wsdl:message name="getLockedByResponse">
+        <wsdl:part name="getLockedByResponse" element="tns:getLockedByResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="lockRequest">
+        <wsdl:part name="lock" element="tns:lock" />
+    </wsdl:message>
+    
+    <wsdl:message name="lockResponse">
+        <wsdl:part name="lockResponse" element="tns:lockResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="unlockRequest">
+        <wsdl:part name="unlock" element="tns:unlock" />
+    </wsdl:message>
+    
+    <wsdl:message name="unlockResponse">
+        <wsdl:part name="unlockResponse" element="tns:unlockResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="NotAcquiredFault">
+        <wsdl:part name="NotAcquiredFault" element="tns:NotAcquired" />
+    </wsdl:message>
+    
+    <wsdl:message name="LockedFault">
+        <wsdl:part name="LockedFault" element="tns:Locked" />
+    </wsdl:message>
+    
+    <wsdl:message name="NotLockedFault">
+        <wsdl:part name="NotLockedFault" element="tns:NotLocked" />
+    </wsdl:message>
+    
+    <wsdl:message name="TooManySessionsFault">
+        <wsdl:part name="TooManySessionsFault" element="tns:TooManySessions" />
+    </wsdl:message>
+    
+    <wsdl:message name="NameInUseFault">
+        <wsdl:part name="NameInUseFault" element="tns:NameInUse" />
+    </wsdl:message>
+    
+    <wsdl:message name="RequestNotFoundFault">
+        <wsdl:part name="RequestNotFoundFault" element="tns:RequestNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="RequestExpiredFault">
+        <wsdl:part name="RequestExpiredFault" element="tns:RequestExpired" />
+    </wsdl:message>
+    
+    <wsdl:message name="RequestDeniedFault">
+        <wsdl:part name="RequestDeniedFault" element="tns:RequestDenied" />
+    </wsdl:message>
+    
+    <wsdl:message name="SessionNotFoundFault">
+        <wsdl:part name="SessionNotFoundFault" element="tns:SessionNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="LockNotFoundFault">
+        <wsdl:part name="LockNotFoundFault" element="tns:LockNotFound" />
+    </wsdl:message>
+    
+    <wsdl:message name="SessionTakenFault">
+        <wsdl:part name="SessionTakenFault" element="tns:SessionTaken" />
+    </wsdl:message>
+    
+    <wsdl:message name="LockTakenFault">
+        <wsdl:part name="LockTakenFault" element="tns:LockTaken" />
+    </wsdl:message>
+    
+    <wsdl:portType name="Acquirable">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:acquirable_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getAcquired">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/Acquired" name="getAcquiredRequest" message="tns:getAcquiredRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/AcquiredResponse" name="getAcquiredResponse" message="tns:getAcquiredResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getAcquiredBy">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/AcquiredBy" name="getAcquiredByRequest" message="tns:getAcquiredByRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/AcquiredByResponse" name="getAcquiredByResponse" message="tns:getAcquiredByResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="acquire">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/acquire" name="acquireRequest" message="tns:acquireRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/acquireResponse" name="acquireResponse" message="tns:acquireResponse" />
+            <wsdl:fault name="acquireNotAcquired" message="tns:NotAcquiredFault" />
+            <wsdl:fault name="acquireLocked" message="tns:LockedFault" />
+            <wsdl:fault name="acquireTooManySessions" message="tns:TooManySessionsFault" />
+            <wsdl:fault name="acquireNameInUse" message="tns:NameInUseFault" />
+            <wsdl:fault name="acquireSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="release">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/release" name="releaseRequest" message="tns:releaseRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Acquirable/releaseResponse" name="releaseResponse" message="tns:releaseResponse" />
+            <wsdl:fault name="releaseNotAcquired" message="tns:NotAcquiredFault" />
+            <wsdl:fault name="releaseLocked" message="tns:LockedFault" />
+            <wsdl:fault name="releaseSessionNotFound" message="tns:SessionNotFoundFault" />
+            <wsdl:fault name="releaseSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="Lockable">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:lockable_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getLocked">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/Locked" name="getLockedRequest" message="tns:getLockedRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/LockedResponse" name="getLockedResponse" message="tns:getLockedResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getLockedBy">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/LockedBy" name="getLockedByRequest" message="tns:getLockedByRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/LockedByResponse" name="getLockedByResponse" message="tns:getLockedByResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="lock">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/lock" name="lockRequest" message="tns:lockRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/lockResponse" name="lockResponse" message="tns:lockResponse" />
+            <wsdl:fault name="lockSessionNotFound" message="tns:SessionNotFoundFault" />
+            <wsdl:fault name="lockNotLocked" message="tns:NotLockedFault" />
+            <wsdl:fault name="lockNotAcquired" message="tns:NotAcquiredFault" />
+            <wsdl:fault name="lockSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="unlock">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/unlock" name="unlockRequest" message="tns:unlockRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Lockable/unlockResponse" name="unlockResponse" message="tns:unlockResponse" />
+            <wsdl:fault name="unlockLockNotFound" message="tns:LockNotFoundFault" />
+            <wsdl:fault name="unlockNotLocked" message="tns:NotLockedFault" />
+            <wsdl:fault name="unlockNotAcquired" message="tns:NotAcquiredFault" />
+            <wsdl:fault name="unlockSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="Requestable">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:requestable_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="approve">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/approve" name="approveRequest" message="tns:approveRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/approveResponse" name="approveResponse" message="tns:approveResponse" />
+            <wsdl:fault name="approveRequestNotFound" message="tns:RequestNotFoundFault" />
+            <wsdl:fault name="approveRequestExpired" message="tns:RequestExpiredFault" />
+            <wsdl:fault name="approveSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="deny">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/deny" name="denyRequest" message="tns:denyRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/denyResponse" name="denyResponse" message="tns:denyResponse" />
+            <wsdl:fault name="denyRequestNotFound" message="tns:RequestNotFoundFault" />
+            <wsdl:fault name="denyRequestExpired" message="tns:RequestExpiredFault" />
+            <wsdl:fault name="denySecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="request">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/request" name="requestRequest" message="tns:requestRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/requestResponse" name="requestResponse" message="tns:requestResponse" />
+            <wsdl:fault name="requestSessionNotFound" message="tns:SessionNotFoundFault" />
+            <wsdl:fault name="requestRequestDenied" message="tns:RequestDeniedFault" />
+            <wsdl:fault name="requestNotAcquired" message="tns:NotAcquiredFault" />
+            <wsdl:fault name="requestSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="take">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/take" name="takeRequest" message="tns:takeRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/takeResponse" name="takeResponse" message="tns:takeResponse" />
+            <wsdl:fault name="takeSessionNotFound" message="tns:SessionNotFoundFault" />
+            <wsdl:fault name="takeLockNotFound" message="tns:LockNotFoundFault" />
+            <wsdl:fault name="takeNotAcquired" message="tns:NotAcquiredFault" />
+            <wsdl:fault name="takeSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:binding name="AcquirableHTTPBinding" type="tns:Acquirable">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getAcquired">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Acquirable/Acquired"/>
+            <wsdl:input name="getAcquiredRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="getAcquiredResponse"><soap11:body use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAcquiredBy">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Acquirable/AcquiredBy"/>
+            <wsdl:input name="getAcquiredByRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="getAcquiredByResponse"><soap11:body use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="acquire">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Acquirable/acquire"/>
+            <wsdl:input name="acquireRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="acquireResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="acquireNotAcquired"><soap11:fault name="acquireNotAcquired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="acquireLocked"><soap11:fault name="acquireLocked" use="literal"/></wsdl:fault>
+            <wsdl:fault name="acquireTooManySessions"><soap11:fault name="acquireTooManySessions" use="literal"/></wsdl:fault>
+            <wsdl:fault name="acquireNameInUse"><soap11:fault name="acquireNameInUse" use="literal"/></wsdl:fault>
+            <wsdl:fault name="acquireSecurityException"><soap11:fault name="acquireSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="release">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Acquirable/release"/>
+            <wsdl:input name="releaseRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="releaseResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="releaseNotAcquired"><soap11:fault name="releaseNotAcquired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="releaseLocked"><soap11:fault name="releaseLocked" use="literal"/></wsdl:fault>
+            <wsdl:fault name="releaseSessionNotFound"><soap11:fault name="releaseSessionNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="releaseSecurityException"><soap11:fault name="releaseSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="LockableHTTPBinding" type="tns:Lockable">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getLocked">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Lockable/Locked"/>
+            <wsdl:input name="getLockedRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="getLockedResponse"><soap11:body use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getLockedBy">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Lockable/LockedBy"/>
+            <wsdl:input name="getLockedByRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="getLockedByResponse"><soap11:body use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="lock">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Lockable/lock"/>
+            <wsdl:input name="lockRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="lockResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="lockSessionNotFound"><soap11:fault name="lockSessionNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lockNotLocked"><soap11:fault name="lockNotLocked" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lockNotAcquired"><soap11:fault name="lockNotAcquired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lockSecurityException"><soap11:fault name="lockSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="unlock">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Lockable/unlock"/>
+            <wsdl:input name="unlockRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="unlockResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="unlockLockNotFound"><soap11:fault name="unlockLockNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unlockNotLocked"><soap11:fault name="unlockNotLocked" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unlockNotAcquired"><soap11:fault name="unlockNotAcquired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unlockSecurityException"><soap11:fault name="unlockSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="RequestableHTTPBinding" type="tns:Requestable">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="approve">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/approve"/>
+            <wsdl:input name="approveRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="approveResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="approveRequestNotFound"><soap11:fault name="approveRequestNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="approveRequestExpired"><soap11:fault name="approveRequestExpired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="approveSecurityException"><soap11:fault name="approveSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deny">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/deny"/>
+            <wsdl:input name="denyRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="denyResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="denyRequestNotFound"><soap11:fault name="denyRequestNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="denyRequestExpired"><soap11:fault name="denyRequestExpired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="denySecurityException"><soap11:fault name="denySecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="request">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/request"/>
+            <wsdl:input name="requestRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="requestResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="requestSessionNotFound"><soap11:fault name="requestSessionNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="requestRequestDenied"><soap11:fault name="requestRequestDenied" use="literal"/></wsdl:fault>
+            <wsdl:fault name="requestNotAcquired"><soap11:fault name="requestNotAcquired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="requestSecurityException"><soap11:fault name="requestSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="take">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/take"/>
+            <wsdl:input name="takeRequest"><soap11:body use="literal"/></wsdl:input>
+            <wsdl:output name="takeResponse"><soap11:body use="literal"/></wsdl:output>
+            <wsdl:fault name="takeSessionNotFound"><soap11:fault name="takeSessionNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="takeLockNotFound"><soap11:fault name="takeLockNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="takeNotAcquired"><soap11:fault name="takeNotAcquired" use="literal"/></wsdl:fault>
+            <wsdl:fault name="takeSecurityException"><soap11:fault name="takeSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

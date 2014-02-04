@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DeviceServices"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/device"
+    xmlns:device="http://www.smpte-ra.org/schemas/st2071/2014/device"
+    xmlns:mode="http://www.smpte-ra.org/schemas/st2071/2014/mode"
+    xmlns:control="http://www.smpte-ra.org/schemas/st2071/2014/device/control"
+    xmlns:event="http://www.smpte-ra.org/schemas/st2071/2014/event"
+    xmlns:media="http://www.smpte-ra.org/schemas/st2071/2014/media"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:wsoap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device" 
+        location="file:///Users/posicks/work/workspaces/standards/MDCF/src/xml/device_bindings.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/mode" 
+        location="file:///Users/posicks/work/workspaces/standards/MDCF/src/xml/device.mode_bindings.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device/control" 
+        location="file:///Users/posicks/work/workspaces/standards/MDCF/src/xml/device.control_bindings.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event" 
+        location="file:///Users/posicks/work/workspaces/standards/MDCF/src/xml/device.event_bindings.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/media" 
+        location="file:///Users/posicks/work/workspaces/standards/MDCF/src/xml/media_bindings.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security" 
+        location="file:///Users/posicks/work/workspaces/standards/MDCF/src/xml/security_bindings.wsdl" />
+    
+    <wsdl:service name="DeviceServices">
+        <wsdl:port name="DeviceHTTPPort" binding="device:DeviceHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/Device"/>
+        </wsdl:port>
+        <wsdl:port name="DeviceDirectoryHTTPPort" binding="device:DeviceDirectoryHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/DeviceDirectory"/>
+        </wsdl:port>
+        <wsdl:port name="DeviceRegistryHTTPPort" binding="device:DeviceRegistryHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/DeviceRegistry"/>
+        </wsdl:port>
+        <wsdl:port name="ModeSupportHTTPPort" binding="mode:ModeSupportHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/ModeSupport"/>
+        </wsdl:port>
+        <wsdl:port name="AcquirableHTTPPort" binding="control:AcquirableHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/Acquirable"/>
+        </wsdl:port>
+        <wsdl:port name="LockableHTTPPort" binding="control:LockableHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/Lockable"/>
+        </wsdl:port>
+        <wsdl:port name="StatusSupportHTTPPort" binding="event:StatusSupportHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/StatusSupport"/>
+        </wsdl:port>
+        <wsdl:port name="EventerHTTPPort" binding="event:EventerHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/Eventer"/>
+        </wsdl:port>
+        <wsdl:port name="EventBroadcasterHTTPPort" binding="event:EventBroadcasterHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/EventBroadcaster"/>
+        </wsdl:port>
+        <wsdl:port name="CallbackHandlerHTTPPort" binding="event:CallbackHandlerHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/CallbackHandler"/>
+        </wsdl:port>
+        <wsdl:port name="MediaDirectoryHTTPPort" binding="media:MediaDirectoryHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/MediaDirectory"/>
+        </wsdl:port>
+        <wsdl:port name="MediaAccessHTTPPort" binding="media:MediaAccessHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/MediaAccess"/>
+        </wsdl:port>
+        <wsdl:port name="AuthorizerHTTPPort" binding="security:AuthorizerHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/Authorizer"/>
+        </wsdl:port>
+        <wsdl:port name="AuthenticatorHTTPPort" binding="security:AuthenticatorHTTPBinding">
+            <wsoap12:address location="http://localhost:8088/Authenticator"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Service"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/service"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/service"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:security="http://www.smpte-ra.org/schemas/st2071/2014/security"
+    xmlns:query="http://www.smpte-ra.org/schemas/st2071/2014/query"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2o.wsdl" />
+    
+    <wsdl:types>
+        <xs:schema
+            targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/service" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">
+            
+            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2q.xsd" />
+        </xs:schema>
+    </wsdl:types>
+    
+    <wsdl:message name="USNRequest">
+        <wsdl:part name="getUSN" element="tns:getUSN" />
+    </wsdl:message>
+    
+    <wsdl:message name="USNResponse">
+        <wsdl:part name="getUSNResponse" element="tns:getUSNResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="TypeRequest">
+        <wsdl:part name="getType" element="tns:getType" />
+    </wsdl:message>
+    
+    <wsdl:message name="TypeResponse">
+        <wsdl:part name="getTypeResponse" element="tns:getTypeResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="StateRequest">
+        <wsdl:part name="getState" element="tns:getState" />
+    </wsdl:message>
+    
+    <wsdl:message name="StateResponse">
+        <wsdl:part name="getStateResponse" element="tns:getStateResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="URLsRequest">
+        <wsdl:part name="getURLs" element="tns:getURLs" />
+    </wsdl:message>
+    
+    <wsdl:message name="URLsResponse">
+        <wsdl:part name="getURLsResponse" element="tns:getURLsResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="AttributesRequest">
+        <wsdl:part name="getAttributes" element="tns:getAttributes" />
+    </wsdl:message>
+    
+    <wsdl:message name="AttributesResponse">
+        <wsdl:part name="getAttributesResponse" element="tns:getAttributesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="CapabilitiesResponse">
+        <wsdl:part name="getCapabilitiesResponse" element="tns:getCapabilitiesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="CapabilitiesRequest">
+        <wsdl:part name="getCapabilities" element="tns:getCapabilities" />
+    </wsdl:message>
+    
+    <wsdl:message name="NamespacesRequest">
+        <wsdl:part name="getNamespaces" element="tns:getNamespaces" />
+    </wsdl:message>
+    
+    <wsdl:message name="NamespacesResponse">
+        <wsdl:part name="getNamespacesResponse" element="tns:getNamespacesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="listTemplatesRequest">
+        <wsdl:part name="listTemplates" element="tns:listTemplates" />
+    </wsdl:message>
+    
+    <wsdl:message name="listTemplatesResponse">
+        <wsdl:part name="listTemplatesResponse" element="tns:listTemplatesResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="bindRequest">
+        <wsdl:part name="bind" element="tns:bind" />
+    </wsdl:message>
+    
+    <wsdl:message name="bindResponse">
+        <wsdl:part name="bindResponse" element="tns:bindResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="unbindRequest">
+        <wsdl:part name="unbind" element="tns:unbind" />
+    </wsdl:message>
+    
+    <wsdl:message name="unbindResponse">
+        <wsdl:part name="unbindResponse" element="tns:unbindResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="createRequest">
+        <wsdl:part name="create" element="tns:create" />
+    </wsdl:message>
+    
+    <wsdl:message name="createResponse">
+        <wsdl:part name="createResponse" element="tns:createResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="destroyRequest">
+        <wsdl:part name="destroy" element="tns:destroy" />
+    </wsdl:message>
+    
+    <wsdl:message name="destroyResponse">
+        <wsdl:part name="destroyResponse" element="tns:destroyResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupRequest">
+        <wsdl:part name="lookup" element="tns:lookup" />
+    </wsdl:message>
+    
+    <wsdl:message name="lookupResponse">
+        <wsdl:part name="lookupResponse" element="tns:lookupResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="searchRequest">
+        <wsdl:part name="search" element="tns:search" />
+    </wsdl:message>
+    
+    <wsdl:message name="searchResponse">
+        <wsdl:part name="searchResponse" element="tns:searchResponse" />
+    </wsdl:message>
+    
+    <wsdl:message name="ServiceExceptionFault">
+        <wsdl:part name="ServiceExceptionFault" element="tns:ServiceException" />
+    </wsdl:message>
+    
+    <wsdl:message name="ServiceNotFoundFault">
+        <wsdl:part name="ServiceNotFoundFault" element="tns:ServiceNotFound" />
+    </wsdl:message>
+    
+    <wsdl:portType name="Service">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:service_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getUSN">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/USN" name="USNRequest" message="tns:USNRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/UDNResponse" name="USNResponse" message="tns:USNResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getType">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/Type" name="TypeRequest" message="tns:TypeRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/TypeResponse" name="TypeResponse" message="tns:TypeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getState">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/State" name="StateRequest" message="tns:StateRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/StateResponse" name="StateResponse" message="tns:StateResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getURLs">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/URLs" name="URLsRequest" message="tns:URLsRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/URLsResponse" name="URLsResponse" message="tns:URLsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getAttributes">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/Attributes" name="AttributesRequest" message="tns:AttributesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/AttributesResponse" name="AttributesResponse" message="tns:AttributesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getCapabilities">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/Capabilities" name="CapabilitiesRequest" message="tns:CapabilitiesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/CapabilitiesResponse" name="CapabilitiesResponse" message="tns:CapabilitiesResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="ServiceDirectory">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:service_directory_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="getNamespaces">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/Namespaces" name="NamespacesRequest" message="tns:NamespacesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/NamespacesResponse" name="NamespacesResponse" message="tns:NamespacesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="lookup">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/lookup" name="lookupRequest" message="tns:lookupRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/lookupResponse" name="lookupResponse" message="tns:lookupResponse" />
+            <wsdl:fault name="lookupServiceNotFound" message="tns:ServiceNotFoundFault" />
+            <wsdl:fault name="lookupServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="lookupSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/search" name="searchRequest" message="tns:searchRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/searchResponse" name="searchResponse" message="tns:searchResponse"  />
+            <wsdl:fault name="searchInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="searchServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="searchSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="ServiceRegistry">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:service_registry_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="bind">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/bind" name="bindRequest" message="tns:bindRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/bindResponse" name="bindResponse" message="tns:bindResponse" />
+            <wsdl:fault name="bindServiceNotFound" message="tns:ServiceNotFoundFault" />
+            <wsdl:fault name="bindServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="bindSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="unbind">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/unbind" name="unbindRequest" message="tns:unbindRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/unbindResponse" name="unbindResponse" message="tns:unbindResponse"  />
+            <wsdl:fault name="unbindServiceNotFound" message="tns:ServiceNotFoundFault" />
+            <wsdl:fault name="unbindServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="unbindSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:portType name="ServiceFactory">
+        <wsdl:documentation>
+            UCN = urn:smpte:ucn:org.smpte.st2071:service_factory_v1.0
+        </wsdl:documentation>
+        <wsdl:operation name="listTemplates">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/listTemplates" name="listTemplatesRequest" message="tns:listTemplatesRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/listTemplatesResponse" name="listTemplatesResponse" message="tns:listTemplatesResponse" />
+            <wsdl:fault name="listTemplatesInvalidQuery" message="query:InvalidQueryFault" />
+            <wsdl:fault name="listTemplatesServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="listTemplatesSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="create">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/create" name="createRequest" message="tns:createRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/createResponse" name="createResponse" message="tns:createResponse" />
+            <wsdl:fault name="createServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="createSecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+        <wsdl:operation name="destroy">
+            <wsdl:input wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/destroy" name="destroyRequest" message="tns:destroyRequest" />
+            <wsdl:output wsam:Action="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/destroyResponse" name="destroyResponse" message="tns:destroyResponse" />
+            <wsdl:fault name="destroyServiceException" message="tns:ServiceExceptionFault" />
+            <wsdl:fault name="destroySecurityException" message="security:SecurityExceptionFault" />
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:binding name="ServiceHTTPBinding" type="tns:Service">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getUSN">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/service/Service/USN" style="document" />
+            <wsdl:input name="USNRequest"><soap11:body parts="getUSN" use="literal"/></wsdl:input>
+            <wsdl:output name="USNResponse"><soap11:body parts="getUSNResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getType">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/service/Service/Type" style="document" />
+            <wsdl:input name="TypeRequest"><soap11:body parts="getType" use="literal"/></wsdl:input>
+            <wsdl:output name="TypeResponse"><soap11:body parts="getTypeResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getState">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/service/Service/State" style="document" />
+            <wsdl:input name="StateRequest"><soap11:body parts="getState" use="literal"/></wsdl:input>
+            <wsdl:output name="StateResponse"><soap11:body parts="getStateResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getURLs">
+            <soap11:operation soapAction="http://www.smpte-ra.org/schemas/st2071/2014/service/Service/URLs" style="document" />
+            <wsdl:input name="URLsRequest"><soap11:body parts="getURLs" use="literal"/></wsdl:input>
+            <wsdl:output name="URLsResponse"><soap11:body parts="getURLsResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAttributes">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/Attributes" style="document" />
+            <wsdl:input name="AttributesRequest"><soap11:body parts="getAttributes" use="literal"/></wsdl:input>
+            <wsdl:output name="AttributesResponse"><soap11:body parts="getAttributesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCapabilities">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/Service/Capabilities" style="document" />
+            <wsdl:input name="CapabilitiesRequest"><soap11:body parts="getCapabilities" use="literal"/></wsdl:input>
+            <wsdl:output name="CapabilitiesResponse"><soap11:body parts="getCapabilitiesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="ServiceDirectoryHTTPBinding" type="tns:ServiceDirectory">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getNamespaces">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/Namespaces" style="document" />
+            <wsdl:input name="NamespacesRequest"><soap11:body parts="getNamespaces" use="literal"/></wsdl:input>
+            <wsdl:output name="NamespacesResponse"><soap11:body parts="getNamespacesResponse" use="literal"/></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="lookup">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/lookup" style="document" />
+            <wsdl:input name="lookupRequest"><soap11:body parts="lookup" use="literal"/></wsdl:input>
+            <wsdl:output name="lookupResponse"><soap11:body parts="lookupResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="lookupServiceNotFound"><soap11:fault name="lookupServiceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lookupServiceException"><soap11:fault name="lookupServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="lookupSecurityException"><soap11:fault name="lookupSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/search" style="document" />
+            <wsdl:input name="searchRequest"><soap11:body parts="search" use="literal"/></wsdl:input>
+            <wsdl:output name="searchResponse"><soap11:body parts="searchResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="searchInvalidQuery"><soap11:fault name="searchInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="searchServiceException"><soap11:fault name="searchServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="searchSecurityException"><soap11:fault name="searchSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="ServiceRegistryHTTPBinding" type="tns:ServiceRegistry">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="bind">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/bind" style="document" />
+            <wsdl:input name="bindRequest"><soap11:body parts="bind" use="literal"/></wsdl:input>
+            <wsdl:output name="bindResponse"><soap11:body parts="bindResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="bindServiceNotFound"><soap11:fault name="bindServiceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="bindServiceException"><soap11:fault name="bindServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="bindSecurityException"><soap11:fault name="bindSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="unbind">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/unbind" style="document" />
+            <wsdl:input name="unbindRequest"><soap11:body parts="unbind" use="literal"/></wsdl:input>
+            <wsdl:output name="unbindResponse"><soap11:body parts="unbindResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="unbindServiceNotFound"><soap11:fault name="unbindServiceNotFound" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unbindServiceException"><soap11:fault name="unbindServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="unbindSecurityException"><soap11:fault name="unbindSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="ServiceFactoryHTTPBinding" type="tns:ServiceFactory">
+        <wsp:Policy xmlns:bp12="http://ws-i.org/profiles/basic-profile/1.2/" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <bp12:Conformant/>
+        </wsp:Policy>
+        <soap11:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="listTemplates">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/listTemplates" style="document" />
+            <wsdl:input name="listTemplatesRequest"><soap11:body parts="listTemplates" use="literal"/></wsdl:input>
+            <wsdl:output name="listTemplatesResponse"><soap11:body parts="listTemplatesResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="listTemplatesInvalidQuery"><soap11:fault name="listTemplatesInvalidQuery" use="literal"/></wsdl:fault>
+            <wsdl:fault name="listTemplatesServiceException"><soap11:fault name="listTemplatesServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="listTemplatesSecurityException"><soap11:fault name="listTemplatesSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="create">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/create" style="document" />
+            <wsdl:input name="createRequest"><soap11:body parts="create" use="literal"/></wsdl:input>
+            <wsdl:output name="createResponse"><soap11:body parts="createResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="createServiceException"><soap11:fault name="createServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="createSecurityException"><soap11:fault name="createSecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="destroy">
+            <soap11:operation soapAction="http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/destroy" style="document" />
+            <wsdl:input name="destroyRequest"><soap11:body parts="destroy" use="literal"/></wsdl:input>
+            <wsdl:output name="destroyResponse"><soap11:body parts="destroyResponse" use="literal"/></wsdl:output>
+            <wsdl:fault name="destroyServiceException"><soap11:fault name="destroyServiceException" use="literal"/></wsdl:fault>
+            <wsdl:fault name="destroySecurityException"><soap11:fault name="destroySecurityException" use="literal"/></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

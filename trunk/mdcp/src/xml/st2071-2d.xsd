@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema  
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/session"
+    xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/session"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:types="http://www.smpte-ra.org/schemas/st2071/2014/types"
+    xmlns:identity="http://www.smpte-ra.org/schemas/st2071/2014/identity" 
+    xmlns:device="http://www.smpte-ra.org/schemas/st2071/2014/device"
+    xmlns:event="http://www.smpte-ra.org/schemas/st2071/2014/event"
+    elementFormDefault="qualified" >
+    
+    <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
+        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2a.xsd" />
+    <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
+        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2b.xsd" />
+    <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device"
+        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2c.xsd" />
+    <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
+        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2e.xsd" />
+    
+    <xs:complexType name="Session">
+        <xs:sequence>
+            <xs:element ref="tns:Who" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Name" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:AcquiredAt" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="id" type="identity:URI" use="required" />
+        <xs:attribute name="is_lock" type="xs:boolean" use="optional" />
+    </xs:complexType>
+    
+    <xs:element name="Session" type="tns:Session" />
+    
+    <xs:complexType name="Sessions">
+        <xs:sequence>
+            <xs:element ref="tns:Session" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="Sessions" type="tns:Sessions" />
+    
+    <xs:complexType name="NotAcquired">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="NotAcquired" type="tns:NotAcquired" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="NotLocked">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="NotLocked" type="tns:NotLocked" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="Locked">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Locked" type="tns:Locked" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="SessionNotFound">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+                <xs:sequence>
+                    <xs:element ref="tns:SessionID" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="SessionNotFound" type="tns:SessionNotFound" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="LockNotFound">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+                <xs:sequence>
+                    <xs:element ref="tns:LockID" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="LockNotFound" type="tns:LockNotFound" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="TooManySessions">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="TooManySessions" type="tns:TooManySessions" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="NameInUse">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="NameInUse" type="tns:NameInUse" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="RequestNotFound">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+                <xs:sequence>
+                    <xs:element ref="tns:RequestID" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="RequestNotFound" type="tns:RequestNotFound" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="RequestExpired">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+                <xs:sequence>
+                    <xs:element ref="tns:RequestID" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="RequestExpired" type="tns:RequestExpired" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="RequestDenied">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+                <xs:sequence>
+                    <xs:element ref="tns:RequestID" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="RequestDenied" type="tns:RequestDenied" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="SessionTaken">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="SessionTaken" type="tns:SessionTaken" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="LockTaken">
+        <xs:complexContent>
+            <xs:extension base="types:Exception">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="LockTaken" type="tns:LockTaken" substitutionGroup="types:Exception" />
+    
+    <xs:complexType name="SessionEvent">
+        <xs:complexContent>
+            <xs:extension base="event:StatusEvent">
+                <xs:sequence>
+                    <xs:element ref="tns:Session" />
+                </xs:sequence>
+                <xs:attribute name="rn" type="identity:RN" use="required" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="SessionEvent" type="tns:SessionEvent" substitutionGroup="event:Event" />
+    
+    <xs:complexType name="RequestEvent">
+        <xs:complexContent>
+            <xs:extension base="tns:SessionEvent">
+                <xs:sequence>
+                    <xs:element ref="tns:Who" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="RequestEvent" type="tns:RequestEvent" substitutionGroup="event:Event" />
+    
+    <xs:simpleType name="ControlEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="RequestAcquire" />
+            <xs:enumeration value="RequestLock" />
+            <xs:enumeration value="Approved" />
+            <xs:enumeration value="Denied" />
+            <xs:enumeration value="SessionTaken" />
+            <xs:enumeration value="LockTaken" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:element name="ID" type="identity:URI" />
+    <xs:element name="RequestID" type="identity:URI" />
+    <xs:element name="SessionID" type="identity:URI" />
+    <xs:element name="LockID" type="identity:URI" />
+    <xs:element name="Who" type="xs:string" />
+    <xs:element name="Message" type="xs:string" />
+    <xs:element name="Name" type="xs:string" />
+    <xs:element name="AcquiredAt" type="types:DateTime" />
+    
+    <!-- WSDL Elements and Types -->
+    <xs:complexType name="EmptyRequest">
+        <xs:sequence />
+    </xs:complexType>
+    
+    <xs:complexType name="EmptyResponse">
+        <xs:sequence />
+    </xs:complexType>
+    
+    <xs:complexType name="URIRequest">
+        <xs:sequence>
+            <xs:element ref="identity:URI" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="URIResponse">
+        <xs:sequence>
+            <xs:element ref="identity:URI" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="RequestParameters">
+        <xs:sequence>
+            <xs:element ref="tns:ID" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Name" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Message" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="BooleanResponse">
+        <xs:sequence>
+            <xs:element ref="types:Boolean" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="getAcquired" type="tns:EmptyRequest" />
+    
+    <xs:element name="getAcquiredResponse" type="tns:BooleanResponse"/>
+    
+    <xs:element name="getAcquiredBy" type="tns:EmptyRequest" />
+    
+    <xs:complexType name="getAcquiredByResponse">
+        <xs:sequence>
+            <xs:element ref="tns:Sessions" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="getAcquiredByResponse" type="tns:getAcquiredByResponse"/>
+    
+    <xs:complexType name="acquire">
+        <xs:sequence>
+            <xs:element ref="tns:Name" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="acquire" type="tns:acquire" />
+    
+    <xs:element name="acquireResponse" type="tns:URIResponse"/>
+    
+    <xs:element name="approve" type="tns:URIRequest" />
+    
+    <xs:complexType name="approveResponse">
+        <xs:sequence />
+    </xs:complexType>
+    
+    <xs:element name="approveResponse" type="tns:EmptyResponse"/>
+    
+    <xs:complexType name="deny">
+        <xs:sequence>
+            <xs:element ref="tns:RequestID" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Message" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="deny" type="tns:deny" />
+    
+    <xs:element name="denyResponse" type="tns:EmptyResponse"/>
+    
+    <xs:element name="request" type="tns:RequestParameters" />
+    
+    <xs:element name="requestResponse" type="tns:URIResponse"/>
+    
+    <xs:element name="take" type="tns:RequestParameters" />
+    
+    <xs:element name="takeResponse" type="tns:URIResponse"/>
+    
+    <xs:element name="release" type="tns:URIRequest" />
+    
+    <xs:element name="releaseResponse" type="tns:BooleanResponse"/>
+    
+    <xs:element name="getLocked" type="tns:EmptyRequest" />
+    
+    <xs:element name="getLockedResponse" type="tns:BooleanResponse"/>
+    
+    <xs:element name="getLockedBy" type="tns:EmptyRequest" />
+    
+    <xs:complexType name="getLockedByResponse">
+        <xs:sequence>
+            <xs:element ref="tns:Session" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="getLockedByResponse" type="tns:getLockedByResponse"/>
+    
+    <xs:complexType name="lock">
+        <xs:sequence>
+            <xs:element ref="tns:SessionID" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="tns:Name" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:element name="lock" type="tns:lock" />
+    
+    <xs:element name="lockResponse" type="tns:URIResponse" />
+    
+    <xs:element name="unlock" type="tns:URIRequest" />
+    
+    <xs:element name="unlockResponse" type="tns:BooleanResponse" />
+</xs:schema>
