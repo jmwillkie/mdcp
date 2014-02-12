@@ -22,6 +22,15 @@ import java.util.Stack;
 @SuppressWarnings("unchecked")
 public class ListenerProcessor<T> implements Closeable
 {
+    public static interface ListenerProcessorListener
+    {
+        public <T> void listenerRegistered(Class<T> type, T listener);
+        
+        
+        public <T> void listenerUnregistered(Class<T> type, T listener);
+    }
+    
+    
     protected static class Dispatcher implements InvocationHandler
     {
         ListenerProcessor<?> processor;
@@ -91,6 +100,8 @@ public class ListenerProcessor<T> implements Closeable
     private Object[] listeners = new Object[0];
 
     private T dispatcher;
+
+    private ListenerProcessor<ListenerProcessorListener> listenerProcessorListeners = new ListenerProcessor<>(ListenerProcessorListener.class);
     
 
     public ListenerProcessor(Class<T> iface)
@@ -122,6 +133,7 @@ public class ListenerProcessor<T> implements Closeable
             temp[temp.length - 1] = listener;
             this.listeners = temp;
             
+            listenerProcessorListeners.getDispatcher().listenerUnregistered(iface, listener);
             return listener;
         } else
         {
@@ -141,18 +153,25 @@ public class ListenerProcessor<T> implements Closeable
             {
                 if (temp[index] == listener || temp[index].equals(listener))
                 {
-                    Object foundListener = temp[index];
+                    T foundListener = temp[index];
                     
                     // Found listener, delete it and shift remaining listeners back one position.
                     System.arraycopy(temp, index + 1, temp, index, temp.length - index - 1);
                     this.listeners = Arrays.copyOf(temp, temp.length - 1);
                     
-                    return (T) foundListener;
+                    listenerProcessorListeners.getDispatcher().listenerUnregistered(iface, foundListener);
+                    return foundListener;
                 }
             }
         }
         
         return null;
+    }
+    
+    
+    public boolean hasListeners()
+    {
+        return listeners != null && listeners.length > 0;
     }
     
     
@@ -163,6 +182,28 @@ public class ListenerProcessor<T> implements Closeable
             dispatcher = (T) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{iface}, new Dispatcher(this));
         } 
         return dispatcher;
+    }
+    
+    
+    /**
+     * Registers a Listener Processor Listener to receive events when new listeners are registered.
+     * 
+     * @param listener The Listener Processor Listener
+     */
+    public void registerListenerProcessorListener(ListenerProcessorListener listener)
+    {
+        listenerProcessorListeners.registerListener(listener);
+    }
+    
+    
+    /**
+     * Unregisters a Listener Processor Listener.
+     * 
+     * @param listener The Listener Processor Listener
+     */
+    public void unregisterListenerProcessorListener(ListenerProcessorListener listener)
+    {
+        listenerProcessorListeners.unregisterListener(listener);
     }
 
 
@@ -211,6 +252,8 @@ public class ListenerProcessor<T> implements Closeable
     public void close()
     throws IOException
     {
+        listenerProcessorListeners.close();
+        
         for (int i = 0; i < this.listeners.length; i++)
         {
             this.listeners[i] = null;

@@ -26,14 +26,26 @@
 		<mkdir dir="${build_dir}" />
 		<javac destdir="${build_dir}" debug="true" target="1.7" source="1.7" includeantruntime="false">
 			<src path="${java_src_dir}" />
-            <include name="${lib_dir}/*.jar" />
+			<classpath>
+				<path>
+	                <fileset dir="${lib_dir}">
+	                	<include name="*.jar" />
+                	</fileset>
+			    </path>
+			</classpath>
 			<exclude name="**/tests/**" />
 		</javac>
 	</target>
 
 	<target name="jar" description="Makes mdcf.jar" depends="compile">
         <mkdir dir="${metainf_dir}" />
-		<jar jarfile="${dist_dir}/${jarname}" basedir="${build_dir}" includes="**/*.class **/*.properties **/.xml **/*.wsdl **/*.xsd **/*.idl">
+		<jar jarfile="${dist_dir}/${jarname}" basedir="${build_dir}">
+			<include name="**/*.class" />
+            <include name="**/*.properties" />
+            <include name="**/*.xml" />
+            <include name="**/*.wsdl" />
+            <include name="**/*.xsd" />
+            <include name="**/*.idl" />
 			<exclude name="**/tests/*.class" />
 			<exclude name="**/tests/**" />
 			<manifest>
@@ -53,7 +65,7 @@
 			Bundle-Version: ${version}
 			Bundle-Name: ST2071-1 Media and Device Control Framework (MDCF)
 			Bundle-SymbolicName: ${basepackage}
-			Export-Package: ${basepackage}.device;version=${version},${basepackage}.event;version=${version},${basepackage}.identity;version=${version},${basepackage}.media;version=${version},${basepackage}.mode;version=${version}${basepackage}.query;version=${version}${basepackage}.security;version=${version}${basepackage}.mode;service=${version}${basepackage}.session;version=${version}${basepackage}.types;version=${version}
+			Export-Package: org.smpte.util;version=${version},${basepackage}.device;version=${version},${basepackage}.event;version=${version},${basepackage}.identity;version=${version},${basepackage}.media;version=${version},${basepackage}.mode;version=${version}${basepackage}.query;version=${version}${basepackage}.security;version=${version}${basepackage}.mode;service=${version}${basepackage}.session;version=${version}${basepackage}.types;version=${version}
 			Bundle-Vendor: smpte.org
 			Bundle-RequiredExecutionEnvironment: J2SE-1.7
 			Import-Package: java.*
