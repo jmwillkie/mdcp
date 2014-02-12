@@ -64,6 +64,7 @@
             <file name="st2071-2g.xsd"/>
             <file name="st2071-2h.xsd"/>
             <file name="st2071-2i.xsd"/>
+            <file name="st2071-2q.xsd"/>
         </folder>
         <file name="device.control_services.wsdl"/>
         <file name="device.event_services.wsdl"/>
