@@ -1,17 +1,21 @@
 package org.smpte.st2071.mdcd;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -229,6 +233,8 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
             }
         }
     }
+
+    public static final String PROP_DOMAINS = "domains";
     
     protected NetworkTopologyDiscoveryService topology;
     
@@ -336,7 +342,6 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     {
         try
         {
-            // TODO: Load configured domains
             if (properties == null)
             {
                 properties = loadConfiguration();
@@ -415,24 +420,87 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
 
     public void interfaceAdded(NetworkInterface networkInterface, List<InetAddress> addresses)
     {
-        System.out.println("Interface Added : " + networkInterface.getDisplayName() + "; Addresses: " + addresses +".");
+        log.fine("Interface Added : " + networkInterface.getDisplayName() + "; Addresses: " + addresses +".");
+        for (InetAddress address : addresses)
+        {
+            addressAdded(networkInterface, address);
+        }
     }
 
 
     public void interfaceRemoved(NetworkInterface networkInterface, List<InetAddress> addresses)
     {
-        System.out.println("Interface Removed : " + networkInterface.getDisplayName() + "; Addresses: " + addresses +".");
+        log.fine("Interface Removed : " + networkInterface.getDisplayName() + "; Addresses: " + addresses +".");
+        for (InetAddress address : addresses)
+        {
+            addressRemoved(networkInterface, address);
+        }
     }
 
 
     public void addressAdded(NetworkInterface networkInterface, InetAddress address)
     {
-        System.out.println("Address Added : " + networkInterface.getDisplayName() + "; Address: " + address +".");
+        log.fine("Address Added : " + networkInterface.getDisplayName() + "; Address: " + address +".");
+        
+        Set<String> defaultDomains = new HashSet<String>();
+        
         // TODO: Create reverse subnet mask domain names (IP 192.168.1.20 becomes 0.1.168.192.in-addr.arpa.)
         String reverseMaskDomain = InetAddressUtils.reverseMapAddress(address);
         if (!defaultDomains.contains(reverseMaskDomain))
         {
             defaultDomains.add(reverseMaskDomain);
+        }
+        
+        // TODO: Add configured domain names
+        String configuredDomains = properties.get(PROP_DOMAINS);
+        if (configuredDomains != null)
+        {
+            String[] domains = configuredDomains.split(";,");
+            if (domains != null && domains.length > 0)
+            {
+                for (String domain : domains)
+                {
+                    if (domain != null && domain.length() > 0)
+                    {
+                        defaultDomains.add(domain);
+                    }
+                }
+            }
+        }
+        
+        // TODO: Get domain names from the hostname assigned to the machine, if any.
+        String hostname = topology.lookupName(address);
+        if (hostname != null && hostname.length() > 0)
+        {
+            String domain = determineDomain(hostname);
+            if (domain != null && domain.length() > 0)
+            {
+                defaultDomains.add(domain);
+            }
+        }
+        
+        // TODO: Get domain names from hostnames derived from reverse lookups of the IP Address
+        
+        
+        // TODO: Add "local."
+        defaultDomains.add(MulticastDNSService.LINK_LOCAL_DOMAIN);
+        
+        // TODO: Get domain names from DHCP "Domain" option code 15 (RFC 2132)
+        // TODO: Get domain names from DHCP "Domain Search" option code 119 (RFC 3397)
+        // TODO: If IPv6, Get domain names from IPv6 Router Advertisement DNSSL (RFC 6106)
+    }
+
+
+    private String determineDomain(String hostname)
+    {
+        
+        int pos = hostname.indexOf('.');
+        if (pos >= 0)
+        {
+            return hostname.substring(pos + 1);
+        } else
+        {
+            return null;
         }
     }
 
@@ -440,7 +508,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     public void addressRemoved(NetworkInterface networkInterface, InetAddress address)
     {
         // TODO: Remove artifacts related to only this address.
-        System.out.println("Address Removed : " + networkInterface.getDisplayName() + "; Address: " + address +".");
+        log.fine("Address Removed : " + networkInterface.getDisplayName() + "; Address: " + address +".");
         
     }
     
@@ -515,6 +583,8 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
         {
             service.start();
             
+            System.out.println("\nPress \'q\' or \'Q\' to quit.");
+            
             int count = 0;
             while (true && count < Integer.MAX_VALUE)
             {
@@ -526,8 +596,6 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
                 
                 // Test DNS Record Discovery
                 // Test Service Discovery Discovery
-                
-                System.out.println("\nPress \'q\' or \'Q\' to quit.");
                 
                 try
                 {

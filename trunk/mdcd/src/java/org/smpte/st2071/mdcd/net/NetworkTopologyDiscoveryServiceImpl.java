@@ -1,19 +1,25 @@
 package org.smpte.st2071.mdcd.net;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
+import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,9 +30,10 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
 {
     static class TopologyPoller extends TimerTask
     {
-        private final Logger log = Logger.getLogger(getClass().getName());
+        private static final Logger log = Logger.getLogger(TopologyPoller.class.getName());
         
-        private Timer timer = new Timer();
+        private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        
         
         private transient boolean started = false;
         
@@ -54,10 +61,10 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
         {
             if (!started)
             {
-                log.fine("Network Topology Poller Starting");
+                log.finer("Network Topology Poller Starting");
                 started = true;
-                timer.schedule(this, 0, 60000);
-                log.info("Network Topology Poller Started");
+                executor.scheduleAtFixedRate(this, 0, 10, TimeUnit.SECONDS);
+                log.fine("Network Topology Poller Started");
             }
         }
         
@@ -66,10 +73,10 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
         {
             if (started)
             {
-                log.fine("Network Topology Poller Stopping");
+                log.finer("Network Topology Poller Stopping");
                 started = false;
-                timer.cancel();
-                log.info("Network Topology Poller Stopped");
+                executor.shutdown();;
+                log.fine("Network Topology Poller Stopped");
             }
         }
         
@@ -159,6 +166,8 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
     private boolean useLoopback;
     
     private TopologyPoller topologyPoller = new TopologyPoller(this, listenerProcessor.getDispatcher());
+
+    private Set<String> hostnames = new HashSet<>();
     
     
     public NetworkTopologyDiscoveryServiceImpl(boolean useIPv6, boolean useSiteLocal, boolean useVirtual, boolean useLoopback)
@@ -172,17 +181,18 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
     
     public void start()
     {
-        log.fine("Network Topology Monitor Starting");
+        log.finer("Network Topology Monitor Starting");
         
+        hostnames = determineHostNames();
         topologyPoller.start();
         
-        log.info("Network Topology Monitor Started");
+        log.fine("Network Topology Monitor Started");
     }
     
     
     public void stop()
     {
-        log.fine("Network Topology Monitor Stopping");
+        log.finer("Network Topology Monitor Stopping");
         
         topologyPoller.stop();
         
@@ -194,7 +204,7 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
             // ignore
         }
         
-        log.info("Network Topology Monitor Stopped");
+        log.fine("Network Topology Monitor Stopped");
     }
 
 
@@ -336,29 +346,6 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
     }
 
 
-    public void interfaceRemoved(NetworkInterface networkInterface, List<InetAddress> addresses)
-    {
-        log.fine("Network Interface \"" + networkInterface + "\" for Addresses " + addresses + " Removed.");
-        listenerProcessor.getDispatcher().interfaceRemoved(networkInterface, addresses);
-    }
-
-
-    public void addressAdded(NetworkInterface networkInterface, InetAddress address)
-    {
-        log.fine("Address \"" + address + "\" for Network Interface \"" + networkInterface + "\" Added.");
-        
-        listenerProcessor.getDispatcher().addressAdded(networkInterface, address);
-    }
-
-
-    public void addressRemoved(NetworkInterface networkInterface, InetAddress address)
-    {
-        log.fine("Address \"" + address + "\" for Network Interface \"" + networkInterface + "\" Removed.");
-        
-        listenerProcessor.getDispatcher().addressRemoved(networkInterface, address);
-    }
-
-
     @Override
     public int getNetworkPrefixLength(InetAddress address)
     {
@@ -391,5 +378,107 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
         }
         
         return -1;
+    }
+    
+    
+    protected Set<String> determineHostNames()
+    {
+        HashSet<String> hostnames = new HashSet<>();
+        String hostname;
+        
+        try
+        {
+            InetAddress localHost = InetAddress.getLocalHost();
+            hostname = localHost.getCanonicalHostName();
+            
+            if (hostname != null && hostname.length() > 0 && !hostname.equals(localHost.getHostAddress()) && !hostname.startsWith(localHost.getHostAddress()))
+            {
+                hostnames.add(hostname);
+            }
+        } catch (UnknownHostException e)
+        {
+            // ignore
+            log.log(Level.FINE, e.getMessage(), e);
+        }
+            
+        String[] PROPRTY_NAMES = new String[] {"COMPUTERNAME", "HOSTNAME", "hostname"};
+        
+        for (String varName : PROPRTY_NAMES)
+        {
+            hostname = System.getenv(varName);
+            if (hostname != null && hostname.length() > 0)
+            {
+                hostnames.add(hostname);
+            }
+        }
+        
+        for (String varName : PROPRTY_NAMES)
+        {
+            hostname = System.getProperty(varName);
+            if (hostname != null && hostname.length() > 0)
+            {
+                hostnames.add(hostname);
+            }
+        }
+            
+        String[] COMMANDS = new String[]{"hostname", "hostname -f"};
+        for (String command : COMMANDS)
+        {
+            try
+            {
+                Process process = Runtime.getRuntime().exec(command);
+                int returnValue = process.waitFor();
+                if (returnValue == 0)
+                {
+                    DataInputStream in = new DataInputStream(process.getInputStream());
+                    if (in.available() > 0)
+                    {
+                        StringBuilder b = new StringBuilder();
+                        int value;
+                        while ((value = in.read()) >= 0)
+                        {
+                            b.append((char) value);
+                        }
+                        if (b.length() > 0)
+                        {
+                            hostnames.add(b.toString());
+                        }
+                    }
+                }
+            } catch (Throwable e)
+            {
+                log.log(Level.FINE, "Error executing system command \"hostname -f\" - " + e.getMessage(), e);
+            }
+        }
+        
+        return hostnames;
+    }
+    
+    
+    @Override
+    public Set<String> getHostNames()
+    {
+        return hostnames;
+    }
+
+
+    @Override
+    public String lookupName(InetAddress address)
+    {
+        if (address.isLoopbackAddress())
+        {
+            try
+            {
+                return InetAddress.getLocalHost().getCanonicalHostName();
+            } catch (UnknownHostException e)
+            {
+                // ignore
+            }
+        } else
+        {
+            return address.getCanonicalHostName();
+        }
+        
+        return address.getHostAddress();
     }
 }
