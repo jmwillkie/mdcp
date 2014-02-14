@@ -5,6 +5,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface NetworkTopologyDiscoveryService
 {
@@ -12,6 +13,12 @@ public interface NetworkTopologyDiscoveryService
     
     
     public void unregisterNetworkTopologyListener(NetworkTopologyListener listener);
+    
+    
+    public Set<String> getHostNames();
+    
+    
+    public String lookupName(InetAddress address);
     
     
     /**
