@@ -101,7 +101,7 @@ public class ListenerProcessor<T> implements Closeable
 
     private T dispatcher;
 
-    private static ListenerProcessor<ListenerProcessorListener> listenerProcessorListeners = new ListenerProcessor<>(ListenerProcessorListener.class);
+    private static ListenerProcessor<ListenerProcessorListener> listenerProcessorListeners = null;
     
 
     public ListenerProcessor(Class<T> iface)
@@ -116,6 +116,11 @@ public class ListenerProcessor<T> implements Closeable
     
     public synchronized T registerListener(T listener)
     {
+        if (listenerProcessorListeners == null)
+        {
+            listenerProcessorListeners = new ListenerProcessor<>(ListenerProcessorListener.class);
+        }
+        
         // Make sure the listener is not null and that it implements the Interface
         if (listener != null && iface.isAssignableFrom(listener.getClass()))
         {
@@ -252,7 +257,10 @@ public class ListenerProcessor<T> implements Closeable
     public void close()
     throws IOException
     {
-        listenerProcessorListeners.close();
+        if (listenerProcessorListeners != null)
+        {
+            listenerProcessorListeners.close();
+        }
         
         for (int i = 0; i < this.listeners.length; i++)
         {
