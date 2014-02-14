@@ -6,8 +6,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -101,7 +103,7 @@ public class ListenerProcessor<T> implements Closeable
 
     private T dispatcher;
 
-    private static ListenerProcessor<ListenerProcessorListener> listenerProcessorListeners = null;
+    private static List<ListenerProcessorListener> listenerProcessorListeners = new ArrayList<>();
     
 
     public ListenerProcessor(Class<T> iface)
@@ -116,11 +118,6 @@ public class ListenerProcessor<T> implements Closeable
     
     public synchronized T registerListener(T listener)
     {
-        if (listenerProcessorListeners == null)
-        {
-            listenerProcessorListeners = new ListenerProcessor<>(ListenerProcessorListener.class);
-        }
-        
         // Make sure the listener is not null and that it implements the Interface
         if (listener != null && iface.isAssignableFrom(listener.getClass()))
         {
@@ -138,11 +135,29 @@ public class ListenerProcessor<T> implements Closeable
             temp[temp.length - 1] = listener;
             this.listeners = temp;
             
-            listenerProcessorListeners.getDispatcher().listenerRegistered(iface, listener);
+            dispatchListenerRegistered(iface, listener);
             return listener;
         } else
         {
             return null;
+        }
+    }
+
+
+    protected synchronized void dispatchListenerRegistered(Class<T> type, T listener)
+    {
+        for (ListenerProcessorListener processorListener : listenerProcessorListeners)
+        {
+            processorListener.listenerRegistered(type, listener);
+        }
+    }
+
+
+    protected synchronized void dispatchListenerUnregistered(Class<T> type, T listener)
+    {
+        for (ListenerProcessorListener processorListener : listenerProcessorListeners)
+        {
+            processorListener.listenerUnregistered(type, listener);
         }
     }
 
@@ -164,7 +179,7 @@ public class ListenerProcessor<T> implements Closeable
                     System.arraycopy(temp, index + 1, temp, index, temp.length - index - 1);
                     this.listeners = Arrays.copyOf(temp, temp.length - 1);
                     
-                    listenerProcessorListeners.getDispatcher().listenerUnregistered(iface, foundListener);
+                    dispatchListenerUnregistered(iface, foundListener);
                     return foundListener;
                 }
             }
@@ -195,9 +210,12 @@ public class ListenerProcessor<T> implements Closeable
      * 
      * @param listener The Listener Processor Listener
      */
-    public void registerListenerProcessorListener(ListenerProcessorListener listener)
+    public synchronized void registerListenerProcessorListener(ListenerProcessorListener listener)
     {
-        listenerProcessorListeners.registerListener(listener);
+        if (!listenerProcessorListeners.contains(listener))
+        {
+            listenerProcessorListeners.add(listener);
+        }
     }
     
     
@@ -206,9 +224,9 @@ public class ListenerProcessor<T> implements Closeable
      * 
      * @param listener The Listener Processor Listener
      */
-    public void unregisterListenerProcessorListener(ListenerProcessorListener listener)
+    public synchronized void unregisterListenerProcessorListener(ListenerProcessorListener listener)
     {
-        listenerProcessorListeners.unregisterListener(listener);
+        listenerProcessorListeners.remove(listener);
     }
 
 
@@ -259,7 +277,7 @@ public class ListenerProcessor<T> implements Closeable
     {
         if (listenerProcessorListeners != null)
         {
-            listenerProcessorListeners.close();
+            listenerProcessorListeners.clear();
         }
         
         for (int i = 0; i < this.listeners.length; i++)
