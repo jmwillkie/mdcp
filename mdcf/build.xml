@@ -58,8 +58,7 @@
 		</jar>
 	</target>
 
-	<target name="bundle" description="Creates an OSGi bundle" depends="jar">
-		<get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.384/bnd-0.0.384.jar" dest="${build_dir}/bnd.jar" />
+	<target name="bundle" description="Creates an OSGi bundle" depends="download_bnd_file,jar">
 		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${build_dir}/bnd.jar" />
 		<echo file="${dist_dir}/${projectname}-${version}.bnd" append="false">
 			Bundle-Version: ${version}
@@ -73,6 +72,14 @@
 		<bndwrap definitions="${dist_dir}" jars="${dist_dir}/${jarname}" output="${dist_dir}/${bundle.jar}" />
 		<delete file="${dist_dir}/${projectname}-${version}.bnd" />
 	</target>
+	
+	<target name="test_bnd_file">
+	   <available file="${build_dir}/bnd.jar"  property="bnd.file.found"/>
+	</target>
+    
+    <target name="download_bnd_file" depends="test_bnd_file" unless="bnd.file.found">
+        <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.384/bnd-0.0.384.jar" dest="${build_dir}/bnd.jar" />
+    </target>
 
 	<target name="clean" description="Remove old class files">
 		<delete dir="${build_dir}" />
