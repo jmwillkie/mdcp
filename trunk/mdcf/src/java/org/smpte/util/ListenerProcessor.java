@@ -101,7 +101,7 @@ public class ListenerProcessor<T> implements Closeable
 
     private T dispatcher;
 
-    private ListenerProcessor<ListenerProcessorListener> listenerProcessorListeners = new ListenerProcessor<>(ListenerProcessorListener.class);
+    private static ListenerProcessor<ListenerProcessorListener> listenerProcessorListeners = new ListenerProcessor<>(ListenerProcessorListener.class);
     
 
     public ListenerProcessor(Class<T> iface)
