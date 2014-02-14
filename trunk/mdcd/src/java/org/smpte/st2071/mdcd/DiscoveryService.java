@@ -1,6 +1,7 @@
 package org.smpte.st2071.mdcd;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.naming.NamingException;
 
@@ -35,6 +36,22 @@ public interface DiscoveryService
     public static final String TXT_PROP_PROTOCOL = "proto";
     
     public static final String TXT_PROP_PATH = "path";
+    
+    
+    /**
+     * Sets the configuration for the Discovery Service.
+     * 
+     * @param properties The configuration map
+     */
+    public void setConfiguration(Map<String, String> properties);
+    
+    
+    /**
+     * Gets the configuration for the Discovery Service.
+     * 
+     * @return The configuration map
+     */
+    public Map<String, String> getConfiguration();
     
     
     /**

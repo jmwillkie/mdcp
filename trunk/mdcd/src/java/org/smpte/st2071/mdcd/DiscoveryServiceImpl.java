@@ -1,11 +1,17 @@
 package org.smpte.st2071.mdcd;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +21,7 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
+import org.smpte.st2071.mdcd.net.InetAddressUtils;
 import org.smpte.st2071.mdcd.net.NetworkTopologyDiscoveryService;
 import org.smpte.st2071.mdcd.net.NetworkTopologyDiscoveryServiceImpl;
 import org.smpte.st2071.mdcd.net.NetworkTopologyListener;
@@ -235,9 +242,28 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     protected MulticastDNSService service = null;
 
-    private DomainBrowser browseDomains;
+    protected DomainBrowser browseDomains;
 
-    private DomainBrowser registrationDomains;
+    protected DomainBrowser registrationDomains;
+    
+    protected List<String> defaultDomains = new ArrayList<String>();
+    
+    protected Map<String, String> properties = new HashMap<>();
+
+
+    @Override
+    public void setConfiguration(Map<String, String> properties)
+    {
+        this.properties.clear();
+        this.properties.putAll(properties);
+    }
+
+
+    @Override
+    public Map<String, String> getConfiguration()
+    {
+        return properties;
+    }
     
     
     @Override
@@ -310,6 +336,12 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     {
         try
         {
+            // TODO: Load configured domains
+            if (properties == null)
+            {
+                properties = loadConfiguration();
+            }
+            
             executor = Executors.newScheduledThreadPool(1);
             
             querier = new MulticastDNSQuerier(true, true);
@@ -383,28 +415,32 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
 
     public void interfaceAdded(NetworkInterface networkInterface, List<InetAddress> addresses)
     {
-        // TODO Auto-generated method stub
-        
+        System.out.println("Interface Added : " + networkInterface.getDisplayName() + "; Addresses: " + addresses +".");
     }
 
 
     public void interfaceRemoved(NetworkInterface networkInterface, List<InetAddress> addresses)
     {
-        // TODO Auto-generated method stub
-        
+        System.out.println("Interface Removed : " + networkInterface.getDisplayName() + "; Addresses: " + addresses +".");
     }
 
 
     public void addressAdded(NetworkInterface networkInterface, InetAddress address)
     {
-        // TODO Auto-generated method stub
-        
+        System.out.println("Address Added : " + networkInterface.getDisplayName() + "; Address: " + address +".");
+        // TODO: Create reverse subnet mask domain names (IP 192.168.1.20 becomes 0.1.168.192.in-addr.arpa.)
+        String reverseMaskDomain = InetAddressUtils.reverseMapAddress(address);
+        if (!defaultDomains.contains(reverseMaskDomain))
+        {
+            defaultDomains.add(reverseMaskDomain);
+        }
     }
 
 
     public void addressRemoved(NetworkInterface networkInterface, InetAddress address)
     {
-        // TODO Auto-generated method stub
+        // TODO: Remove artifacts related to only this address.
+        System.out.println("Address Removed : " + networkInterface.getDisplayName() + "; Address: " + address +".");
         
     }
     
@@ -420,6 +456,53 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
         // TODO: Get domain names from DHCP "Domain Search" option code 119 (RFC 3397)
         // TODO: If IPv6, Get domain names from IPv6 Router Advertisement DNSSL (RFC 6106)
         return null;
+    }
+    
+    
+    protected Map<String, String> loadConfiguration()
+    {
+        Map<String, String> map = new HashMap<>();
+        Properties properties = new Properties();
+        
+        Class<?> clazz = getClass();
+        java.net.URL url = clazz.getResource(clazz.getSimpleName());
+        
+        if (url != null && url.getProtocol().equalsIgnoreCase("file"))
+        {
+            try
+            {
+                File file = new File(url.toURI());
+                properties.load(new FileReader(file));
+            } catch (IOException e)
+            {
+                log.log(Level.WARNING, "Error opening configuration file \"" + url + "\" - " + e.getMessage(), e);
+            } catch (URISyntaxException e)
+            {
+                log.log(Level.WARNING, "Error opening configuration file \"" + url + "\" - " + e.getMessage(), e);
+            }
+        } else
+        {
+            try
+            {
+                properties.load(url.openStream());
+            } catch (IOException e)
+            {
+                log.log(Level.WARNING, "Error opening configuration URL \"" + url + "\" - " + e.getMessage(), e);
+            }
+        }
+        
+        for (Map.Entry<Object, Object> entry : properties.entrySet())
+        {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+            
+            if (key != null)
+            {
+                map.put(key.toString(), value == null ? null : value.toString());
+            }
+        }
+        
+        return map;
     }
     
     
