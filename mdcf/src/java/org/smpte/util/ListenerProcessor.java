@@ -133,7 +133,7 @@ public class ListenerProcessor<T> implements Closeable
             temp[temp.length - 1] = listener;
             this.listeners = temp;
             
-            listenerProcessorListeners.getDispatcher().listenerUnregistered(iface, listener);
+            listenerProcessorListeners.getDispatcher().listenerRegistered(iface, listener);
             return listener;
         } else
         {
