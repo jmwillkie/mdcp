@@ -4,7 +4,7 @@ package org.smpte_ra.schemas.st2071._2014.types;
 import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -16,39 +16,32 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * <pre>
  * &lt;complexType name="FramedTime">
- *   &lt;complexContent>
- *     &lt;extension base="{http://www.smpte-ra.org/schemas/st2071/2014/types}DateTime">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Frame"/>
- *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}FrameRate"/>
- *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Scale"/>
- *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}TotalFrames"/>
- *       &lt;/sequence>
+ *   &lt;simpleContent>
+ *     &lt;extension base="&lt;http://www.smpte-ra.org/schemas/st2071/2014/types>DateTime">
+ *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Frame use="required""/>
+ *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}FrameRate use="required""/>
+ *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Scale use="required""/>
+ *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}TotalFrames use="required""/>
  *     &lt;/extension>
- *   &lt;/complexContent>
+ *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
  * 
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "FramedTime", propOrder = {
-    "frame",
-    "frameRate",
-    "scale",
-    "totalFrames"
-})
+@XmlType(name = "FramedTime")
 public class FramedTime
     extends DateTime
 {
 
-    @XmlElement(name = "Frame")
+    @XmlAttribute(name = "Frame", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", required = true)
     protected long frame;
-    @XmlElement(name = "FrameRate")
+    @XmlAttribute(name = "FrameRate", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", required = true)
     protected long frameRate;
-    @XmlElement(name = "Scale")
+    @XmlAttribute(name = "Scale", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", required = true)
     protected long scale;
-    @XmlElement(name = "TotalFrames", required = true)
+    @XmlAttribute(name = "TotalFrames", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", required = true)
     @XmlSchemaType(name = "unsignedLong")
     protected BigInteger totalFrames;
 

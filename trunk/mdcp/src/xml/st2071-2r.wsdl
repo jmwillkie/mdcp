@@ -10,9 +10,9 @@
     xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
     
     <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
-        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2p.wsdl" />
+        location="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2p.wsdl" />
     <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
-        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2o.wsdl" />
+        location="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2o.wsdl" />
     
     <wsdl:types>
         <xs:schema
@@ -20,7 +20,7 @@
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified">
             
-            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2q.xsd" />
+            <xs:include schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2q.xsd" />
         </xs:schema>
     </wsdl:types>
     

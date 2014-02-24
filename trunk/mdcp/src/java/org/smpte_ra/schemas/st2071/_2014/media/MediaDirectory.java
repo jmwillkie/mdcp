@@ -54,9 +54,9 @@ public interface MediaDirectory {
      * @param create
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws MediaCreationFailedFault
-     * @throws SecurityExceptionFault
      * @throws MediaNotFoundFault
+     * @throws SecurityExceptionFault
+     * @throws MediaCreationFailedFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/create")
     @WebResult(name = "createResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", partName = "createResponse")
@@ -73,9 +73,9 @@ public interface MediaDirectory {
      * @param delete
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws SecurityExceptionFault
      * @throws MediaDeletionFailedFault
      * @throws MediaNotFoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/delete")
     @WebResult(name = "deleteResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", partName = "deleteResponse")
@@ -93,9 +93,9 @@ public interface MediaDirectory {
      * @param umn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaList
+     * @throws MediaNotFoundFault
      * @throws SecurityExceptionFault
      * @throws InvalidQueryFault
-     * @throws MediaNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/list")
     @WebResult(name = "MediaList", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media")
@@ -115,8 +115,8 @@ public interface MediaDirectory {
      * @param lookup
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws SecurityExceptionFault
      * @throws MediaNotFoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookup")
     @WebResult(name = "lookupResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", partName = "lookupResponse")
@@ -133,8 +133,8 @@ public interface MediaDirectory {
      * @param umn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaAsset
-     * @throws SecurityExceptionFault
      * @throws MediaNotFoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/lookupAsset")
     @WebResult(name = "MediaAsset", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media")
@@ -153,9 +153,9 @@ public interface MediaDirectory {
      * @param umn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaList
+     * @throws MediaNotFoundFault
      * @throws SecurityExceptionFault
      * @throws InvalidQueryFault
-     * @throws MediaNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/search")
     @WebResult(name = "MediaList", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media")
@@ -175,9 +175,9 @@ public interface MediaDirectory {
      * @param update
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws SecurityExceptionFault
      * @throws MediaUpdateFailedFault
      * @throws MediaNotFoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/update")
     @WebResult(name = "updateResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", partName = "updateResponse")

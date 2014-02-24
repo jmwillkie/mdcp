@@ -56,14 +56,14 @@ public class MediaList {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link MaterialAsset }{@code >}
+     * {@link JAXBElement }{@code <}{@link Media }{@code >}
      * {@link JAXBElement }{@code <}{@link MediaAsset }{@code >}
-     * {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}
+     * {@link JAXBElement }{@code <}{@link MediaSegment }{@code >}
      * {@link JAXBElement }{@code <}{@link MediaContainer }{@code >}
+     * {@link JAXBElement }{@code <}{@link MaterialAsset }{@code >}
+     * {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}
      * {@link JAXBElement }{@code <}{@link MediaFile }{@code >}
      * {@link JAXBElement }{@code <}{@link MediaBundle }{@code >}
-     * {@link JAXBElement }{@code <}{@link Media }{@code >}
-     * {@link JAXBElement }{@code <}{@link MediaSegment }{@code >}
      * 
      * 
      */

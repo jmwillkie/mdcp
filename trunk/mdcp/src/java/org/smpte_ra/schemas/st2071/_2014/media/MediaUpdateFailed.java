@@ -44,14 +44,14 @@ public class MediaUpdateFailed
      * 
      * @return
      *     possible object is
-     *     {@link JAXBElement }{@code <}{@link MaterialAsset }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Media }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaAsset }{@code >}
-     *     {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}
+     *     {@link JAXBElement }{@code <}{@link MediaSegment }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaContainer }{@code >}
+     *     {@link JAXBElement }{@code <}{@link MaterialAsset }{@code >}
+     *     {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaFile }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaBundle }{@code >}
-     *     {@link JAXBElement }{@code <}{@link Media }{@code >}
-     *     {@link JAXBElement }{@code <}{@link MediaSegment }{@code >}
      *     
      */
     public JAXBElement<? extends Media> getMedia() {
@@ -63,14 +63,14 @@ public class MediaUpdateFailed
      * 
      * @param value
      *     allowed object is
-     *     {@link JAXBElement }{@code <}{@link MaterialAsset }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Media }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaAsset }{@code >}
-     *     {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}
+     *     {@link JAXBElement }{@code <}{@link MediaSegment }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaContainer }{@code >}
+     *     {@link JAXBElement }{@code <}{@link MaterialAsset }{@code >}
+     *     {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaFile }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaBundle }{@code >}
-     *     {@link JAXBElement }{@code <}{@link Media }{@code >}
-     *     {@link JAXBElement }{@code <}{@link MediaSegment }{@code >}
      *     
      */
     public void setMedia(JAXBElement<? extends Media> value) {

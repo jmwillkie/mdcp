@@ -48,7 +48,7 @@ else
     mkdir $CLASSES
 fi
 
-echo Importing device_services.wsdl
+echo Importing $XML_SOURCE/device_services.wsdl
 wsimport $XML_SOURCE/device_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
 echo Importing device.event_services.wsdl
 wsimport $XML_SOURCE/device.event_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES

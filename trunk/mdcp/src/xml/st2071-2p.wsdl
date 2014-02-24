@@ -13,7 +13,7 @@
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified">
             
-            <xs:include schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2i.xsd" />
+            <xs:include schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2i.xsd" />
         </xs:schema>
     </wsdl:types>
     

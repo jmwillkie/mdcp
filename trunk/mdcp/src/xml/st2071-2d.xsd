@@ -10,13 +10,13 @@
     elementFormDefault="qualified" >
     
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
-        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2a.xsd" />
+        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2a.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2b.xsd" />
+        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device"
-        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2c.xsd" />
+        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2c.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
-        schemaLocation="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2e.xsd" />
+        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd" />
     
     <xs:complexType name="Session">
         <xs:sequence>

@@ -11,7 +11,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     
     <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device" 
-        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2j.wsdl" />
+        location="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2j.wsdl" />
     
     <wsdl:service name="DeviceService">
         <wsdl:port name="DevicePort" binding="device:DeviceHTTPBinding">
