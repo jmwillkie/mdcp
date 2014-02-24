@@ -73,8 +73,8 @@ public interface MediaDirectory {
      * @param delete
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws MediaDeletionFailedFault
      * @throws SecurityExceptionFault
+     * @throws MediaDeletionFailedFault
      * @throws MediaNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/delete")
@@ -93,8 +93,8 @@ public interface MediaDirectory {
      * @param umn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaList
-     * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
+     * @throws InvalidQueryFault
      * @throws MediaNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/list")
@@ -153,8 +153,8 @@ public interface MediaDirectory {
      * @param umn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaList
-     * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
+     * @throws InvalidQueryFault
      * @throws MediaNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/search")

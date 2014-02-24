@@ -45,10 +45,10 @@ public class PollResponse {
      * @return
      *     possible object is
      *     {@link JAXBElement }{@code <}{@link ModeEvent }{@code >}
-     *     {@link JAXBElement }{@code <}{@link Event }{@code >}
-     *     {@link JAXBElement }{@code <}{@link DeviceEvent }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaEvent }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DeviceEvent }{@code >}
      *     {@link JAXBElement }{@code <}{@link StatusEvent }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Event }{@code >}
      *     
      */
     public JAXBElement<? extends Event> getEvent() {
@@ -61,10 +61,10 @@ public class PollResponse {
      * @param value
      *     allowed object is
      *     {@link JAXBElement }{@code <}{@link ModeEvent }{@code >}
-     *     {@link JAXBElement }{@code <}{@link Event }{@code >}
-     *     {@link JAXBElement }{@code <}{@link DeviceEvent }{@code >}
      *     {@link JAXBElement }{@code <}{@link MediaEvent }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DeviceEvent }{@code >}
      *     {@link JAXBElement }{@code <}{@link StatusEvent }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Event }{@code >}
      *     
      */
     public void setEvent(JAXBElement<? extends Event> value) {

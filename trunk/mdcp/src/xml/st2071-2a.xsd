@@ -71,28 +71,21 @@
     	</xs:sequence>
     </xs:complexType>
     
-    <xs:complexType name="DateTime">
-        <xs:sequence>
-            <xs:element ref="tns:Date" maxOccurs="1" />
-            <xs:element ref="tns:Hour" minOccurs="1" maxOccurs="1" />
-            <xs:element ref="tns:Minute" minOccurs="1" maxOccurs="1" />
-            <xs:element ref="tns:Second" minOccurs="1" maxOccurs="1" />
-            <xs:element ref="tns:Microsecond" minOccurs="1" maxOccurs="1" />
-            <xs:element ref="tns:MicrosFromEpoch" minOccurs="1" maxOccurs="1"/>
-       </xs:sequence>
+    <xs:complexType name="DateTime" >
+        <xs:simpleContent>
+            <xs:extension base="xs:dateTime" />
+        </xs:simpleContent>
     </xs:complexType>
     
     <xs:complexType name="FramedTime" >
-       <xs:complexContent>
+        <xs:simpleContent>
            <xs:extension base="tns:DateTime">
-               <xs:sequence>
-                   <xs:element ref="tns:Frame" minOccurs="1" maxOccurs="1" />
-                   <xs:element ref="tns:FrameRate" minOccurs="1" maxOccurs="1" />
-                   <xs:element ref="tns:Scale" minOccurs="1" maxOccurs="1" />
-                   <xs:element ref="tns:TotalFrames" minOccurs="1" maxOccurs="1" />
-               </xs:sequence>
+               <xs:attribute ref="tns:Frame" use="required" />
+               <xs:attribute ref="tns:FrameRate" use="required" />
+               <xs:attribute ref="tns:Scale" use="required" />
+               <xs:attribute ref="tns:TotalFrames" use="required" />
            </xs:extension>
-       </xs:complexContent>
+       </xs:simpleContent>
     </xs:complexType>
     
     <xs:complexType name="Image">
@@ -103,44 +96,6 @@
             <xs:element ref="tns:Data" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
     </xs:complexType>
-    
-    <xs:element name="Date" type="xs:date" />
-    
-    <xs:element name="Hour">
-       <xs:simpleType>
-           <xs:restriction base="xs:integer">
-               <xs:minInclusive value="0" />
-               <xs:maxInclusive value="23" />
-           </xs:restriction>
-       </xs:simpleType>
-    </xs:element>
-    
-    <xs:element name="Minute">
-       <xs:simpleType>
-           <xs:restriction base="xs:integer">
-               <xs:minInclusive value="0" />
-               <xs:maxInclusive value="59" />
-           </xs:restriction>
-       </xs:simpleType>
-    </xs:element>
-    
-    <xs:element name="Second">
-       <xs:simpleType>
-           <xs:restriction base="xs:integer">
-               <xs:minInclusive value="0" />
-               <xs:maxInclusive value="59" />
-           </xs:restriction>
-       </xs:simpleType>
-    </xs:element>
-    
-    <xs:element name="Microsecond">
-       <xs:simpleType>
-           <xs:restriction base="xs:integer">
-               <xs:minInclusive value="0" />
-               <xs:maxInclusive value="999999" />
-           </xs:restriction>
-       </xs:simpleType>
-    </xs:element>
     
     <xs:complexType name="Capability">
         <xs:sequence>
@@ -179,12 +134,11 @@
     <xs:element name="String" type="xs:string" />
     
     <!-- END The types defined in this section are NOT part of the MDC standard, but are needed for MDCF types -->
+    <xs:attribute name="Frame" type="tns:uint50" />
+    <xs:attribute name="FrameRate" type="tns:uint50" />
+    <xs:attribute name="Scale" type="tns:uint50" />
+    <xs:attribute name="TotalFrames" type="xs:unsignedLong" />
     
-    <xs:element name="MicrosFromEpoch" type="xs:unsignedLong"/>
-    <xs:element name="Frame" type="tns:uint50" />
-    <xs:element name="FrameRate" type="tns:uint50" />
-    <xs:element name="Scale" type="tns:uint50" />
-    <xs:element name="TotalFrames" type="xs:unsignedLong" />
     <xs:element name="MIMEType" type="xs:string" />
     <xs:element name="Height" type="xs:unsignedShort" />
     <xs:element name="Width" type="xs:unsignedShort" />
