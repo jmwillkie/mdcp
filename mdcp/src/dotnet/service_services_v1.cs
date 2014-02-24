@@ -467,44 +467,8 @@ public class ServiceInformation {
 public class DateTime {
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="date")]
-    public System.DateTime Date;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Hour;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Minute;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Second;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Microsecond;
-    
-    /// <remarks/>
-    public System.UInt64 MicrosFromEpoch;
-}
-
-/// <remarks/>
-[System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.smpte-ra.org/schemas/st2071/2014/types")]
-public class FramedTime : DateTime {
-    
-    /// <remarks/>
-    public System.UInt64 Frame;
-    
-    /// <remarks/>
-    public System.UInt64 FrameRate;
-    
-    /// <remarks/>
-    public System.UInt64 Scale;
-    
-    /// <remarks/>
-    public System.UInt64 TotalFrames;
+    [System.Xml.Serialization.XmlTextAttribute()]
+    public System.DateTime Value;
 }
 
 /// <remarks/>
@@ -1155,6 +1119,43 @@ public class MediaInstance : MediaFile {
     /// <remarks/>
     [System.Xml.Serialization.XmlArrayItem(IsNullable=false)]
     public MediaSegment[] Composition;
+}
+
+/// <remarks/>
+[System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.smpte-ra.org/schemas/st2071/2014/types")]
+public class FramedTime : DateTime {
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
+    public System.UInt64 Frame;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool FrameSpecified;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
+    public System.UInt64 FrameRate;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool FrameRateSpecified;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
+    public System.UInt64 Scale;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool ScaleSpecified;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
+    public System.UInt64 TotalFrames;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool TotalFramesSpecified;
 }
 
 /// <remarks/>

@@ -53,15 +53,15 @@ public abstract class QueryExpression {
      * @return
      *     possible object is
      *     {@link JAXBElement }{@code <}{@link EQUALS }{@code >}
+     *     {@link JAXBElement }{@code <}{@link CONTAINS }{@code >}
+     *     {@link JAXBElement }{@code <}{@link NOT }{@code >}
      *     {@link JAXBElement }{@code <}{@link Expression }{@code >}
+     *     {@link JAXBElement }{@code <}{@link LESSTHAN }{@code >}
      *     {@link JAXBElement }{@code <}{@link MATCHES }{@code >}
+     *     {@link JAXBElement }{@code <}{@link IMPLEMENTS }{@code >}
+     *     {@link JAXBElement }{@code <}{@link GREATERTHAN }{@code >}
      *     {@link JAXBElement }{@code <}{@link OR }{@code >}
      *     {@link JAXBElement }{@code <}{@link AND }{@code >}
-     *     {@link JAXBElement }{@code <}{@link GREATERTHAN }{@code >}
-     *     {@link JAXBElement }{@code <}{@link IMPLEMENTS }{@code >}
-     *     {@link JAXBElement }{@code <}{@link CONTAINS }{@code >}
-     *     {@link JAXBElement }{@code <}{@link LESSTHAN }{@code >}
-     *     {@link JAXBElement }{@code <}{@link NOT }{@code >}
      *     
      */
     public JAXBElement<? extends Expression> getExpression() {
@@ -74,15 +74,15 @@ public abstract class QueryExpression {
      * @param value
      *     allowed object is
      *     {@link JAXBElement }{@code <}{@link EQUALS }{@code >}
+     *     {@link JAXBElement }{@code <}{@link CONTAINS }{@code >}
+     *     {@link JAXBElement }{@code <}{@link NOT }{@code >}
      *     {@link JAXBElement }{@code <}{@link Expression }{@code >}
+     *     {@link JAXBElement }{@code <}{@link LESSTHAN }{@code >}
      *     {@link JAXBElement }{@code <}{@link MATCHES }{@code >}
+     *     {@link JAXBElement }{@code <}{@link IMPLEMENTS }{@code >}
+     *     {@link JAXBElement }{@code <}{@link GREATERTHAN }{@code >}
      *     {@link JAXBElement }{@code <}{@link OR }{@code >}
      *     {@link JAXBElement }{@code <}{@link AND }{@code >}
-     *     {@link JAXBElement }{@code <}{@link GREATERTHAN }{@code >}
-     *     {@link JAXBElement }{@code <}{@link IMPLEMENTS }{@code >}
-     *     {@link JAXBElement }{@code <}{@link CONTAINS }{@code >}
-     *     {@link JAXBElement }{@code <}{@link LESSTHAN }{@code >}
-     *     {@link JAXBElement }{@code <}{@link NOT }{@code >}
      *     
      */
     public void setExpression(JAXBElement<? extends Expression> value) {

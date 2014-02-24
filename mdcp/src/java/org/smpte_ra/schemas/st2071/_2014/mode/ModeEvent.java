@@ -41,8 +41,8 @@ public class ModeEvent
 {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "RN", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/identity", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "Mode", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/mode", type = JAXBElement.class, required = false)
+        @XmlElementRef(name = "Mode", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/mode", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "RN", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/identity", type = JAXBElement.class, required = false)
     })
     protected List<JAXBElement<?>> rest;
 
@@ -52,8 +52,8 @@ public class ModeEvent
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "RN" is used by two different parts of a schema. See: 
-     * line 55 of file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2f.xsd
-     * line 30 of file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2e.xsd
+     * line 55 of file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2f.xsd
+     * line 30 of file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names: 
@@ -74,10 +74,10 @@ public class ModeEvent
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link String }{@code >}
-     * {@link JAXBElement }{@code <}{@link String }{@code >}
-     * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link Mode }{@code >}
+     * {@link JAXBElement }{@code <}{@link String }{@code >}
+     * {@link JAXBElement }{@code <}{@link String }{@code >}
+     * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * 
      * 

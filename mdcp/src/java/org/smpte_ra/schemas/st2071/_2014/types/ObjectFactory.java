@@ -1,11 +1,9 @@
 
 package org.smpte_ra.schemas.st2071._2014.types;
 
-import java.math.BigInteger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 
@@ -27,32 +25,22 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _Exception_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Exception");
-    private final static QName _MicrosFromEpoch_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "MicrosFromEpoch");
     private final static QName _Boolean_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Boolean");
     private final static QName _FramedTime_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "FramedTime");
     private final static QName _Attributes_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Attributes");
-    private final static QName _Scale_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Scale");
     private final static QName _String_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "String");
     private final static QName _DATATYPE_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "DATA_TYPE");
     private final static QName _Image_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Image");
-    private final static QName _Minute_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Minute");
-    private final static QName _Hour_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Hour");
     private final static QName _Key_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Key");
     private final static QName _MIMEType_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "MIMEType");
     private final static QName _STATUS_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "STATUS");
-    private final static QName _TotalFrames_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "TotalFrames");
-    private final static QName _Frame_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Frame");
-    private final static QName _Capabilities_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Capabilities");
     private final static QName _Width_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Width");
-    private final static QName _Microsecond_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Microsecond");
+    private final static QName _Capabilities_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Capabilities");
     private final static QName _Height_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Height");
     private final static QName _Map_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Map");
-    private final static QName _Second_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Second");
     private final static QName _Keys_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Keys");
     private final static QName _Message_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Message");
-    private final static QName _FrameRate_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "FrameRate");
     private final static QName _Data_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Data");
-    private final static QName _Date_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Date");
     private final static QName _DateTime_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "DateTime");
     private final static QName _Capability_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Capability");
 
@@ -64,14 +52,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Map }
-     * 
-     */
-    public Map createMap() {
-        return new Map();
-    }
-
-    /**
      * Create an instance of {@link DateTime }
      * 
      */
@@ -80,27 +60,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Map }
+     * 
+     */
+    public Map createMap() {
+        return new Map();
+    }
+
+    /**
      * Create an instance of {@link Key }
      * 
      */
     public Key createKey() {
         return new Key();
-    }
-
-    /**
-     * Create an instance of {@link Image }
-     * 
-     */
-    public Image createImage() {
-        return new Image();
-    }
-
-    /**
-     * Create an instance of {@link Capabilities }
-     * 
-     */
-    public Capabilities createCapabilities() {
-        return new Capabilities();
     }
 
     /**
@@ -120,6 +92,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Image }
+     * 
+     */
+    public Image createImage() {
+        return new Image();
+    }
+
+    /**
+     * Create an instance of {@link Capabilities }
+     * 
+     */
+    public Capabilities createCapabilities() {
+        return new Capabilities();
+    }
+
+    /**
      * Create an instance of {@link FramedTime }
      * 
      */
@@ -134,15 +122,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Exception")
     public JAXBElement<Exception> createException(Exception value) {
         return new JAXBElement<Exception>(_Exception_QNAME, Exception.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "MicrosFromEpoch")
-    public JAXBElement<BigInteger> createMicrosFromEpoch(BigInteger value) {
-        return new JAXBElement<BigInteger>(_MicrosFromEpoch_QNAME, BigInteger.class, null, value);
     }
 
     /**
@@ -173,15 +152,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Scale")
-    public JAXBElement<Long> createScale(Long value) {
-        return new JAXBElement<Long>(_Scale_QNAME, Long.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -206,24 +176,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Image")
     public JAXBElement<Image> createImage(Image value) {
         return new JAXBElement<Image>(_Image_QNAME, Image.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Minute")
-    public JAXBElement<Integer> createMinute(Integer value) {
-        return new JAXBElement<Integer>(_Minute_QNAME, Integer.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Hour")
-    public JAXBElement<Integer> createHour(Integer value) {
-        return new JAXBElement<Integer>(_Hour_QNAME, Integer.class, null, value);
     }
 
     /**
@@ -254,33 +206,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "TotalFrames")
-    public JAXBElement<BigInteger> createTotalFrames(BigInteger value) {
-        return new JAXBElement<BigInteger>(_TotalFrames_QNAME, BigInteger.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Frame")
-    public JAXBElement<Long> createFrame(Long value) {
-        return new JAXBElement<Long>(_Frame_QNAME, Long.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Capabilities }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Capabilities")
-    public JAXBElement<Capabilities> createCapabilities(Capabilities value) {
-        return new JAXBElement<Capabilities>(_Capabilities_QNAME, Capabilities.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
      * 
      */
@@ -290,12 +215,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Capabilities }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Microsecond")
-    public JAXBElement<Integer> createMicrosecond(Integer value) {
-        return new JAXBElement<Integer>(_Microsecond_QNAME, Integer.class, null, value);
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Capabilities")
+    public JAXBElement<Capabilities> createCapabilities(Capabilities value) {
+        return new JAXBElement<Capabilities>(_Capabilities_QNAME, Capabilities.class, null, value);
     }
 
     /**
@@ -317,15 +242,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Second")
-    public JAXBElement<Integer> createSecond(Integer value) {
-        return new JAXBElement<Integer>(_Second_QNAME, Integer.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Keys }{@code >}}
      * 
      */
@@ -344,30 +260,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "FrameRate")
-    public JAXBElement<Long> createFrameRate(Long value) {
-        return new JAXBElement<Long>(_FrameRate_QNAME, Long.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Data")
     public JAXBElement<byte[]> createData(byte[] value) {
         return new JAXBElement<byte[]>(_Data_QNAME, byte[].class, null, ((byte[]) value));
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Date")
-    public JAXBElement<XMLGregorianCalendar> createDate(XMLGregorianCalendar value) {
-        return new JAXBElement<XMLGregorianCalendar>(_Date_QNAME, XMLGregorianCalendar.class, null, value);
     }
 
     /**

@@ -138,50 +138,12 @@ End Class
 
 '''<remarks/>
 <System.Xml.Serialization.XmlTypeAttribute(Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/types"),  _
- System.Xml.Serialization.XmlRootAttribute("ValidTill", Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/security"),  _
- System.Xml.Serialization.XmlIncludeAttribute(GetType(FramedTime))>  _
+ System.Xml.Serialization.XmlRootAttribute("ValidTill", Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/security")>  _
 Public Class DateTime
     
     '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="date")>  _
-    Public [Date] As Date
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Hour As String
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Minute As String
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Second As String
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Microsecond As String
-    
-    '''<remarks/>
-    Public MicrosFromEpoch As System.UInt64
-End Class
-
-'''<remarks/>
-<System.Xml.Serialization.XmlTypeAttribute(Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/types")>  _
-Public Class FramedTime
-    Inherits DateTime
-    
-    '''<remarks/>
-    Public Frame As System.UInt64
-    
-    '''<remarks/>
-    Public FrameRate As System.UInt64
-    
-    '''<remarks/>
-    Public Scale As System.UInt64
-    
-    '''<remarks/>
-    Public TotalFrames As System.UInt64
+    <System.Xml.Serialization.XmlTextAttribute()>  _
+    Public Value As Date
 End Class
 
 '''<remarks/>

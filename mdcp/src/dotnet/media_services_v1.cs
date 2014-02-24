@@ -280,27 +280,8 @@ public class Media {
 public class DateTime {
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="date")]
-    public System.DateTime Date;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Hour;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Minute;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Second;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
-    public string Microsecond;
-    
-    /// <remarks/>
-    public System.UInt64 MicrosFromEpoch;
+    [System.Xml.Serialization.XmlTextAttribute()]
+    public System.DateTime Value;
 }
 
 /// <remarks/>
@@ -308,16 +289,36 @@ public class DateTime {
 public class FramedTime : DateTime {
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
     public System.UInt64 Frame;
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool FrameSpecified;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
     public System.UInt64 FrameRate;
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool FrameRateSpecified;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
     public System.UInt64 Scale;
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool ScaleSpecified;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlAttributeAttribute()]
     public System.UInt64 TotalFrames;
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnore()]
+    public bool TotalFramesSpecified;
 }
 
 /// <remarks/>

@@ -59,8 +59,8 @@ public interface ModeSupport {
     /**
      * 
      * @param mode
-     * @throws SecurityExceptionFault
      * @throws InvalidModeFault
+     * @throws SecurityExceptionFault
      * @throws ModeExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/changeMode")

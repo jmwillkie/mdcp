@@ -60,8 +60,8 @@ public class ObjectFactory {
     private final static QName _DeviceNotBound_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "DeviceNotBound");
     private final static QName _GetUDN_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "getUDN");
     private final static QName _ChildrenResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "childrenResponse");
-    private final static QName _GetUDNResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "getUDNResponse");
     private final static QName _DeviceEvent_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "DeviceEvent");
+    private final static QName _GetUDNResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "getUDNResponse");
     private final static QName _Online_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "Online");
     private final static QName _AncestorsResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "ancestorsResponse");
     private final static QName _Lookup_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "lookup");
@@ -678,21 +678,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetUDNResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", name = "getUDNResponse")
-    public JAXBElement<GetUDNResponse> createGetUDNResponse(GetUDNResponse value) {
-        return new JAXBElement<GetUDNResponse>(_GetUDNResponse_QNAME, GetUDNResponse.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DeviceEvent }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", name = "DeviceEvent", substitutionHeadNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/event", substitutionHeadName = "Event")
     public JAXBElement<DeviceEvent> createDeviceEvent(DeviceEvent value) {
         return new JAXBElement<DeviceEvent>(_DeviceEvent_QNAME, DeviceEvent.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetUDNResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", name = "getUDNResponse")
+    public JAXBElement<GetUDNResponse> createGetUDNResponse(GetUDNResponse value) {
+        return new JAXBElement<GetUDNResponse>(_GetUDNResponse_QNAME, GetUDNResponse.class, null, value);
     }
 
     /**

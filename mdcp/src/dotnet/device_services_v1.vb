@@ -466,45 +466,8 @@ End Class
 Public Class DateTime
     
     '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="date")>  _
-    Public [Date] As Date
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Hour As String
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Minute As String
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Second As String
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlElementAttribute(DataType:="integer")>  _
-    Public Microsecond As String
-    
-    '''<remarks/>
-    Public MicrosFromEpoch As System.UInt64
-End Class
-
-'''<remarks/>
-<System.Xml.Serialization.XmlTypeAttribute(Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/types")>  _
-Public Class FramedTime
-    Inherits DateTime
-    
-    '''<remarks/>
-    Public Frame As System.UInt64
-    
-    '''<remarks/>
-    Public FrameRate As System.UInt64
-    
-    '''<remarks/>
-    Public Scale As System.UInt64
-    
-    '''<remarks/>
-    Public TotalFrames As System.UInt64
+    <System.Xml.Serialization.XmlTextAttribute()>  _
+    Public Value As Date
 End Class
 
 '''<remarks/>
@@ -1036,6 +999,44 @@ Public Class MediaInstance
     '''<remarks/>
     <System.Xml.Serialization.XmlArrayItem(IsNullable:=false)>  _
     Public Composition As MediaSegment()
+End Class
+
+'''<remarks/>
+<System.Xml.Serialization.XmlTypeAttribute(Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/types")>  _
+Public Class FramedTime
+    Inherits DateTime
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlAttributeAttribute()>  _
+    Public Frame As System.UInt64
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlIgnore()>  _
+    Public FrameSpecified As Boolean
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlAttributeAttribute()>  _
+    Public FrameRate As System.UInt64
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlIgnore()>  _
+    Public FrameRateSpecified As Boolean
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlAttributeAttribute()>  _
+    Public Scale As System.UInt64
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlIgnore()>  _
+    Public ScaleSpecified As Boolean
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlAttributeAttribute()>  _
+    Public TotalFrames As System.UInt64
+    
+    '''<remarks/>
+    <System.Xml.Serialization.XmlIgnore()>  _
+    Public TotalFramesSpecified As Boolean
 End Class
 
 '''<remarks/>
