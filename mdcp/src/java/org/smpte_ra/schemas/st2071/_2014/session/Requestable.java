@@ -42,9 +42,9 @@ public interface Requestable {
      * @param approve
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.EmptyResponse
+     * @throws SecurityExceptionFault
      * @throws RequestNotFoundFault
      * @throws RequestExpiredFault
-     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/approve")
     @WebResult(name = "approveResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "approveResponse")
@@ -60,9 +60,9 @@ public interface Requestable {
      * 
      * @param message
      * @param requestID
+     * @throws SecurityExceptionFault
      * @throws RequestNotFoundFault
      * @throws RequestExpiredFault
-     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/deny")
     @RequestWrapper(localName = "deny", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", className = "org.smpte_ra.schemas.st2071._2014.session.Deny")
@@ -81,10 +81,10 @@ public interface Requestable {
      * @param request
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
-     * @throws NotAcquiredFault
      * @throws RequestDeniedFault
-     * @throws SessionNotFoundFault
      * @throws SecurityExceptionFault
+     * @throws SessionNotFoundFault
+     * @throws NotAcquiredFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/request")
     @WebResult(name = "requestResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "requestResponse")
@@ -101,10 +101,10 @@ public interface Requestable {
      * @param take
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
-     * @throws NotAcquiredFault
-     * @throws SessionNotFoundFault
      * @throws SecurityExceptionFault
      * @throws LockNotFoundFault
+     * @throws SessionNotFoundFault
+     * @throws NotAcquiredFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/take")
     @WebResult(name = "takeResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "takeResponse")

@@ -16,7 +16,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "ServiceService", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service", wsdlLocation = "file:/Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/service_services.wsdl")
+@WebServiceClient(name = "ServiceService", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service", wsdlLocation = "file:/Users/posicks/work/workspaces/standards/MDCP/src/xml/service_services.wsdl")
 public class ServiceService
     extends javax.xml.ws.Service
 {
@@ -29,7 +29,7 @@ public class ServiceService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/service_services.wsdl");
+            url = new URL("file:/Users/posicks/work/workspaces/standards/MDCP/src/xml/service_services.wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

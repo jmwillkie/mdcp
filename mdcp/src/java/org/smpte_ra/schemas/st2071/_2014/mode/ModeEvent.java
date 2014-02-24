@@ -41,8 +41,8 @@ public class ModeEvent
 {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "Mode", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/mode", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "RN", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/identity", type = JAXBElement.class, required = false)
+        @XmlElementRef(name = "RN", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/identity", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "Mode", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/mode", type = JAXBElement.class, required = false)
     })
     protected List<JAXBElement<?>> rest;
 
@@ -76,8 +76,8 @@ public class ModeEvent
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
-     * {@link JAXBElement }{@code <}{@link Mode }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
+     * {@link JAXBElement }{@code <}{@link Mode }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * 
      * 

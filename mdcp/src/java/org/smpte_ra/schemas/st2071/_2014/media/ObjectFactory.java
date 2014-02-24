@@ -172,19 +172,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MediaFile }
-     * 
-     */
-    public MediaFile createMediaFile() {
-        return new MediaFile();
-    }
-
-    /**
      * Create an instance of {@link MediaList }
      * 
      */
     public MediaList createMediaList() {
         return new MediaList();
+    }
+
+    /**
+     * Create an instance of {@link MediaFile }
+     * 
+     */
+    public MediaFile createMediaFile() {
+        return new MediaFile();
     }
 
     /**
