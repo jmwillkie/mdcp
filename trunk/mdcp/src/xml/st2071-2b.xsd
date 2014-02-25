@@ -24,31 +24,37 @@
 	
 	<xs:simpleType name="RN">
 		<xs:restriction base="tns:URN">
-			<xs:pattern value="urn:smpte:u[dsmc]n:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:(([\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))(([;,])[\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))*)?"></xs:pattern>
+			<xs:pattern value="urn:smpte:u[dsmc]n:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:.*"></xs:pattern>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="AtributeRN">
+		<xs:restriction base="tns:RN">
+			<xs:pattern value="urn:smpte:u[dsm]n:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:(([\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{S}~!@#$%^*\(\)\[\]\{\}\.&gt;&lt;\?':&amp;])*&quot;?)?)([;,][\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{S}~!@#$%^*\(\)\[\]\{\}\.&gt;&lt;\?':&amp;])*&quot;?)?)*)?"></xs:pattern>
 		</xs:restriction>
 	</xs:simpleType>
 	
     <xs:simpleType name="UDN">
-    	<xs:restriction base="tns:RN">
-    		<xs:pattern value="urn:smpte:udn:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:(([\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))(([;,])[\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))*)?"></xs:pattern>
+    	<xs:restriction base="tns:AtributeRN">
+    		<xs:pattern value="urn:smpte:udn:.*"></xs:pattern>
     	</xs:restriction>
     </xs:simpleType>
 	
 	<xs:simpleType name="USN">
-		<xs:restriction base="tns:RN">
-			<xs:pattern value="urn:smpte:usn:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:(([\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))(([;,])[\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))*)?"></xs:pattern>
+		<xs:restriction base="tns:AtributeRN">
+			<xs:pattern value="urn:smpte:usn:.*:type=&quot;?.+&quot;?([;,].*)?"></xs:pattern>
 		</xs:restriction>
 	</xs:simpleType>
 	
     <xs:simpleType name="UMN">
-    	<xs:restriction base="tns:RN">
-    		<xs:pattern value="urn:smpte:umn:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:(([\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))(([;,])[\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{P}\p{S}&amp;-;,])*$quot;?))*)?"></xs:pattern>
+    	<xs:restriction base="tns:AtributeRN">
+    		<xs:pattern value="urn:smpte:umn:.*:type=&quot;?.+&quot;?([;,].*)?"></xs:pattern>
     	</xs:restriction>
     </xs:simpleType>
     
     <xs:simpleType name="UCN">
     	<xs:restriction base="tns:RN">
-    		<xs:pattern value="urn:smpte:ucn:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:([\d\w\+\-_\p{Zs}]+_v\d+(\.\d+)*)?"></xs:pattern>
+    		<xs:pattern value="urn:smpte:ucn:.*:([\d\w\+\-_\p{Zs}]+_v[0-9]+(\.[0-9]+)*)?"></xs:pattern>
     	</xs:restriction>
     </xs:simpleType>
     

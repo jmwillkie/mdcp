@@ -66,8 +66,8 @@ public interface DeviceDirectory {
      * @param udn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.device.DeviceInformations
-     * @throws SecurityExceptionFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/ancestors")
     @WebResult(name = "DeviceInformations", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device")
@@ -85,8 +85,8 @@ public interface DeviceDirectory {
      * @param udn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.device.DeviceInformation
-     * @throws SecurityExceptionFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/lookup")
     @WebResult(name = "DeviceInformation", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device")
@@ -104,8 +104,8 @@ public interface DeviceDirectory {
      * @param udn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.device.DeviceInformation
-     * @throws SecurityExceptionFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/parent")
     @WebResult(name = "DeviceInformation", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device")
@@ -124,9 +124,9 @@ public interface DeviceDirectory {
      * @param udn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.device.DeviceInformations
+     * @throws DeviceNotFoundFault_Exception
      * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
-     * @throws DeviceNotFoundFault_Exception
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/children")
     @WebResult(name = "DeviceInformations", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device")
@@ -147,9 +147,9 @@ public interface DeviceDirectory {
      * @param udn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.device.DeviceInformations
+     * @throws DeviceNotFoundFault_Exception
      * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
-     * @throws DeviceNotFoundFault_Exception
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/siblings")
     @WebResult(name = "DeviceInformations", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device")
@@ -170,9 +170,9 @@ public interface DeviceDirectory {
      * @param udn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.device.DeviceInformations
+     * @throws DeviceNotFoundFault_Exception
      * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
-     * @throws DeviceNotFoundFault_Exception
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceDirectory/search")
     @WebResult(name = "DeviceInformations", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device")

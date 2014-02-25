@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UCN 
+    xmlns="http://www.smpte-ra.org/schemas/st2071/2014/identity"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.smpte-ra.org/schemas/st2071/2014/identity st2071-2b.xsd">
+    urn:smpte:ucn:net.posick:service_v1.0.100
+</UCN>

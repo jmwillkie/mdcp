@@ -41,8 +41,8 @@ public interface MediaAccess {
      * @param umn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.identity.URLs
-     * @throws MediaNotFoundFault
      * @throws SecurityExceptionFault
+     * @throws MediaNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaAccess/lookupURLs")
     @WebResult(name = "URLs", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/identity")

@@ -43,10 +43,10 @@ public interface DeviceRegistry {
      * @param parentUDN
      * @param capabilities
      * @param udn
-     * @throws SecurityExceptionFault
      * @throws DeviceNotBoundFault
-     * @throws DeviceAlreadyBoundFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws DeviceAlreadyBoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/bind")
     @RequestWrapper(localName = "bind", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", className = "org.smpte_ra.schemas.st2071._2014.device.Bind")
@@ -68,8 +68,8 @@ public interface DeviceRegistry {
      * 
      * @param udn
      * @throws DeviceNotUnboundFault
-     * @throws SecurityExceptionFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/unbind")
     @RequestWrapper(localName = "unbind", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", className = "org.smpte_ra.schemas.st2071._2014.device.Unbind")
@@ -85,8 +85,8 @@ public interface DeviceRegistry {
      * 
      * @param _boolean
      * @param udn
-     * @throws SecurityExceptionFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/setOnline")
     @RequestWrapper(localName = "setOnline", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", className = "org.smpte_ra.schemas.st2071._2014.device.SetOnline")
