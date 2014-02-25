@@ -67,9 +67,9 @@ public interface Lockable {
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
      * @throws NotAcquiredFault
-     * @throws SecurityExceptionFault
      * @throws NotLockedFault
      * @throws SessionNotFoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Lockable/lock")
     @WebResult(name = "lockResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "lockResponse")
@@ -86,10 +86,10 @@ public interface Lockable {
      * @param unlock
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.BooleanResponse
-     * @throws NotAcquiredFault
-     * @throws SecurityExceptionFault
-     * @throws NotLockedFault
      * @throws LockNotFoundFault
+     * @throws NotAcquiredFault
+     * @throws NotLockedFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Lockable/unlock")
     @WebResult(name = "unlockResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "unlockResponse")

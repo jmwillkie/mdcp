@@ -28,18 +28,18 @@ public class ObjectFactory {
     private final static QName _Boolean_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Boolean");
     private final static QName _FramedTime_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "FramedTime");
     private final static QName _Attributes_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Attributes");
+    private final static QName _Entries_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Entries");
     private final static QName _String_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "String");
     private final static QName _DATATYPE_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "DATA_TYPE");
     private final static QName _Image_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Image");
-    private final static QName _Key_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Key");
     private final static QName _MIMEType_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "MIMEType");
     private final static QName _STATUS_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "STATUS");
     private final static QName _Width_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Width");
     private final static QName _Capabilities_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Capabilities");
     private final static QName _Height_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Height");
     private final static QName _Map_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Map");
-    private final static QName _Keys_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Keys");
     private final static QName _Message_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Message");
+    private final static QName _MapEntry_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "MapEntry");
     private final static QName _Data_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Data");
     private final static QName _DateTime_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "DateTime");
     private final static QName _Capability_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Capability");
@@ -68,19 +68,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Key }
+     * Create an instance of {@link MapEntry }
      * 
      */
-    public Key createKey() {
-        return new Key();
+    public MapEntry createMapEntry() {
+        return new MapEntry();
     }
 
     /**
-     * Create an instance of {@link Keys }
+     * Create an instance of {@link Entries }
      * 
      */
-    public Keys createKeys() {
-        return new Keys();
+    public Entries createEntries() {
+        return new Entries();
     }
 
     /**
@@ -152,6 +152,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Entries }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Entries")
+    public JAXBElement<Entries> createEntries(Entries value) {
+        return new JAXBElement<Entries>(_Entries_QNAME, Entries.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -176,15 +185,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Image")
     public JAXBElement<Image> createImage(Image value) {
         return new JAXBElement<Image>(_Image_QNAME, Image.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Key }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Key")
-    public JAXBElement<Key> createKey(Key value) {
-        return new JAXBElement<Key>(_Key_QNAME, Key.class, null, value);
     }
 
     /**
@@ -242,21 +242,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Keys }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Keys")
-    public JAXBElement<Keys> createKeys(Keys value) {
-        return new JAXBElement<Keys>(_Keys_QNAME, Keys.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Message")
     public JAXBElement<String> createMessage(String value) {
         return new JAXBElement<String>(_Message_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MapEntry }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "MapEntry")
+    public JAXBElement<MapEntry> createMapEntry(MapEntry value) {
+        return new JAXBElement<MapEntry>(_MapEntry_QNAME, MapEntry.class, null, value);
     }
 
     /**

@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Keys"/>
+ *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Entries"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,35 +28,35 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Map", propOrder = {
-    "keys"
+    "entries"
 })
 public class Map {
 
-    @XmlElement(name = "Keys", required = true)
-    protected Keys keys;
+    @XmlElement(name = "Entries", required = true)
+    protected Entries entries;
 
     /**
-     * Gets the value of the keys property.
+     * Gets the value of the entries property.
      * 
      * @return
      *     possible object is
-     *     {@link Keys }
+     *     {@link Entries }
      *     
      */
-    public Keys getKeys() {
-        return keys;
+    public Entries getEntries() {
+        return entries;
     }
 
     /**
-     * Sets the value of the keys property.
+     * Sets the value of the entries property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Keys }
+     *     {@link Entries }
      *     
      */
-    public void setKeys(Keys value) {
-        this.keys = value;
+    public void setEntries(Entries value) {
+        this.entries = value;
     }
 
 }

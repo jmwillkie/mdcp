@@ -9,15 +9,15 @@ import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for Key complex type.
+ * <p>Java class for MapEntry complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Key">
+ * &lt;complexType name="MapEntry">
  *   &lt;simpleContent>
  *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
- *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="type" use="required" type="{http://www.smpte-ra.org/schemas/st2071/2014/types}DATA_TYPE" />
  *     &lt;/extension>
  *   &lt;/simpleContent>
@@ -27,15 +27,15 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Key", propOrder = {
+@XmlType(name = "MapEntry", propOrder = {
     "value"
 })
-public class Key {
+public class MapEntry {
 
     @XmlValue
     protected String value;
-    @XmlAttribute(name = "id", required = true)
-    protected String id;
+    @XmlAttribute(name = "key", required = true)
+    protected String key;
     @XmlAttribute(name = "type", required = true)
     protected DATATYPE type;
 
@@ -64,27 +64,27 @@ public class Key {
     }
 
     /**
-     * Gets the value of the id property.
+     * Gets the value of the key property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getId() {
-        return id;
+    public String getKey() {
+        return key;
     }
 
     /**
-     * Sets the value of the id property.
+     * Sets the value of the key property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setId(String value) {
-        this.id = value;
+    public void setKey(String value) {
+        this.key = value;
     }
 
     /**

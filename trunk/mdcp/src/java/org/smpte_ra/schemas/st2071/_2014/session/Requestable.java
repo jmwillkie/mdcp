@@ -42,9 +42,9 @@ public interface Requestable {
      * @param approve
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.EmptyResponse
-     * @throws RequestExpiredFault
      * @throws SecurityExceptionFault
      * @throws RequestNotFoundFault
+     * @throws RequestExpiredFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/approve")
     @WebResult(name = "approveResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "approveResponse")
@@ -60,9 +60,9 @@ public interface Requestable {
      * 
      * @param message
      * @param requestID
-     * @throws RequestExpiredFault
-     * @throws RequestNotFoundFault
      * @throws SecurityExceptionFault
+     * @throws RequestNotFoundFault
+     * @throws RequestExpiredFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/deny")
     @RequestWrapper(localName = "deny", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", className = "org.smpte_ra.schemas.st2071._2014.session.Deny")
@@ -101,10 +101,10 @@ public interface Requestable {
      * @param take
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
-     * @throws NotAcquiredFault
-     * @throws SecurityExceptionFault
      * @throws LockNotFoundFault
+     * @throws NotAcquiredFault
      * @throws SessionNotFoundFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/take")
     @WebResult(name = "takeResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "takeResponse")

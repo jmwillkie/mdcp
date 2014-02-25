@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Frame use="required""/>
  *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}FrameRate use="required""/>
  *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Scale use="required""/>
- *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}TotalFrames use="required""/>
+ *       &lt;attribute ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}TotalFrames default="0""/>
  *     &lt;/extension>
  *   &lt;/simpleContent>
  * &lt;/complexType>
@@ -41,7 +41,7 @@ public class FramedTime
     protected long frameRate;
     @XmlAttribute(name = "Scale", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", required = true)
     protected long scale;
-    @XmlAttribute(name = "TotalFrames", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", required = true)
+    @XmlAttribute(name = "TotalFrames", namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types")
     @XmlSchemaType(name = "unsignedLong")
     protected BigInteger totalFrames;
 
@@ -102,7 +102,11 @@ public class FramedTime
      *     
      */
     public BigInteger getTotalFrames() {
-        return totalFrames;
+        if (totalFrames == null) {
+            return new BigInteger("0");
+        } else {
+            return totalFrames;
+        }
     }
 
     /**

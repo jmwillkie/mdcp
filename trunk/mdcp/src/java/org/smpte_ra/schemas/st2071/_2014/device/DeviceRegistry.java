@@ -43,10 +43,10 @@ public interface DeviceRegistry {
      * @param parentUDN
      * @param capabilities
      * @param udn
-     * @throws SecurityExceptionFault
-     * @throws DeviceAlreadyBoundFault
      * @throws DeviceNotBoundFault
+     * @throws SecurityExceptionFault
      * @throws DeviceNotFoundFault_Exception
+     * @throws DeviceAlreadyBoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/bind")
     @RequestWrapper(localName = "bind", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", className = "org.smpte_ra.schemas.st2071._2014.device.Bind")
@@ -68,8 +68,8 @@ public interface DeviceRegistry {
      * 
      * @param udn
      * @throws SecurityExceptionFault
-     * @throws DeviceNotFoundFault_Exception
      * @throws DeviceNotUnboundFault
+     * @throws DeviceNotFoundFault_Exception
      */
     @WebMethod(action = "http://www.smpte-ra.org/schemas/st2071/2014/device/DeviceRegistry/unbind")
     @RequestWrapper(localName = "unbind", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", className = "org.smpte_ra.schemas.st2071._2014.device.Unbind")
