@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FramedTime frame="1" frame_rate="30000" scale="1001" total_frames="0"
+    xmlns="http://www.smpte-ra.org/schemas/st2071/2014/types"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.smpte-ra.org/schemas/st2071/2014/types st2071-2a.xsd">
+    0000-00-00T00:01:00.02
+</FramedTime>

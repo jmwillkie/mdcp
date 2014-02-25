@@ -34,8 +34,8 @@ public class ObjectFactory {
     private final static QName _Image_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Image");
     private final static QName _MIMEType_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "MIMEType");
     private final static QName _STATUS_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "STATUS");
-    private final static QName _Width_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Width");
     private final static QName _Capabilities_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Capabilities");
+    private final static QName _Width_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Width");
     private final static QName _Height_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Height");
     private final static QName _Map_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Map");
     private final static QName _Message_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/types", "Message");
@@ -49,6 +49,14 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link Capabilities }
+     * 
+     */
+    public Capabilities createCapabilities() {
+        return new Capabilities();
     }
 
     /**
@@ -97,14 +105,6 @@ public class ObjectFactory {
      */
     public Image createImage() {
         return new Image();
-    }
-
-    /**
-     * Create an instance of {@link Capabilities }
-     * 
-     */
-    public Capabilities createCapabilities() {
-        return new Capabilities();
     }
 
     /**
@@ -206,21 +206,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Width")
-    public JAXBElement<Integer> createWidth(Integer value) {
-        return new JAXBElement<Integer>(_Width_QNAME, Integer.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Capabilities }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Capabilities")
     public JAXBElement<Capabilities> createCapabilities(Capabilities value) {
         return new JAXBElement<Capabilities>(_Capabilities_QNAME, Capabilities.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", name = "Width")
+    public JAXBElement<Integer> createWidth(Integer value) {
+        return new JAXBElement<Integer>(_Width_QNAME, Integer.class, null, value);
     }
 
     /**

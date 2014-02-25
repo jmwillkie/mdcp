@@ -29,8 +29,8 @@ import org.smpte_ra.schemas.st2071._2014.types.OFFSETTYPE;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _MediaInstance_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/media", "MediaInstance");
     private final static QName _Size_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/media", "Size");
+    private final static QName _MediaInstance_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/media", "MediaInstance");
     private final static QName _CreateResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/media", "createResponse");
     private final static QName _TrackType_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/media", "TrackType");
     private final static QName _LookupAsset_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/media", "lookupAsset");
@@ -308,21 +308,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", name = "MediaInstance", substitutionHeadNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", substitutionHeadName = "Media")
-    public JAXBElement<MediaInstance> createMediaInstance(MediaInstance value) {
-        return new JAXBElement<MediaInstance>(_MediaInstance_QNAME, MediaInstance.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", name = "Size")
     public JAXBElement<BigInteger> createSize(BigInteger value) {
         return new JAXBElement<BigInteger>(_Size_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MediaInstance }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", name = "MediaInstance", substitutionHeadNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", substitutionHeadName = "Media")
+    public JAXBElement<MediaInstance> createMediaInstance(MediaInstance value) {
+        return new JAXBElement<MediaInstance>(_MediaInstance_QNAME, MediaInstance.class, null, value);
     }
 
     /**

@@ -711,10 +711,12 @@ Public Class MediaPointer
     Public Source As String
     
     '''<remarks/>
-    Public InpointOffset As System.UInt64
+    <System.Xml.Serialization.XmlElementAttribute(DataType:="nonNegativeInteger")>  _
+    Public InpointOffset As String
     
     '''<remarks/>
-    Public OutpointOffset As System.UInt64
+    <System.Xml.Serialization.XmlElementAttribute(DataType:="nonNegativeInteger")>  _
+    Public OutpointOffset As String
     
     '''<remarks/>
     Public OffsetType As OFFSET_TYPE
@@ -892,10 +894,12 @@ Public Class MediaSegment
     Public Source As String
     
     '''<remarks/>
-    Public InpointOffset As System.UInt64
+    <System.Xml.Serialization.XmlElementAttribute(DataType:="nonNegativeInteger")>  _
+    Public InpointOffset As String
     
     '''<remarks/>
-    Public OutpointOffset As System.UInt64
+    <System.Xml.Serialization.XmlElementAttribute(DataType:="nonNegativeInteger")>  _
+    Public OutpointOffset As String
     
     '''<remarks/>
     Public OffsetType As OFFSET_TYPE
@@ -984,7 +988,8 @@ Public Class MediaFile
     Public MIMEType As String
     
     '''<remarks/>
-    Public Size As System.UInt64
+    <System.Xml.Serialization.XmlElementAttribute(DataType:="nonNegativeInteger")>  _
+    Public Size As String
 End Class
 
 '''<remarks/>
@@ -1007,36 +1012,21 @@ Public Class FramedTime
     Inherits DateTime
     
     '''<remarks/>
-    <System.Xml.Serialization.XmlAttributeAttribute()>  _
-    Public Frame As System.UInt64
+    <System.Xml.Serialization.XmlAttributeAttribute(Namespace:="", DataType:="nonNegativeInteger")>  _
+    Public frame As String
     
     '''<remarks/>
-    <System.Xml.Serialization.XmlIgnore()>  _
-    Public FrameSpecified As Boolean
+    <System.Xml.Serialization.XmlAttributeAttribute(Namespace:="", DataType:="nonNegativeInteger")>  _
+    Public frame_rate As String
     
     '''<remarks/>
-    <System.Xml.Serialization.XmlAttributeAttribute()>  _
-    Public FrameRate As System.UInt64
+    <System.Xml.Serialization.XmlAttributeAttribute(Namespace:="", DataType:="nonNegativeInteger")>  _
+    Public scale As String
     
     '''<remarks/>
-    <System.Xml.Serialization.XmlIgnore()>  _
-    Public FrameRateSpecified As Boolean
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlAttributeAttribute()>  _
-    Public Scale As System.UInt64
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlIgnore()>  _
-    Public ScaleSpecified As Boolean
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlAttributeAttribute()>  _
-    Public TotalFrames As System.UInt64
-    
-    '''<remarks/>
-    <System.Xml.Serialization.XmlIgnore()>  _
-    Public TotalFramesSpecified As Boolean
+    <System.ComponentModel.DefaultValue("0"),  _
+     System.Xml.Serialization.XmlAttributeAttribute(Namespace:="", DataType:="nonNegativeInteger")>  _
+    Public total_frames As String
 End Class
 
 '''<remarks/>

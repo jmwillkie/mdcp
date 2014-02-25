@@ -81,10 +81,10 @@ public interface Requestable {
      * @param request
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
-     * @throws NotAcquiredFault
-     * @throws SecurityExceptionFault
-     * @throws SessionNotFoundFault
      * @throws RequestDeniedFault
+     * @throws SecurityExceptionFault
+     * @throws NotAcquiredFault
+     * @throws SessionNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/request")
     @WebResult(name = "requestResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "requestResponse")
@@ -101,10 +101,10 @@ public interface Requestable {
      * @param take
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
-     * @throws LockNotFoundFault
+     * @throws SecurityExceptionFault
      * @throws NotAcquiredFault
      * @throws SessionNotFoundFault
-     * @throws SecurityExceptionFault
+     * @throws LockNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/session/Requestable/take")
     @WebResult(name = "takeResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "takeResponse")

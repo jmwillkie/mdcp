@@ -7,16 +7,17 @@
     xmlns:types="http://www.smpte-ra.org/schemas/st2071/2014/types"
     xmlns:event="http://www.smpte-ra.org/schemas/st2071/2014/event"
     xmlns:query="http://www.smpte-ra.org/schemas/st2071/2014/query"
-    elementFormDefault="qualified">
-
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified" >
+    
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2a.xsd" />
+        schemaLocation="st2071-2a.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
+        schemaLocation="st2071-2b.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd" />
+        schemaLocation="st2071-2e.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2h.xsd" />
+        schemaLocation="st2071-2h.xsd" />
 
     <xs:complexType name="DeviceInformation">
         <xs:sequence>

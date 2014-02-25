@@ -1,6 +1,11 @@
 #!/bin/sh
 
 BASE=`dirname $0`
+if [ "$BASE" == "." ]; then
+    BASE=`pwd`;
+fi
+echo Base Directory is "$BASE"
+
 SOURCE=$BASE;
 #XML_SOURCE=$SOURCE/xml;
 XML_SOURCE=$BASE/xml;
@@ -48,6 +53,8 @@ else
     mkdir $CLASSES
 fi
 
+pushd $XML_SOURCE
+
 echo Importing $XML_SOURCE/device_services.wsdl
 wsimport $XML_SOURCE/device_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
 echo Importing device.event_services.wsdl
@@ -76,3 +83,5 @@ wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SO
 wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/media_services_v1.vb $XML_SOURCE/media_services.wsdl
 wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/security_services_v1.vb $XML_SOURCE/security_services.wsdl
 wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/service_services_v1.vb $XML_SOURCE/service_services.wsdl
+
+popd

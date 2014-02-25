@@ -5,12 +5,13 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:types="http://www.smpte-ra.org/schemas/st2071/2014/types"
     xmlns:identity="http://www.smpte-ra.org/schemas/st2071/2014/identity" 
-    elementFormDefault="qualified" >
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified" >
     
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2a.xsd" />
+        schemaLocation="st2071-2a.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
+        schemaLocation="st2071-2b.xsd" />
 
     <xs:complexType name="StatusEvent">
         <xs:complexContent>

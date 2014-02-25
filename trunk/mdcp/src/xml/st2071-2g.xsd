@@ -7,16 +7,17 @@
     xmlns:types="http://www.smpte-ra.org/schemas/st2071/2014/types"
     xmlns:query="http://www.smpte-ra.org/schemas/st2071/2014/query"
     xmlns:event="http://www.smpte-ra.org/schemas/st2071/2014/event"
-    elementFormDefault="qualified">
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified" >
     
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2a.xsd" />
+        schemaLocation="st2071-2a.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
+        schemaLocation="st2071-2b.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/query"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2h.xsd" />
+        schemaLocation="st2071-2h.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd" />
+        schemaLocation="st2071-2e.xsd" />
 
     <xs:simpleType name="TRACK_TYPE">
         <xs:restriction base="xs:string">
@@ -253,15 +254,15 @@
     <xs:element name="Duration" type="types:FramedTime" />
     <xs:element name="Composition" type="tns:MediaSegments" />
     <xs:element name="MIMEType" type="xs:string" />
-    <xs:element name="Size" type="xs:unsignedLong" />
+    <xs:element name="Size" type="types:uint64" />
     <xs:element name="Name" type="xs:string" />
     <xs:element name="Location" type="identity:UMN" />
     <xs:element name="Created" type="types:DateTime" />
     <xs:element name="Modified" type="types:DateTime" />
     <xs:element name="Metadata" type="types:Map" />
     <xs:element name="Source" type="identity:UMN" />
-    <xs:element name="InpointOffset" type="xs:unsignedLong" />
-    <xs:element name="OutpointOffset" type="xs:unsignedLong" />
+    <xs:element name="InpointOffset" type="types:uint64" />
+    <xs:element name="OutpointOffset" type="types:uint64" />
     <xs:element name="OffsetType" type="types:OFFSET_TYPE" />
     <xs:element name="Format" type="identity:URI" />
     <xs:element name="Track" type="xs:unsignedShort" />

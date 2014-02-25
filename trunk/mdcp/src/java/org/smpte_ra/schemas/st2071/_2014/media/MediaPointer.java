@@ -46,10 +46,8 @@ public class MediaPointer {
     @XmlElement(name = "Source", required = true)
     protected String source;
     @XmlElement(name = "InpointOffset", required = true)
-    @XmlSchemaType(name = "unsignedLong")
     protected BigInteger inpointOffset;
     @XmlElement(name = "OutpointOffset", required = true)
-    @XmlSchemaType(name = "unsignedLong")
     protected BigInteger outpointOffset;
     @XmlElement(name = "OffsetType", required = true)
     protected OFFSETTYPE offsetType;

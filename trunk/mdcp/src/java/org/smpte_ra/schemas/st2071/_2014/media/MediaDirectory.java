@@ -54,8 +54,8 @@ public interface MediaDirectory {
      * @param create
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws MediaCreationFailedFault
      * @throws MediaNotFoundFault
+     * @throws MediaCreationFailedFault
      * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/create")
@@ -175,9 +175,9 @@ public interface MediaDirectory {
      * @param update
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.media.MediaResponse
-     * @throws MediaUpdateFailedFault
      * @throws MediaNotFoundFault
      * @throws SecurityExceptionFault
+     * @throws MediaUpdateFailedFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/media/MediaDirectory/update")
     @WebResult(name = "updateResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/media", partName = "updateResponse")
