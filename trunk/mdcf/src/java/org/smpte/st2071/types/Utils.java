@@ -4,15 +4,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.smpte_ra.schemas.st2071._2014.identity.URLs;
 import org.smpte_ra.schemas.st2071._2014.types.DATATYPE;
-import org.smpte_ra.schemas.st2071._2014.types.DateTime;
 import org.smpte_ra.schemas.st2071._2014.types.Key;
 import org.smpte_ra.schemas.st2071._2014.types.Keys;
 
@@ -44,23 +41,6 @@ public class Utils
         }
         
         return results.toArray(new URL[results.size()]);
-    }
-
-
-    public static Date datetimeToDate(DateTime datetime)
-    {
-        if (datetime != null)
-        {
-            Calendar calendar = datetime.getDate().toGregorianCalendar();
-            calendar.set(Calendar.HOUR_OF_DAY, datetime.getHour());
-            calendar.set(Calendar.MINUTE, datetime.getMinute());
-            calendar.set(Calendar.SECOND, datetime.getSecond());
-            calendar.set(Calendar.MILLISECOND, datetime.getMicrosecond() * 1000);
-            return calendar.getTime();
-        } else
-        {
-            return new Date();
-        }
     }
 
 
