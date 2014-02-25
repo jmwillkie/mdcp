@@ -9,7 +9,7 @@
     xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/">
     
     <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/security"
-        location="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2p.wsdl" />
+        location="st2071-2p.wsdl" />
     
     <wsdl:types>
         <xs:schema 
@@ -17,7 +17,7 @@
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified">
             
-            <xs:include schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2d.xsd" />
+            <xs:include schemaLocation="st2071-2d.xsd" />
         </xs:schema>
     </wsdl:types>
     

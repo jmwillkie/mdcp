@@ -42,16 +42,16 @@ import org.smpte_ra.schemas.st2071._2014.service.ServiceException;
     "message"
 })
 @XmlSeeAlso({
-    SecurityException.class,
-    ServiceException.class,
-    DeviceException.class,
     InvalidQuery.class,
     ModeException.class,
     InvalidMode.class,
     MediaDeletionFailed.class,
     MediaCreationFailed.class,
     MediaUpdateFailed.class,
-    MediaNotFound.class
+    MediaNotFound.class,
+    DeviceException.class,
+    SecurityException.class,
+    ServiceException.class
 })
 public abstract class Exception {
 

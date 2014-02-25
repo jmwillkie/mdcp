@@ -4,15 +4,23 @@
     xmlns:tns="http://www.smpte-ra.org/schemas/st2071/2014/types"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:identity="http://www.smpte-ra.org/schemas/st2071/2014/identity" 
-    elementFormDefault="qualified">
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified" >
     
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
+        schemaLocation="st2071-2b.xsd" />
     
     <xs:simpleType name="uint50">
-        <xs:restriction base="xs:unsignedLong">
+        <xs:restriction base="xs:nonNegativeInteger">
             <xs:minInclusive value="0" />
-            <xs:maxInclusive value="11258999068442624" />
+            <xs:maxInclusive value="1125899906842623" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="uint64">
+        <xs:restriction base="xs:nonNegativeInteger">
+            <xs:minInclusive value="0" />
+            <xs:maxInclusive value="18446744073709551615" />
         </xs:restriction>
     </xs:simpleType>
     
@@ -80,10 +88,10 @@
     <xs:complexType name="FramedTime" >
         <xs:simpleContent>
            <xs:extension base="tns:DateTime">
-               <xs:attribute ref="tns:Frame" use="required" />
-               <xs:attribute ref="tns:FrameRate" use="required" />
-               <xs:attribute ref="tns:Scale" use="required" />
-               <xs:attribute ref="tns:TotalFrames" default="0" />
+               <xs:attribute name="frame" type="tns:uint50" use="required" />
+               <xs:attribute name="frame_rate" type="tns:uint50" use="required" />
+               <xs:attribute name="scale" type="tns:uint50" use="required" />
+               <xs:attribute name="total_frames" type="tns:uint64" default="0" />
            </xs:extension>
        </xs:simpleContent>
     </xs:complexType>
@@ -134,11 +142,6 @@
     <xs:element name="String" type="xs:string" />
     
     <!-- END The types defined in this section are NOT part of the MDC standard, but are needed for MDCF types -->
-    <xs:attribute name="Frame" type="tns:uint50" />
-    <xs:attribute name="FrameRate" type="tns:uint50" />
-    <xs:attribute name="Scale" type="tns:uint50" />
-    <xs:attribute name="TotalFrames" type="xs:unsignedLong" />
-    
     <xs:element name="MIMEType" type="xs:string" />
     <xs:element name="Height" type="xs:unsignedShort" />
     <xs:element name="Width" type="xs:unsignedShort" />

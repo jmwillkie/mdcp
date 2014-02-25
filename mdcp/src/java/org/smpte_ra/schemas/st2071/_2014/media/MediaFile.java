@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
@@ -45,7 +44,6 @@ public class MediaFile
     @XmlElement(name = "MIMEType", required = true)
     protected String mimeType;
     @XmlElement(name = "Size", required = true)
-    @XmlSchemaType(name = "unsignedLong")
     protected BigInteger size;
 
     /**

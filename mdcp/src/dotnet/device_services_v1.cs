@@ -735,10 +735,12 @@ public class MediaPointer {
     public string Source;
     
     /// <remarks/>
-    public System.UInt64 InpointOffset;
+    [System.Xml.Serialization.XmlElementAttribute(DataType="nonNegativeInteger")]
+    public string InpointOffset;
     
     /// <remarks/>
-    public System.UInt64 OutpointOffset;
+    [System.Xml.Serialization.XmlElementAttribute(DataType="nonNegativeInteger")]
+    public string OutpointOffset;
     
     /// <remarks/>
     public OFFSET_TYPE OffsetType;
@@ -910,10 +912,12 @@ public class MediaSegment : Media {
     public string Source;
     
     /// <remarks/>
-    public System.UInt64 InpointOffset;
+    [System.Xml.Serialization.XmlElementAttribute(DataType="nonNegativeInteger")]
+    public string InpointOffset;
     
     /// <remarks/>
-    public System.UInt64 OutpointOffset;
+    [System.Xml.Serialization.XmlElementAttribute(DataType="nonNegativeInteger")]
+    public string OutpointOffset;
     
     /// <remarks/>
     public OFFSET_TYPE OffsetType;
@@ -998,7 +1002,8 @@ public class MediaFile : Media {
     public string MIMEType;
     
     /// <remarks/>
-    public System.UInt64 Size;
+    [System.Xml.Serialization.XmlElementAttribute(DataType="nonNegativeInteger")]
+    public string Size;
 }
 
 /// <remarks/>
@@ -1019,36 +1024,21 @@ public class MediaInstance : MediaFile {
 public class FramedTime : DateTime {
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute()]
-    public System.UInt64 Frame;
+    [System.Xml.Serialization.XmlAttributeAttribute(Namespace="", DataType="nonNegativeInteger")]
+    public string frame;
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIgnore()]
-    public bool FrameSpecified;
+    [System.Xml.Serialization.XmlAttributeAttribute(Namespace="", DataType="nonNegativeInteger")]
+    public string frame_rate;
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute()]
-    public System.UInt64 FrameRate;
+    [System.Xml.Serialization.XmlAttributeAttribute(Namespace="", DataType="nonNegativeInteger")]
+    public string scale;
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIgnore()]
-    public bool FrameRateSpecified;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute()]
-    public System.UInt64 Scale;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnore()]
-    public bool ScaleSpecified;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute()]
-    public System.UInt64 TotalFrames;
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnore()]
-    public bool TotalFramesSpecified;
+    [System.ComponentModel.DefaultValue("0")]
+    [System.Xml.Serialization.XmlAttributeAttribute(Namespace="", DataType="nonNegativeInteger")]
+    public string total_frames;
 }
 
 /// <remarks/>

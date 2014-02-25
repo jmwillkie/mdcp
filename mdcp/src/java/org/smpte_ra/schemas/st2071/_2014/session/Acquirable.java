@@ -66,11 +66,11 @@ public interface Acquirable {
      * @param acquire
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.URIResponse
-     * @throws LockedFault
-     * @throws TooManySessionsFault
-     * @throws NotAcquiredFault
      * @throws NameInUseFault
      * @throws SecurityExceptionFault
+     * @throws NotAcquiredFault
+     * @throws LockedFault
+     * @throws TooManySessionsFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Acquirable/acquire")
     @WebResult(name = "acquireResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "acquireResponse")
@@ -87,10 +87,10 @@ public interface Acquirable {
      * @param release
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.session.BooleanResponse
-     * @throws LockedFault
-     * @throws NotAcquiredFault
-     * @throws SessionNotFoundFault
      * @throws SecurityExceptionFault
+     * @throws NotAcquiredFault
+     * @throws LockedFault
+     * @throws SessionNotFoundFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/device/control/Acquirable/release")
     @WebResult(name = "releaseResponse", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/session", partName = "releaseResponse")

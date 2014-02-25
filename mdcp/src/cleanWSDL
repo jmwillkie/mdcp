@@ -1,0 +1,62 @@
+#!/bin/sh
+
+BASE=`dirname $0`
+if [ "$BASE" == "." ]; then
+    BASE=`pwd`;
+fi
+echo Base Directory is "$BASE"
+
+SOURCE=$BASE;
+#XML_SOURCE=$SOURCE/xml;
+XML_SOURCE=$BASE/xml;
+#GENERATED=$BASE/generated;
+#GENERATED_SOURCE=$GENERATED/src;
+GENERATED_SOURCE=$BASE;
+#GENERATED_JAVA_SOURCE=$GENERATED_SOURCE/java;
+GENERATED_JAVA_SOURCE=$GENERATED_SOURCE/java;
+GENERATED_DOTNET_SOURCE=$GENERATED_SOURCE/dotnet
+#CLASSES=$BASE/classes
+CLASSES=$BASE/../../classes
+
+if [ -d $GENERATED ]; then
+    echo $GENERATED directory already exists;
+else
+    echo creating directory $GENERATED;
+    mkdir $GENERATED
+fi
+
+if [ -d $GENERATED_SOURCE ]; then
+    echo $GENERATED_SOURCE directory already exists;
+else
+    echo creating directory $GENERATED_SOURCE;
+    mkdir $GENERATED_SOURCE
+fi
+
+if [ -d $GENERATED_JAVA_SOURCE ]; then
+    echo $GENERATED_JAVA_SOURCE directory already exists;
+else
+    echo creating directory $GENERATED_JAVA_SOURCE;
+    mkdir $GENERATED_JAVA_SOURCE
+fi
+
+if [ -d $GENERATED_DOTNET_SOURCE ]; then
+    echo $GENERATED_DOTNET_SOURCE directory already exists;
+else
+    echo creating directory $GENERATED_DOTNET_SOURCE;
+    mkdir $GENERATED_DOTNET_SOURCE
+fi
+
+if [ -d $CLASSES ]; then
+    echo $CLASSES directory already exists;
+else
+    echo creating directory $CLASSES;
+    mkdir $CLASSES
+fi
+
+pushd $GENERATED_JAVA_SOURCE
+find $GENERATED_JAVA_SOURCE -type f -name "*.java" -exec rm -f {} \;
+popd
+pushd $GENERATED_DOTNET_SOURCE
+find $GENERATED_DOTNET_SOURCE -type f -name "*.vb" -exec rm -f {} \;
+find $GENERATED_DOTNET_SOURCE -type f -name "*.cs" -exec rm -f {} \;
+popd

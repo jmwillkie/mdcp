@@ -8,18 +8,19 @@
     xmlns:mode="http://www.smpte-ra.org/schemas/st2071/2014/mode"
     xmlns:media="http://www.smpte-ra.org/schemas/st2071/2014/media" 
     xmlns:device="http://www.smpte-ra.org/schemas/st2071/2014/device" 
-    elementFormDefault="qualified">
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified" >
     
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2a.xsd" />
+        schemaLocation="st2071-2a.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
+        schemaLocation="st2071-2b.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/mode"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2f.xsd" />
+        schemaLocation="st2071-2f.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/media"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2g.xsd" />
+        schemaLocation="st2071-2g.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2c.xsd" />
+        schemaLocation="st2071-2c.xsd" />
     
     <xs:complexType name="Expression" abstract="true">
     </xs:complexType>

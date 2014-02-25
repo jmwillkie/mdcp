@@ -52,8 +52,8 @@ public class ModeEvent
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "RN" is used by two different parts of a schema. See: 
-     * line 55 of file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2f.xsd
-     * line 30 of file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd
+     * line 56 of file:/Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2f.xsd
+     * line 31 of file:/Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names: 

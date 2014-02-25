@@ -59,9 +59,9 @@ public interface ModeSupport {
     /**
      * 
      * @param mode
+     * @throws InvalidModeFault
      * @throws SecurityExceptionFault
      * @throws ModeExceptionFault
-     * @throws InvalidModeFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/mode/ModeSupport/changeMode")
     @RequestWrapper(localName = "changeMode", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/mode", className = "org.smpte_ra.schemas.st2071._2014.mode.ChangeMode")

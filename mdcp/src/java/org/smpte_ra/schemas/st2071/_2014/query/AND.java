@@ -58,16 +58,16 @@ public class AND
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link CONTAINS }{@code >}
      * {@link JAXBElement }{@code <}{@link MATCHES }{@code >}
-     * {@link JAXBElement }{@code <}{@link LESSTHAN }{@code >}
      * {@link JAXBElement }{@code <}{@link GREATERTHAN }{@code >}
-     * {@link JAXBElement }{@code <}{@link EQUALS }{@code >}
+     * {@link JAXBElement }{@code <}{@link NOT }{@code >}
      * {@link JAXBElement }{@code <}{@link Expression }{@code >}
      * {@link JAXBElement }{@code <}{@link OR }{@code >}
+     * {@link JAXBElement }{@code <}{@link EQUALS }{@code >}
+     * {@link JAXBElement }{@code <}{@link CONTAINS }{@code >}
+     * {@link JAXBElement }{@code <}{@link LESSTHAN }{@code >}
      * {@link JAXBElement }{@code <}{@link IMPLEMENTS }{@code >}
      * {@link JAXBElement }{@code <}{@link AND }{@code >}
-     * {@link JAXBElement }{@code <}{@link NOT }{@code >}
      * 
      * 
      */

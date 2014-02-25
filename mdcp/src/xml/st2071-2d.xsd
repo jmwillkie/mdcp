@@ -7,16 +7,17 @@
     xmlns:identity="http://www.smpte-ra.org/schemas/st2071/2014/identity" 
     xmlns:device="http://www.smpte-ra.org/schemas/st2071/2014/device"
     xmlns:event="http://www.smpte-ra.org/schemas/st2071/2014/event"
-    elementFormDefault="qualified" >
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified" >
     
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/types"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2a.xsd" />
+        schemaLocation="st2071-2a.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/identity"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2b.xsd" />
+        schemaLocation="st2071-2b.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/device"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2c.xsd" />
+        schemaLocation="st2071-2c.xsd" />
     <xs:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
-        schemaLocation="file:///Users/posicks/work/workspaces/standards/MDCP/src/xml/st2071-2e.xsd" />
+        schemaLocation="st2071-2e.xsd" />
     
     <xs:complexType name="Session">
         <xs:sequence>
