@@ -176,17 +176,17 @@ Public Class Map
     
     '''<remarks/>
     <System.Xml.Serialization.XmlArrayItem(IsNullable:=false)>  _
-    Public Keys As Key()
+    Public Entries As MapEntry()
 End Class
 
 '''<remarks/>
 <System.Xml.Serialization.XmlTypeAttribute(Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/types"),  _
  System.Xml.Serialization.XmlRootAttribute(Namespace:="http://www.smpte-ra.org/schemas/st2071/2014/types")>  _
-Public Class Key
+Public Class MapEntry
     
     '''<remarks/>
     <System.Xml.Serialization.XmlAttributeAttribute(Namespace:="")>  _
-    Public id As String
+    Public key As String
     
     '''<remarks/>
     <System.Xml.Serialization.XmlAttributeAttribute(Namespace:="")>  _

@@ -46,28 +46,28 @@
         </xs:restriction>
     </xs:simpleType>
     
-    <xs:complexType name="Key" mixed="true">
+    <xs:complexType name="MapEntry" mixed="true">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="id" type="xs:string" use="required" />
+                <xs:attribute name="key" type="xs:string" use="required" />
                 <xs:attribute name="type" type="tns:DATA_TYPE" use="required" />
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     
-    <xs:element name="Key" type="tns:Key" />
+    <xs:element name="MapEntry" type="tns:MapEntry" />
     
-    <xs:complexType name="Keys">
+    <xs:complexType name="Entries">
         <xs:sequence>
-            <xs:element ref="tns:Key" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="tns:MapEntry" minOccurs="0" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
     
-    <xs:element name="Keys" type="tns:Keys" />
+    <xs:element name="Entries" type="tns:Entries" />
     
     <xs:complexType name="Map">
     	<xs:sequence>
-    	    <xs:element ref="tns:Keys" minOccurs="1" maxOccurs="1" />
+    	    <xs:element ref="tns:Entries" minOccurs="1" maxOccurs="1" />
     	</xs:sequence>
     </xs:complexType>
     
@@ -83,7 +83,7 @@
                <xs:attribute ref="tns:Frame" use="required" />
                <xs:attribute ref="tns:FrameRate" use="required" />
                <xs:attribute ref="tns:Scale" use="required" />
-               <xs:attribute ref="tns:TotalFrames" use="required" />
+               <xs:attribute ref="tns:TotalFrames" default="0" />
            </xs:extension>
        </xs:simpleContent>
     </xs:complexType>

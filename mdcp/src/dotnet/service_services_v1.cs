@@ -189,17 +189,17 @@ public class Map {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlArrayItem(IsNullable=false)]
-    public Key[] Keys;
+    public MapEntry[] Entries;
 }
 
 /// <remarks/>
 [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.smpte-ra.org/schemas/st2071/2014/types")]
 [System.Xml.Serialization.XmlRootAttribute(Namespace="http://www.smpte-ra.org/schemas/st2071/2014/types")]
-public class Key {
+public class MapEntry {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlAttributeAttribute(Namespace="")]
-    public string id;
+    public string key;
     
     /// <remarks/>
     [System.Xml.Serialization.XmlAttributeAttribute(Namespace="")]

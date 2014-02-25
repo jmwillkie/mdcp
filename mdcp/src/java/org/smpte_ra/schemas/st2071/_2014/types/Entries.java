@@ -10,16 +10,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for Keys complex type.
+ * <p>Java class for Entries complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Keys">
+ * &lt;complexType name="Entries">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}Key" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.smpte-ra.org/schemas/st2071/2014/types}MapEntry" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -29,41 +29,41 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Keys", propOrder = {
-    "key"
+@XmlType(name = "Entries", propOrder = {
+    "mapEntry"
 })
-public class Keys {
+public class Entries {
 
-    @XmlElement(name = "Key")
-    protected List<Key> key;
+    @XmlElement(name = "MapEntry")
+    protected List<MapEntry> mapEntry;
 
     /**
-     * Gets the value of the key property.
+     * Gets the value of the mapEntry property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the key property.
+     * This is why there is not a <CODE>set</CODE> method for the mapEntry property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getKey().add(newItem);
+     *    getMapEntry().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Key }
+     * {@link MapEntry }
      * 
      * 
      */
-    public List<Key> getKey() {
-        if (key == null) {
-            key = new ArrayList<Key>();
+    public List<MapEntry> getMapEntry() {
+        if (mapEntry == null) {
+            mapEntry = new ArrayList<MapEntry>();
         }
-        return this.key;
+        return this.mapEntry;
     }
 
 }
