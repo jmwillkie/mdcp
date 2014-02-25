@@ -38,9 +38,9 @@ public interface ServiceRegistry {
     /**
      * 
      * @param serviceInformation
+     * @throws ServiceExceptionFault
      * @throws ServiceNotFoundFault
      * @throws SecurityExceptionFault
-     * @throws ServiceExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/bind")
     @RequestWrapper(localName = "bind", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service", className = "org.smpte_ra.schemas.st2071._2014.service.ServiceInformationRequest")
@@ -55,9 +55,9 @@ public interface ServiceRegistry {
     /**
      * 
      * @param usn
+     * @throws ServiceExceptionFault
      * @throws ServiceNotFoundFault
      * @throws SecurityExceptionFault
-     * @throws ServiceExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceRegistry/unbind")
     @RequestWrapper(localName = "unbind", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service", className = "org.smpte_ra.schemas.st2071._2014.service.USNRequest")

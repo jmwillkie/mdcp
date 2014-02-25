@@ -55,9 +55,9 @@ public interface ServiceDirectory {
      * @param usn
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.service.ServiceInformation
+     * @throws ServiceExceptionFault
      * @throws ServiceNotFoundFault
      * @throws SecurityExceptionFault
-     * @throws ServiceExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/lookup")
     @WebResult(name = "ServiceInformation", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service")
@@ -75,9 +75,9 @@ public interface ServiceDirectory {
      * @param queryExpression
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.service.ServiceInformations
+     * @throws ServiceExceptionFault
      * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
-     * @throws ServiceExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceDirectory/search")
     @WebResult(name = "ServiceInformations", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service")

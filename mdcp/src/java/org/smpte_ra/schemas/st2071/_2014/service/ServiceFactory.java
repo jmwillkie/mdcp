@@ -44,9 +44,9 @@ public interface ServiceFactory {
      * @param queryExpression
      * @return
      *     returns org.smpte_ra.schemas.st2071._2014.service.ServiceTemplates
+     * @throws ServiceExceptionFault
      * @throws InvalidQueryFault
      * @throws SecurityExceptionFault
-     * @throws ServiceExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/listTemplates")
     @WebResult(name = "ServiceTemplates", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service")
@@ -63,8 +63,8 @@ public interface ServiceFactory {
      * 
      * @param map
      * @param usn
-     * @throws SecurityExceptionFault
      * @throws ServiceExceptionFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/create")
     @RequestWrapper(localName = "create", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service", className = "org.smpte_ra.schemas.st2071._2014.service.Create")
@@ -81,8 +81,8 @@ public interface ServiceFactory {
     /**
      * 
      * @param usn
-     * @throws SecurityExceptionFault
      * @throws ServiceExceptionFault
+     * @throws SecurityExceptionFault
      */
     @WebMethod(action = "http://www.smpte-ra.org/wsdl/st2071/2014/service/ServiceFactory/destroy")
     @RequestWrapper(localName = "destroy", targetNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/service", className = "org.smpte_ra.schemas.st2071._2014.service.Destroy")
