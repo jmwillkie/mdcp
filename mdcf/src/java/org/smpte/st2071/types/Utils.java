@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.smpte_ra.schemas.st2071._2014.identity.URLs;
 import org.smpte_ra.schemas.st2071._2014.types.DATATYPE;
-import org.smpte_ra.schemas.st2071._2014.types.Key;
-import org.smpte_ra.schemas.st2071._2014.types.Keys;
+import org.smpte_ra.schemas.st2071._2014.types.Entries;
+import org.smpte_ra.schemas.st2071._2014.types.MapEntry;
 
 import sun.misc.BASE64Decoder;
 
@@ -51,14 +51,14 @@ public class Utils
         
         if (mdcMap != null)
         {
-            Keys keys = mdcMap.getKeys();
-            if (keys != null)
+            Entries entries = mdcMap.getEntries();
+            if (entries != null)
             {
-                for (Key key : keys.getKey())
+                for (MapEntry entry : entries.getMapEntry())
                 {
-                    String id = key.getId();
-                    DATATYPE type = key.getType();
-                    String strValue = key.getValue();
+                    String key = entry.getKey();
+                    DATATYPE type = entry.getType();
+                    String strValue = entry.getValue();
                     Object value = null;
                     
                     try
@@ -95,7 +95,7 @@ public class Utils
                         System.err.println("Map value \"" + key + "\" of type \"" + type + "\" could not be converted - " + e.toString());
                     }
                     
-                    map.put(id, value);
+                    map.put(key, value);
                 }
             }
         }
