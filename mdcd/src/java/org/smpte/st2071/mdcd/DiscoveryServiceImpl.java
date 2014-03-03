@@ -1,13 +1,11 @@
 package org.smpte.st2071.mdcd;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,11 +22,13 @@ import java.util.logging.Logger;
 
 import javax.naming.NamingException;
 
+import net.posick.net.DHCPClient;
+import net.posick.net.InetAddressUtils;
+import net.posick.net.NetworkTopologyDiscoveryService;
+import net.posick.net.NetworkTopologyDiscoveryServiceImpl;
+import net.posick.net.NetworkTopologyListener;
+
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
-import org.smpte.st2071.mdcd.net.InetAddressUtils;
-import org.smpte.st2071.mdcd.net.NetworkTopologyDiscoveryService;
-import org.smpte.st2071.mdcd.net.NetworkTopologyDiscoveryServiceImpl;
-import org.smpte.st2071.mdcd.net.NetworkTopologyListener;
 import org.smpte.st2071.types.Resource;
 import org.smpte.util.ListenerProcessor;
 import org.smpte_ra.schemas.st2071._2014.query.QueryExpression;
@@ -252,9 +252,11 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
 
     protected DomainBrowser registrationDomains;
     
-    protected List<String> defaultDomains = new ArrayList<String>();
+    protected Set<String> defaultDomains = new HashSet<String>();
     
     protected Map<String, String> properties = new HashMap<>();
+
+    private Map<InetAddress, Set<String>> hostnamesByAddress = new HashMap<>();
 
 
     @Override
@@ -337,6 +339,29 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     
     @Override
+    public Set<String> getHostNames()
+    {
+        HashSet<String> hostnames = new HashSet<>();
+        for (Set<String> names : hostnamesByAddress.values())
+        {
+            if (names != null && names.size() > 0)
+            {
+                hostnames.addAll(names);
+            }
+        }
+        
+        return hostnames;
+    }
+
+
+    @Override
+    public Set<String> getHostNamesForAddress(InetAddress address)
+    {
+        return hostnamesByAddress.get(address);
+    }
+    
+    
+    @Override
     public void start()
     throws IOException
     {
@@ -354,7 +379,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
             service = new MulticastDNSService();
             service.setQuerier(querier);
         
-            browseDomains = new DomainBrowser(DomainType.BROWSE, determineDefaultBrowseDomains());
+            browseDomains = new DomainBrowser(DomainType.BROWSE);
             registrationDomains = new DomainBrowser(DomainType.REGISTRATION);
             
             executor.execute(new RunnableTask(browseDomains));
@@ -438,20 +463,31 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     }
 
 
+    // 1: Create reverse subnet mask domain names (IP 192.168.1.20 becomes 0.1.168.192.in-addr.arpa.)
+    // 2: Add configured domain names
+    // 3: Get domain name from hostname
+    // 4: Get domain names from hostnames derived from reverse lookups of the IP Address
+    // 5: Add "local."
+    // 6: Get domain names from DHCP "Domain" option code 15 (RFC 2132)
+    // 7: Get domain names from DHCP "Domain Search" option code 119 (RFC 3397)
+    // 8: If IPv6, Get domain names from IPv6 Router Advertisement DNSSL (RFC 6106)
     public void addressAdded(NetworkInterface networkInterface, InetAddress address)
     {
         log.fine("Address Added : " + networkInterface.getDisplayName() + "; Address: " + address +".");
         
         Set<String> defaultDomains = new HashSet<String>();
-        
-        // TODO: Create reverse subnet mask domain names (IP 192.168.1.20 becomes 0.1.168.192.in-addr.arpa.)
-        String reverseMaskDomain = InetAddressUtils.reverseMapAddress(address);
-        if (!defaultDomains.contains(reverseMaskDomain))
+
+        // 1: Create reverse subnet mask domain names (IP 192.168.1.20 becomes 0.1.168.192.in-addr.arpa.)
+        if (!address.isLoopbackAddress())
         {
-            defaultDomains.add(reverseMaskDomain);
+            String reverseMaskDomain = InetAddressUtils.reverseMapAddress(address);
+            if (!defaultDomains.contains(reverseMaskDomain))
+            {
+                defaultDomains.add(reverseMaskDomain);
+            }
         }
         
-        // TODO: Add configured domain names
+        // 2: Add configured domain names
         String configuredDomains = properties.get(PROP_DOMAINS);
         if (configuredDomains != null)
         {
@@ -462,34 +498,75 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
                 {
                     if (domain != null && domain.length() > 0)
                     {
-                        defaultDomains.add(domain);
+                        defaultDomains.add(domain + (domain.endsWith(".") ? "" : "."));
                     }
                 }
             }
         }
         
-        // TODO: Get domain names from the hostname assigned to the machine, if any.
-        String hostname = topology.lookupName(address);
-        if (hostname != null && hostname.length() > 0)
+        // 3: Get domain names from the hostnames assigned to the address, if any.
+        // 4: (Already done by Topology Service) Get domain names from hostnames derived from reverse lookups of the IP Address
+        try
         {
-            String domain = determineDomain(hostname);
-            if (domain != null && domain.length() > 0)
+            String hostname = address.getCanonicalHostName();
+            if (hostname != null && hostname.length() > 0 && !hostname.equals(address.getHostAddress()) && !hostname.startsWith(address.getHostAddress()))
             {
-                defaultDomains.add(domain);
+                synchronized (hostnamesByAddress)
+                {
+                    Set<String> hostnames = hostnamesByAddress.get(address);
+                    if (hostnames == null)
+                    {
+                        hostnames = new HashSet<>();
+                        hostnamesByAddress.put(address, hostnames);
+                    }
+                    
+                    if (!hostnames.contains(hostname))
+                    {
+                        hostnames.add(hostname);
+                    }
+                }
+                
+                String domain = determineDomain(hostname);
+                if (domain != null && domain.length() > 0)
+                {
+                    defaultDomains.add(domain + (domain.endsWith(".") ? "" : "."));
+                }
+            }
+        } catch (Exception e)
+        {
+            log.log(Level.FINER, "Error looking up name for address \"" + address.getHostAddress() + " - " + e.getMessage(), e);
+        }
+        
+        // 5: Add "local."
+        defaultDomains.add(MulticastDNSService.LINK_LOCAL_DOMAIN);
+        
+        // If IPv4 Address use DHCP
+        if (address.getAddress().length == 4)
+        {
+            // 6: Get domain names from DHCP "Domain" option code 15 (RFC 2132)
+            // 7: Get domain names from DHCP "Domain Search" option code 119 (RFC 3397)
+            try
+            {
+                Set<String> domains = DHCPClient.resolveDHCPDomainNames(address);
+                if (domains != null && domains.size() > 0)
+                {
+                    for (String domain : domains)
+                    {
+                        defaultDomains.add(domain + (domain.endsWith(".") ? "" : "."));
+                    }
+                }
+            } catch (Exception e)
+            {
+                log.log(Level.WARNING, "Could not get domain names from DHCP - " + e.getMessage(), e);
             }
         }
         
-        // TODO: Get domain names from hostnames derived from reverse lookups of the IP Address
+        // TODO: 8: If IPv6, Get domain names from IPv6 Router Advertisement DNSSL (RFC 6106)
         
-        
-        // TODO: Add "local."
-        defaultDomains.add(MulticastDNSService.LINK_LOCAL_DOMAIN);
-        
-        // TODO: Get domain names from DHCP "Domain" option code 15 (RFC 2132)
-        // TODO: Get domain names from DHCP "Domain Search" option code 119 (RFC 3397)
-        // TODO: If IPv6, Get domain names from IPv6 Router Advertisement DNSSL (RFC 6106)
+        this.defaultDomains.addAll(defaultDomains);
+        log.info("Domains for IP: " + address + " = " + defaultDomains);
     }
-
+    
 
     private String determineDomain(String hostname)
     {
@@ -497,7 +574,8 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
         int pos = hostname.indexOf('.');
         if (pos >= 0)
         {
-            return hostname.substring(pos + 1);
+            String domain = hostname.substring(pos + 1);
+            return domain == null || domain.length() == 0 ? null : domain;
         } else
         {
             return null;
@@ -509,21 +587,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     {
         // TODO: Remove artifacts related to only this address.
         log.fine("Address Removed : " + networkInterface.getDisplayName() + "; Address: " + address +".");
-        
-    }
-    
-    
-    protected String[] determineDefaultBrowseDomains()
-    {
-        // TODO: Create reverse subnet mask domain names (IP 192.168.1.20 becomes 0.1.168.192.in-addr.arpa.)
-        // TODO: Add configured domain names
-        // TODO: Get domain name from hostname
-        // TODO: Get domain names from hostnames derived from reverse lookups of the IP Address
-        // TODO: Add "local."
-        // TODO: Get domain names from DHCP "Domain" option code 15 (RFC 2132)
-        // TODO: Get domain names from DHCP "Domain Search" option code 119 (RFC 3397)
-        // TODO: If IPv6, Get domain names from IPv6 Router Advertisement DNSSL (RFC 6106)
-        return null;
+        hostnamesByAddress.remove(address);
     }
     
     
