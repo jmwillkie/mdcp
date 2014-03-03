@@ -1,6 +1,5 @@
 package org.smpte.st2071.mdcd;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
 import java.util.Set;
