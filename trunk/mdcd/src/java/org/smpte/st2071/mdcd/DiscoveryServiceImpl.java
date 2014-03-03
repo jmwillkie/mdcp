@@ -3,6 +3,7 @@ package org.smpte.st2071.mdcd;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URISyntaxException;
@@ -24,8 +25,7 @@ import javax.naming.NamingException;
 
 import net.posick.net.DHCPClient;
 import net.posick.net.InetAddressUtils;
-import net.posick.net.NetworkTopologyDiscoveryService;
-import net.posick.net.NetworkTopologyDiscoveryServiceImpl;
+import net.posick.net.NetworkTopology;
 import net.posick.net.NetworkTopologyListener;
 
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
@@ -236,7 +236,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
 
     public static final String PROP_DOMAINS = "domains";
     
-    protected NetworkTopologyDiscoveryService topology;
+    protected NetworkTopology topology;
     
     protected ScheduledExecutorService executor;
     
@@ -363,7 +363,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     @Override
     public void start()
-    throws IOException
+    throws Exception
     {
         try
         {
@@ -385,9 +385,13 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
             executor.execute(new RunnableTask(browseDomains));
             executor.execute(new RunnableTask(registrationDomains));
             
-            topology = new NetworkTopologyDiscoveryServiceImpl(true, true, true, true);
+            
+            topology = NetworkTopologyFactory.newNetworkTopology(true, true, true, true);
             topology.registerNetworkTopologyListener(this);
             topology.start();
+        } catch (InvocationTargetException e)
+        {
+            throw (Exception) e.getTargetException();
         } catch (IOException e)
         {
             log.log(Level.SEVERE, e.getMessage(), e);
