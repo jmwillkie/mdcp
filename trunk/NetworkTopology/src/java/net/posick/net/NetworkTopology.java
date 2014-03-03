@@ -6,7 +6,7 @@ import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
 
-public interface NetworkTopologyDiscoveryService
+public interface NetworkTopology
 {
     public void registerNetworkTopologyListener(NetworkTopologyListener listener);
     
@@ -36,7 +36,8 @@ public interface NetworkTopologyDiscoveryService
     public boolean isMonitoringLoopback();
     
     
-    public void start();
+    public void start()
+    throws Exception;
     
     
     public void stop();
