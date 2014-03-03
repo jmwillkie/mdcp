@@ -161,7 +161,7 @@ public interface DiscoveryService
      * @throws Exception if the Discover Service cannot be started for any reason.
      */
     public void start()
-    throws IOException;
+    throws Exception;
     
     
     /**
