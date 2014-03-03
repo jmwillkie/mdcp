@@ -28,26 +28,26 @@
 		</xs:restriction>
 	</xs:simpleType>
 	
-	<xs:simpleType name="AtributeRN">
+	<xs:simpleType name="RNWithAttributes">
 		<xs:restriction base="tns:RN">
 			<xs:pattern value="urn:smpte:u[dsm]n:([\d\w\+\-_\p{Zs}]+(\.[\d\w\+\-_\p{Zs}]+)*)?:(([\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{S}~!@#$%^*\(\)\[\]\{\}\.&gt;&lt;\?':&amp;])*&quot;?)?)([;,][\d\w\+\-_\p{Zs}]+(=&quot;?([\d\w\+\-_\p{Zs}\p{S}~!@#$%^*\(\)\[\]\{\}\.&gt;&lt;\?':&amp;])*&quot;?)?)*)?"></xs:pattern>
 		</xs:restriction>
 	</xs:simpleType>
 	
     <xs:simpleType name="UDN">
-    	<xs:restriction base="tns:AtributeRN">
+    	<xs:restriction base="tns:RNWithAttributes">
     		<xs:pattern value="urn:smpte:udn:.*"></xs:pattern>
     	</xs:restriction>
     </xs:simpleType>
 	
 	<xs:simpleType name="USN">
-		<xs:restriction base="tns:AtributeRN">
+		<xs:restriction base="tns:RNWithAttributes">
 			<xs:pattern value="urn:smpte:usn:.*:type=&quot;?.+&quot;?([;,].*)?"></xs:pattern>
 		</xs:restriction>
 	</xs:simpleType>
 	
     <xs:simpleType name="UMN">
-    	<xs:restriction base="tns:AtributeRN">
+    	<xs:restriction base="tns:RNWithAttributes">
     		<xs:pattern value="urn:smpte:umn:.*:type=&quot;?.+&quot;?([;,].*)?"></xs:pattern>
     	</xs:restriction>
     </xs:simpleType>
