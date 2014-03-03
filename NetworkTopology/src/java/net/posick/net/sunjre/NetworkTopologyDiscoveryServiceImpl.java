@@ -1,4 +1,4 @@
-package net.posick.net;
+package net.posick.net.sunjre;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -22,6 +22,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.posick.net.NetworkTopologyDiscoveryService;
+import net.posick.net.NetworkTopologyListener;
 
 import org.smpte.util.ListenerProcessor;
 
