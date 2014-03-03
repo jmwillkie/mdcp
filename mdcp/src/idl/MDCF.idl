@@ -89,7 +89,12 @@ module identity
         factory init(in wstring text);
     };
     
-    valuetype UCN supports URN
+    valuetype RN supports URN
+    {
+        readonly attribute wstring Scope;
+    };
+    
+    valuetype UCN supports RN
     {
         readonly attribute wstring InterfaceNamespace;
         readonly attribute wstring InterfaceName;
@@ -98,30 +103,24 @@ module identity
         
         factory init(in wstring text);
     };
-    
-    valuetype RN supports URN
-    {
-        readonly attribute wstring Scope;
-        readonly attribute org::smpte::st2071::_2013::types::Map Attributes;
-    };
-    
+
     valuetype UDN supports RN
     {
+        readonly attribute org::smpte::st2071::_2014::types::Map Attributes;
+
         factory init(in wstring text);
     };
     
     valuetype USN supports RN
     {
-        readonly attribute wstring Type;
+        readonly attribute org::smpte::st2071::_2014::types::Map Attributes;
         
         factory init(in wstring text);
     };
     
     valuetype UMN supports RN
     {
-        readonly attribute wstring Type;
-        readonly attribute wstring MID;
-        readonly attribute wstring MAID;
+        readonly attribute org::smpte::st2071::_2014::types::Map Attributes;
         
         factory init(in wstring text);
     };
@@ -200,21 +199,16 @@ module types
         readonly attribute RawData Data;
     };
     
-    valuetype Date
-    {
-        readonly attribute unsigned short Day;
-        readonly attribute unsigned short Month;
-        readonly attribute unsigned short Year;
-    };
-    
     valuetype DateTime
     {
-        readonly attribute Date Date;
+        readonly attribute long Year;
+        readonly attribute unsigned short Month;
+        readonly attribute unsigned short Day;
         readonly attribute unsigned short Hour;
         readonly attribute unsigned short Minute;
         readonly attribute unsigned short Second;
         readonly attribute unsigned long Microsecond;
-        readonly attribute long long MicrosFromEpoch;
+        readonly attribute short TimezoneOffset;
     };
     
     valuetype FramedTime supports DateTime
@@ -222,7 +216,7 @@ module types
         readonly attribute unsigned long long Frame;
         readonly attribute unsigned long long FrameRate;
         readonly attribute unsigned long long Scale;
-        readonly attribute long long TotalFrames;
+        readonly attribute unsigned long long TotalFrames;
     };
 
     valuetype Capability
