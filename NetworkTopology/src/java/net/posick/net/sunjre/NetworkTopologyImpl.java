@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.posick.net.NetworkTopologyDiscoveryService;
+import net.posick.net.NetworkTopology;
 import net.posick.net.NetworkTopologyListener;
 
 import org.smpte.util.ListenerProcessor;
 
 
-public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDiscoveryService
+public class NetworkTopologyImpl implements NetworkTopology
 {
     static class TopologyPoller extends TimerTask
     {
@@ -40,14 +40,14 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
         
         private transient boolean started = false;
         
-        private NetworkTopologyDiscoveryService topologyDiscovery;
+        private NetworkTopology topologyDiscovery;
         
         private Map<NetworkInterface, List<InetAddress>> knownInterfaces = new ConcurrentHashMap<NetworkInterface, List<InetAddress>>();
 
         private NetworkTopologyListener listenerProcessor;
         
         
-        TopologyPoller(NetworkTopologyDiscoveryService topologyDiscovery, NetworkTopologyListener listenerProcessor)
+        TopologyPoller(NetworkTopology topologyDiscovery, NetworkTopologyListener listenerProcessor)
         {
             this.topologyDiscovery = topologyDiscovery;
             this.listenerProcessor = listenerProcessor;
@@ -302,7 +302,7 @@ public class NetworkTopologyDiscoveryServiceImpl implements NetworkTopologyDisco
     private TopologyPoller topologyPoller = new TopologyPoller(this, listenerProcessor.getDispatcher());
     
     
-    public NetworkTopologyDiscoveryServiceImpl(boolean useIPv6, boolean useSiteLocal, boolean useVirtual, boolean useLoopback)
+    public NetworkTopologyImpl(boolean useIPv6, boolean useSiteLocal, boolean useVirtual, boolean useLoopback)
     {
         this.useIPv6 = useIPv6;
         this.useSiteLocal = useSiteLocal;
