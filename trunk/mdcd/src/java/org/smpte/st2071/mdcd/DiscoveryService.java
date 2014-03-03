@@ -1,7 +1,9 @@
 package org.smpte.st2071.mdcd;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -52,6 +54,24 @@ public interface DiscoveryService
      * @return The configuration map
      */
     public Map<String, String> getConfiguration();
+    
+    
+    /**
+     * Returns the hostnames associated to this Discovery Service and the network interfaces it represents.
+     * 
+     * @return The hostnames associated to this Discovery Service and the network interfaces it represents
+     */
+    public Set<String> getHostNames();
+    
+    
+    /**
+     * Returns the hostnames associated to the IP address.
+     * 
+     * @param address The IP address
+     * 
+     * @return The hostnames associated to the Ip address
+     */
+    public Set<String> getHostNamesForAddress(InetAddress address);
     
     
     /**

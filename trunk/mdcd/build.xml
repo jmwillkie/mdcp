@@ -1,4 +1,4 @@
-<project name="MDCDiscovery" default="all" basedir=".">
+<project name="mdcd" default="all" basedir=".">
     <property name="basepackage" value="org.smpte.st2071.mdcd" />
     <property name="namespacepackage" value="org.smpte_ra.schemas.st2071._2014" />
 	<property name="projectname" value="mdcd" />
