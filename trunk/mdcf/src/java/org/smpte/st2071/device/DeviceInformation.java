@@ -10,7 +10,7 @@ import org.smpte.st2071.identity.URL;
 import org.smpte.st2071.types.Capability;
 import org.smpte.st2071.types.Resource;
 
-public class DeviceInformation implements Resource, Serializable
+public class DeviceInformation implements Device, Serializable
 {
     private static final long serialVersionUID = 201402051618L;
 
@@ -40,6 +40,12 @@ public class DeviceInformation implements Resource, Serializable
     public UDN getRN()
     {
         return udn;
+    }
+    
+    
+    public UDN getUDN()
+    {
+        return getRN();
     }
     
     

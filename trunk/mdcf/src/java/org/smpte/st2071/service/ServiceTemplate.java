@@ -1,5 +1,6 @@
 package org.smpte.st2071.service;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +12,11 @@ import org.smpte.st2071.types.Capability;
 import org.smpte.st2071.types.Utils;
 import org.smpte_ra.schemas.st2071._2014.types.Capabilities;
 
-public class ServiceTemplate
+public class ServiceTemplate implements Serializable
 {
+    private static final long serialVersionUID = 201403091517L;
+
     protected USN usn;
-    
-    protected List<String> keys = new ArrayList<>();
     
     protected Map<String, Object> attributes = new HashMap<>();
     
@@ -57,19 +58,6 @@ public class ServiceTemplate
     public Map<String, Object> getAttributes()
     {
         return attributes;
-    }
-    
-    
-    public String[] getKeys()
-    {
-        return keys.toArray(new String[keys.size()]);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public <T> T getAttribute(String key)
-    {
-        return (T) attributes.get(key);
     }
 
 
