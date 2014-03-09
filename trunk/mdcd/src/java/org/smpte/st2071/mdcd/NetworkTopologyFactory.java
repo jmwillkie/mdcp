@@ -10,14 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
-
-import com.sun.istack.internal.logging.Logger;
+import java.util.logging.Logger;
 
 import net.posick.net.NetworkTopology;
 
 public class NetworkTopologyFactory
 {
-    private final static Logger log = Logger.getLogger(NetworkTopologyFactory.class);
+    private final static Logger log = Logger.getLogger(NetworkTopologyFactory.class.getName());
     
     protected final static String DEFAULT_NETWORK_TOPOLOGY = "net.posick.net.sunjre.NetworkTopologyImpl";
     
