@@ -48,19 +48,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link USNs }
-     * 
-     */
-    public USNs createUSNs() {
-        return new USNs();
-    }
-
-    /**
      * Create an instance of {@link URLs }
      * 
      */
     public URLs createURLs() {
         return new URLs();
+    }
+
+    /**
+     * Create an instance of {@link USNs }
+     * 
+     */
+    public USNs createUSNs() {
+        return new USNs();
     }
 
     /**

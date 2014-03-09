@@ -43,8 +43,8 @@ public class ObjectFactory {
     private final static QName _GetParentDeviceDirectory_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "getParentDeviceDirectory");
     private final static QName _Bind_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "bind");
     private final static QName _Device_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "Device");
-    private final static QName _DeviceNotFound_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "DeviceNotFound");
     private final static QName _Children_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "children");
+    private final static QName _DeviceNotFound_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "DeviceNotFound");
     private final static QName _SiblingsResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "siblingsResponse");
     private final static QName _GetURLsResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "getURLsResponse");
     private final static QName _GetNamespacesResponse_QNAME = new QName("http://www.smpte-ra.org/schemas/st2071/2014/device", "getNamespacesResponse");
@@ -525,21 +525,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DeviceNotFound }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", name = "DeviceNotFound", substitutionHeadNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", substitutionHeadName = "Exception")
-    public JAXBElement<DeviceNotFound> createDeviceNotFound(DeviceNotFound value) {
-        return new JAXBElement<DeviceNotFound>(_DeviceNotFound_QNAME, DeviceNotFound.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link UDNFilter }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", name = "children")
     public JAXBElement<UDNFilter> createChildren(UDNFilter value) {
         return new JAXBElement<UDNFilter>(_Children_QNAME, UDNFilter.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DeviceNotFound }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.smpte-ra.org/schemas/st2071/2014/device", name = "DeviceNotFound", substitutionHeadNamespace = "http://www.smpte-ra.org/schemas/st2071/2014/types", substitutionHeadName = "Exception")
+    public JAXBElement<DeviceNotFound> createDeviceNotFound(DeviceNotFound value) {
+        return new JAXBElement<DeviceNotFound>(_DeviceNotFound_QNAME, DeviceNotFound.class, null, value);
     }
 
     /**

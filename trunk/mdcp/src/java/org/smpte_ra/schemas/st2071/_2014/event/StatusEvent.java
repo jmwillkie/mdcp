@@ -40,9 +40,9 @@ import org.smpte_ra.schemas.st2071._2014.types.STATUS;
     "message"
 })
 @XmlSeeAlso({
+    DeviceEvent.class,
     ModeEvent.class,
-    MediaEvent.class,
-    DeviceEvent.class
+    MediaEvent.class
 })
 public class StatusEvent
     extends Event
