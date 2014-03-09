@@ -33,7 +33,7 @@
 
 	<target name="jar" description="Makes mdcp.jar" depends="compile">
         <mkdir dir="${metainf_dir}" />
-		<jar jarfile="${dist_dir}/${jarname}" basedir="${build_dir}" includes="**/*.class **/*.properties **/.xml **/*.wsdl **/*.xsd **/*.idl">
+		<jar jarfile="${dist_dir}/${jarname}" basedir="${build_dir}" includes="**/*.class **/*.properties **/*.xml">
 			<exclude name="**/tests/*.class" />
 			<exclude name="**/tests/**" />
 			<manifest>
