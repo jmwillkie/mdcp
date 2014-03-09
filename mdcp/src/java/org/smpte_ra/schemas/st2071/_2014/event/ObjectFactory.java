@@ -54,14 +54,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Event }
-     * 
-     */
-    public Event createEvent() {
-        return new Event();
-    }
-
-    /**
      * Create an instance of {@link GetStatus }
      * 
      */
@@ -75,6 +67,14 @@ public class ObjectFactory {
      */
     public GetStatusResponse createGetStatusResponse() {
         return new GetStatusResponse();
+    }
+
+    /**
+     * Create an instance of {@link Event }
+     * 
+     */
+    public Event createEvent() {
+        return new Event();
     }
 
     /**

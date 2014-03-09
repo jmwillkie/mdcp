@@ -110,19 +110,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ChangeModeResponse }
-     * 
-     */
-    public ChangeModeResponse createChangeModeResponse() {
-        return new ChangeModeResponse();
-    }
-
-    /**
      * Create an instance of {@link Modes }
      * 
      */
     public Modes createModes() {
         return new Modes();
+    }
+
+    /**
+     * Create an instance of {@link ChangeModeResponse }
+     * 
+     */
+    public ChangeModeResponse createChangeModeResponse() {
+        return new ChangeModeResponse();
     }
 
     /**

@@ -67,19 +67,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SecurityException }
-     * 
-     */
-    public SecurityException createSecurityException() {
-        return new SecurityException();
-    }
-
-    /**
      * Create an instance of {@link Principal }
      * 
      */
     public Principal createPrincipal() {
         return new Principal();
+    }
+
+    /**
+     * Create an instance of {@link SecurityException }
+     * 
+     */
+    public SecurityException createSecurityException() {
+        return new SecurityException();
     }
 
     /**
