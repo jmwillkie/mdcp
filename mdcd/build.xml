@@ -1,4 +1,5 @@
 <project name="mdcd" default="all" basedir=".">
+	<property name="bnd.jar" value="bnd-0.0.384.jar" />
     <property name="basepackage" value="org.smpte.st2071.mdcd" />
     <property name="namespacepackage" value="org.smpte_ra.schemas.st2071._2014" />
 	<property name="projectname" value="mdcd" />
@@ -27,15 +28,19 @@
 		<mkdir dir="${build_dir}" />
 		<javac destdir="${build_dir}" debug="true" target="1.7" source="1.7" includeantruntime="false">
 			<src path="${java_src_dir}" />
-	        <include name="${lib_dir}/*.jar" />
-			<exclude name="**/tests/**" />
+            <classpath>
+                <path>
+                    <fileset dir="${lib_dir}">
+                        <include name="*.jar" />
+                    </fileset>
+                </path>
+            </classpath>
 		</javac>
 	</target>
 
 	<target name="jar" description="Makes mdcd.jar" depends="compile">
         <mkdir dir="${metainf_dir}" />
-		<jar jarfile="${dist_dir}/${jarname}" basedir="${build_dir}" includes="**/*.class **/*.properties **/.xml **/*.wsdl **/*.xsd **/*.idl">
-			<exclude name="**/tests/*.class" />
+		<jar jarfile="${dist_dir}/${jarname}" basedir="${build_dir}">
 			<exclude name="**/tests/**" />
 			<manifest>
 				<attribute name="Implementation-Title" value="SMPTE ST2071-3 Media and Device Control Discovery (MDCD)" />
@@ -47,8 +52,8 @@
 		</jar>
 	</target>
 
-	<target name="bundle" description="Creates an OSGi bundle" depends="download_bnd_file,jar">
-		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${build_dir}/bnd.jar" />
+	<target name="bundle" description="Creates an OSGi bundle" depends="download_bnd_file,jar,compile">
+		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${basedir}/${bnd.jar}" />
 		<echo file="${dist_dir}/${projectname}-${version}.bnd" append="false">
 			Bundle-Version: ${version}
 			Bundle-Name: ST2071-3 Media and Device Control Discovery (MDCD)
@@ -56,18 +61,18 @@
 			Export-Package: ${basepackage};version=${version}
 			Bundle-Vendor: smpte.org
 			Bundle-RequiredExecutionEnvironment: J2SE-1.7
-			Import-Package: !org.smpte.st2071.mdcd*,*
+			Import-Package: !${basepackage}*,*
 		</echo>
 		<bndwrap definitions="${dist_dir}" jars="${dist_dir}/${jarname}" output="${dist_dir}/${bundle.jar}" />
 		<delete file="${dist_dir}/${projectname}-${version}.bnd" />
 	</target>
     
     <target name="test_bnd_file">
-       <available file="${build_dir}/bnd.jar"  property="bnd.file.found"/>
+       <available file="${basedir}/${bnd.jar}"  property="bnd.file.found"/>
     </target>
     
     <target name="download_bnd_file" depends="test_bnd_file" unless="bnd.file.found">
-        <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.384/bnd-0.0.384.jar" dest="${build_dir}/bnd.jar" />
+        <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.384/bnd-0.0.384.jar" dest="${basedir}/${bnd.jar}" />
     </target>
 
 	<target name="clean" description="Remove old class files">
@@ -75,6 +80,7 @@
         <delete file="${dist_dir}/${jarname}"/>
         <delete file="${dist_dir}/${targzname}"/>
         <delete file="${dist_dir}/${zipname}"/>
+        <delete file="${dist_dir}/${bundle.jar}"/>
 	</target>
 
 	<target name="docs" description="Makes Javadoc documentation">

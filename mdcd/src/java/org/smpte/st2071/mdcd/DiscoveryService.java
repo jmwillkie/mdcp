@@ -1,10 +1,7 @@
 package org.smpte.st2071.mdcd;
 
 import java.net.InetAddress;
-import java.util.Map;
 import java.util.Set;
-
-import javax.naming.NamingException;
 
 import org.smpte.st2071.types.Resource;
 import org.smpte_ra.schemas.st2071._2014.query.QueryExpression;
@@ -40,22 +37,6 @@ public interface DiscoveryService
     
     
     /**
-     * Sets the configuration for the Discovery Service.
-     * 
-     * @param properties The configuration map
-     */
-    public void setConfiguration(Map<String, String> properties);
-    
-    
-    /**
-     * Gets the configuration for the Discovery Service.
-     * 
-     * @return The configuration map
-     */
-    public Map<String, String> getConfiguration();
-    
-    
-    /**
      * Returns the hostnames associated to this Discovery Service and the network interfaces it represents.
      * 
      * @return The hostnames associated to this Discovery Service and the network interfaces it represents
@@ -71,22 +52,6 @@ public interface DiscoveryService
      * @return The hostnames associated to the Ip address
      */
     public Set<String> getHostNamesForAddress(InetAddress address);
-    
-    
-    /**
-     * Registers a Discovery Listener
-     * 
-     * @param listener The Discovery Listener
-     */
-    public void registerDiscoveryListener(DiscoveryListener listener);
-    
-    
-    /**
-     * Unregisters a Discovery Listener
-     * 
-     * @param listener The Discovery Listener
-     */
-    public void unregisterDiscoveryListener(DiscoveryListener listener);
     
     
     /**
@@ -117,7 +82,7 @@ public interface DiscoveryService
      * @return The Resource(s) that match the namespace RN and Query Expression by domain.
      */
     public Resource[] listResources(String rn, QueryExpression query)
-    throws NamingException;
+    throws DiscoveryException;
     
     
     /**
@@ -133,7 +98,7 @@ public interface DiscoveryService
      *                 Listeners registered to this Discovery Service instance.
      */
     public void browse(String rn, QueryExpression query, DiscoveryListener listener)
-    throws NamingException;
+    throws DiscoveryException;
     
     
     /**
@@ -142,7 +107,7 @@ public interface DiscoveryService
      * @param resource The Resource to register.
      */
     public void registerResource(Resource resource)
-    throws NamingException;
+    throws DiscoveryException;
     
     
     /**
@@ -151,20 +116,5 @@ public interface DiscoveryService
      * @param instance The Resource to unregister. 
      */
     public void unregisterResource(Resource resource)
-    throws NamingException;
-    
-    
-    /**
-     * Starts the Discovery Service and its time processes.
-     * 
-     * @throws Exception if the Discover Service cannot be started for any reason.
-     */
-    public void start()
-    throws Exception;
-    
-    
-    /**
-     * Stops the Discovery Service and its time processes, freeing resources.
-     */
-    public void stop();
+    throws DiscoveryException;
 }

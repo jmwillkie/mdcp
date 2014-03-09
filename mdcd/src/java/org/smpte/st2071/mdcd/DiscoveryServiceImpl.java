@@ -1,5 +1,6 @@
 package org.smpte.st2071.mdcd;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,13 +22,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.naming.NamingException;
-
 import net.posick.net.DHCPClient;
 import net.posick.net.InetAddressUtils;
 import net.posick.net.NetworkTopology;
 import net.posick.net.NetworkTopologyListener;
 
+import org.smpte.st2071.Configurable;
+import org.smpte.st2071.Startable;
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
 import org.smpte.st2071.types.Resource;
 import org.smpte.util.ListenerProcessor;
@@ -46,7 +47,7 @@ import org.xbill.mDNS.MulticastDNSService;
 import org.xbill.mDNS.Resolve;
 import org.xbill.mDNS.Resolve.Domain;
 
-public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyListener
+public class DiscoveryServiceImpl implements DiscoveryService, DiscoveryServiceEventer, Startable, Closeable, Configurable, NetworkTopologyListener
 {
     protected class DomainBrowser implements Runnable, ResolverListener
     {
@@ -304,7 +305,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     @Override
     public Resource[] listResources(String rn, QueryExpression query)
-    throws NamingException
+    throws DiscoveryException
     {
         // TODO Auto-generated method stub
         return null;
@@ -313,7 +314,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     @Override
     public void browse(String rn, QueryExpression query, DiscoveryListener listener)
-    throws NamingException
+    throws DiscoveryException
     {
         // TODO Auto-generated method stub
         
@@ -322,7 +323,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     @Override
     public void registerResource(Resource resource)
-    throws NamingException
+    throws DiscoveryException
     {
         // TODO Auto-generated method stub
         
@@ -331,7 +332,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
     
     @Override
     public void unregisterResource(Resource resource)
-    throws NamingException
+    throws DiscoveryException
     {
         // TODO Auto-generated method stub
         
@@ -401,7 +402,8 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
 
 
     @Override
-    public void stop()
+    public void close()
+    throws IOException
     {
         topology.stop();
         
@@ -649,7 +651,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
         
         try
         {
-            service.start();
+            ((Startable) service).start();
             
             System.out.println("\nPress \'q\' or \'Q\' to quit.");
             
@@ -681,7 +683,7 @@ public class DiscoveryServiceImpl implements DiscoveryService, NetworkTopologyLi
             } 
         } finally
         {
-            service.stop();
+            ((Closeable) service).close();
         }
         
         System.exit(0);
