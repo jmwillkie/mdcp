@@ -5,9 +5,10 @@ import java.util.Map;
 
 import org.smpte.st2071.identity.RN;
 import org.smpte.st2071.identity.URL;
+import org.smpte.st2071.query.Queryable;
 
 
-public interface Resource
+public interface Resource extends Queryable
 {
     public static enum ResourceType
     {

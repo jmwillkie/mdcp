@@ -8,9 +8,8 @@ import java.util.Map;
 import org.smpte.st2071.identity.URL;
 import org.smpte.st2071.identity.USN;
 import org.smpte.st2071.types.Capability;
-import org.smpte.st2071.types.Resource;
 
-public class ServiceInformation implements Resource, Serializable
+public class ServiceInformation implements Service, Serializable
 {
     private static final long serialVersionUID = 201402051618L;
 
@@ -45,6 +44,12 @@ public class ServiceInformation implements Resource, Serializable
     }
     
     
+    public USN getUSN()
+    {
+        return getRN();
+    }
+    
+    
     public void setRN(USN usn)
     {
         this.usn = usn;
@@ -75,13 +80,13 @@ public class ServiceInformation implements Resource, Serializable
     }
 
 
-    public ServiceTemplate getTemplate()
+    public ServiceTemplate getType()
     {
         return template;
     }
 
 
-    public void setTemplate(ServiceTemplate template)
+    public void setType(ServiceTemplate template)
     {
         this.template = template;
     }
