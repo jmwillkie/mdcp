@@ -17,71 +17,98 @@ GENERATED_JAVA_SOURCE=$GENERATED_SOURCE/java;
 GENERATED_DOTNET_SOURCE=$GENERATED_SOURCE/dotnet
 #CLASSES=$BASE/classes
 CLASSES=$BASE/../../classes
+CXF_WSDL_EXECUTABLE=/Java/apache-cxf-2.7.10/bin/wsdl2java
+JAVA_WSDL_EXECUTABLE=`which wsimport`;
+MONO_WSDL_EXECUTABLE=`which wsdl1`;
 
 if [ -d $GENERATED ]; then
-    echo $GENERATED directory already exists;
+    echo "$GENERATED directory already exists.";
 else
-    echo creating directory $GENERATED;
+    echo "Creating directory $GENERATED.";
     mkdir $GENERATED
 fi
 
 if [ -d $GENERATED_SOURCE ]; then
-    echo $GENERATED_SOURCE directory already exists;
+    echo "$GENERATED_SOURCE directory already exists.";
 else
-    echo creating directory $GENERATED_SOURCE;
+    echo "creating directory $GENERATED_SOURCE.";
     mkdir $GENERATED_SOURCE
 fi
 
 if [ -d $GENERATED_JAVA_SOURCE ]; then
-    echo $GENERATED_JAVA_SOURCE directory already exists;
+    echo "$GENERATED_JAVA_SOURCE directory already exists.";
 else
-    echo creating directory $GENERATED_JAVA_SOURCE;
+    echo "Creating directory $GENERATED_JAVA_SOURCE.";
     mkdir $GENERATED_JAVA_SOURCE
 fi
 
 if [ -d $GENERATED_DOTNET_SOURCE ]; then
-    echo $GENERATED_DOTNET_SOURCE directory already exists;
+    echo "$GENERATED_DOTNET_SOURCE directory already exists.";
 else
-    echo creating directory $GENERATED_DOTNET_SOURCE;
+    echo "Creating directory $GENERATED_DOTNET_SOURCE.";
     mkdir $GENERATED_DOTNET_SOURCE
 fi
 
 if [ -d $CLASSES ]; then
-    echo $CLASSES directory already exists;
+    echo "$CLASSES directory already exists.";
 else
-    echo creating directory $CLASSES;
+    echo "Creating directory $CLASSES.";
     mkdir $CLASSES
+fi
+
+USE_CXF="false";
+if [ -e $CXF_WSDL_EXECUTABLE ]; then
+    echo "Apache CXF is not available.  Using standard Java $JAVA_WSDL_EXECUTABLE for WSDL generation.";
+    USE_CXF="true";
+else
+    echo "Apache CXF is not available.  Using $CXF_WSDL_EXECUTABLE for WSDL generation.";
 fi
 
 pushd $XML_SOURCE
 
-echo Importing $XML_SOURCE/device_services.wsdl
-wsimport $XML_SOURCE/device_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
-echo Importing device.event_services.wsdl
-wsimport $XML_SOURCE/device.event_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
-echo Importing device.control_services.wsdl
-wsimport $XML_SOURCE/device.control_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
-echo Importing device.mode_services.wsdl
-wsimport $XML_SOURCE/device.mode_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
-echo Importing media_services.wsdl
-wsimport $XML_SOURCE/media_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES 
-echo Importing security_services.wsdl
-wsimport $XML_SOURCE/security_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
-echo Importing service_services.wsdl
-wsimport $XML_SOURCE/service_services.wsdl -extension -s $GENERATED_JAVA_SOURCE -d $CLASSES
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/device_services_v1.cs $XML_SOURCE/device_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/device.event_services_v1.cs $XML_SOURCE/device.event_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/device.control_services_v1.cs $XML_SOURCE/device.control_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/device.mode_services_v1.cs $XML_SOURCE/device.mode_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/media_services_v1.cs $XML_SOURCE/media_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/security_services_v1.cs $XML_SOURCE/security_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:CS -out:$GENERATED_DOTNET_SOURCE/service_services_v1.cs $XML_SOURCE/service_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/device_services_v1.vb $XML_SOURCE/device_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/device.event_services_v1.vb $XML_SOURCE/device.event_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/device.control_services_v1.vb $XML_SOURCE/device.control_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/device.mode_services_v1.vb $XML_SOURCE/device.mode_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/media_services_v1.vb $XML_SOURCE/media_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/security_services_v1.vb $XML_SOURCE/security_services.wsdl
-wsdl1 -username:posicks -password:35vn321 -language:VB -out:$GENERATED_DOTNET_SOURCE/service_services_v1.vb $XML_SOURCE/service_services.wsdl
+#FILES="device_services ";
+#FILES+="device.event_services ";
+#FILES+="device.control_services ";
+#FILES+="device.mode_services ";
+#FILES+="media_services ";
+#FILES+="security_services ";
+#FILES+="service_services ";
+
+FILES=`ls *services.wsdl`;
+
+#
+# Generate WSDL Artifacts for Java
+#
+echo "$USE_CXF";
+if [ "$USE_CXF" = "true" ]; then
+    echo "Generating Java WSDL Artifacts using Apache CXF '$CXF_WSDL_EXECUTABLE'.";
+    for WSDL_FILE in $FILES; do
+        echo "Compiling WSDL from '$WSDL_FILE'.";
+        $CXF_WSDL_EXECUTABLE -d $GENERATED_JAVA_SOURCE -compile -classdir $CLASSES $WSDL_FILE
+    done
+else
+    echo "Generating Java WSDL Artifacts using Standard Java '$JAVA_WSDL_EXECUTABLE'.";
+    for WSDL_FILE in $FILES; do
+        echo "Compiling WSDL from '$WSDL_FILE'.";
+        $JAVA_WSDL_EXECUTABLE $WSDL_FILE -s $GENERATED_JAVA_SOURCE -d $CLASSES
+    done
+fi
+
+#
+# Generate WSDL Artifacts for Mono/.Net
+#
+LANGUAGES="CS ";
+LANGUAGES+="VB ";
+
+for LANGUAGE in $LANGUAGES; do
+    echo "Generating $LANGUAGE.Net WSDL Artifacts using Mono '$MONO_WSDL_EXECUTABLE'.";
+    for WSDL_FILE in $FILES; do
+        BASE_FILE=`expr "$WSDL_FILE" : "\(.*\)\.wsdl"`
+        FILE_EXT=`echo $LANGUAGE | tr '[A-Z]' '[a-z]'`
+        OUT_FILE="$GENERATED_DOTNET_SOURCE/$BASE_FILE.$FILE_EXT";
+        echo "Compiling WSDL from '$WSDL_FILE' to '$BASE_FILE.$FILE_EXT'.";
+        $MONO_WSDL_EXECUTABLE -username:posicks -password:35vn321 -language:$LANGUAGE -out:$OUT_FILE $WSDL_FILE
+    done
+done
 
 popd
