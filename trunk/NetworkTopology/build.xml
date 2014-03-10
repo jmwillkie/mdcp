@@ -1,4 +1,5 @@
 <project name="NetworkTopology" default="all" basedir=".">
+    <property name="bnd.jar" value="bnd-0.0.384.jar" />
     <property name="basepackage" value="net.posick.net" />
     <property name="namespacepackage" value="net.posick.net" />
 	<property name="projectname" value="network_topology" />
@@ -48,7 +49,7 @@
 	</target>
 
 	<target name="bundle" description="Creates an OSGi bundle" depends="download_bnd_file,jar">
-		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${build_dir}/bnd.jar" />
+		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${basedir}/${bnd.jar}" />
 		<echo file="${dist_dir}/${projectname}-${version}.bnd" append="false">
 			Bundle-Version: ${version}
 			Bundle-Name: Network Topology
@@ -63,11 +64,11 @@
 	</target>
     
     <target name="test_bnd_file">
-       <available file="${build_dir}/bnd.jar"  property="bnd.file.found"/>
+       <available file="${basedir}/${bnd.jar}"  property="bnd.file.found"/>
     </target>
     
     <target name="download_bnd_file" depends="test_bnd_file" unless="bnd.file.found">
-        <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.384/bnd-0.0.384.jar" dest="${build_dir}/bnd.jar" />
+        <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.384/bnd-0.0.384.jar" dest="${basedir}/${bnd.jar}" />
     </target>
 
 	<target name="clean" description="Remove old class files">
