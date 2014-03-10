@@ -31,7 +31,7 @@
             <classpath>
                 <path>
                     <fileset dir="${lib_dir}">
-                        <include name="*.jar" />
+                        <include name="**/*.jar" />
                     </fileset>
                 </path>
             </classpath>
