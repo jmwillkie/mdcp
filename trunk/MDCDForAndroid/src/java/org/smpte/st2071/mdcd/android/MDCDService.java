@@ -1,6 +1,8 @@
 package org.smpte.st2071.mdcd.android;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.smpte.st2071.mdcd.DiscoveryException;
@@ -8,6 +10,7 @@ import org.smpte.st2071.mdcd.DiscoveryListener;
 import org.smpte.st2071.mdcd.DiscoveryService;
 import org.smpte.st2071.types.Resource;
 import org.smpte_ra.schemas.st2071._2014.query.QueryExpression;
+import org.xbill.mDNS.MulticastDNSService;
 
 import android.app.Service;
 import android.content.Intent;
@@ -18,6 +21,14 @@ import android.os.IBinder;
 public class MDCDService extends Service implements DiscoveryService
 {
     NsdManager discoverManager;
+    
+    MulticastDNSService mdnsService;
+    
+    
+    protected ArrayList<String> findBrowseDomains()
+    {
+        return null;
+    }
     
     
     @Override
@@ -39,8 +50,15 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public void onCreate()
     {
-        // TODO Auto-generated method stub
         super.onCreate();
+        
+        try
+        {
+            mdnsService = new MulticastDNSService();
+        } catch (IOException e)
+        {
+            
+        }
     }
     
     
