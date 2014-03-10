@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="lib" path="libs/net.posick.net_1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/org.smpte.st2071.mdcf_1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/org.smpte.st2071.mdcp_1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/org.xbill.dns_2.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/org.xbill.mdns_2.1.5.jar"/>
+	<classpathentry kind="lib" path="libs/org.smpte.st2071.mdcd_1.0.0.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>
