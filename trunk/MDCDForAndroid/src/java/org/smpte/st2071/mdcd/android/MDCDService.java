@@ -5,9 +5,13 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.xml.ws.Endpoint;
+
 import org.smpte.st2071.mdcd.DiscoveryException;
 import org.smpte.st2071.mdcd.DiscoveryListener;
 import org.smpte.st2071.mdcd.DiscoveryService;
+import org.smpte.st2071.mdcd.android.test.Hello;
+import org.smpte.st2071.mdcd.android.test.HelloImpl;
 import org.smpte.st2071.types.Resource;
 import org.smpte_ra.schemas.st2071._2014.query.QueryExpression;
 import org.xbill.mDNS.MulticastDNSService;
@@ -46,11 +50,17 @@ public class MDCDService extends Service implements DiscoveryService
         super.onConfigurationChanged(newConfig);
     }
     
+    protected Hello hello;
+    protected Endpoint helloEndpoint;
     
     @Override
     public void onCreate()
     {
         super.onCreate();
+        
+        hello = new HelloImpl();
+        helloEndpoint = Endpoint.create(hello);
+        helloEndpoint.publish("http://0.0.0.0:9000/Hello/sayHello");
         
         try
         {

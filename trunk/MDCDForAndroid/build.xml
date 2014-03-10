@@ -27,8 +27,14 @@
 		<mkdir dir="${build_dir}" />
 		<javac destdir="${build_dir}" debug="true" target="1.7" source="1.7" includeantruntime="false">
 			<src path="${java_src_dir}" />
-	        <include name="${lib_dir}/**/*.jar" />
 			<exclude name="**/tests/**" />
+            <classpath>
+                <path>
+                    <fileset dir="${lib_dir}">
+                        <include name="**/*.jar" />
+                    </fileset>
+                </path>
+            </classpath>
 		</javac>
 	</target>
 

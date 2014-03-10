@@ -11,5 +11,37 @@
 	<classpathentry kind="lib" path="libs/org.xbill.dns_2.1.6.jar"/>
 	<classpathentry kind="lib" path="libs/org.xbill.mdns_2.1.5.jar"/>
 	<classpathentry kind="lib" path="libs/org.smpte.st2071.mdcd_1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jaxb-api-2.2.6.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/geronimo-jaxws_2.2_spec-1.1.jar"/>
+	<classpathentry kind="lib" path="libs/android-ws-combine.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-api-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-manifest.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-bindings-soap-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-core-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-databinding-jaxb-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-frontend-jaxws-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-frontend-js-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-javascript-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-transports-http-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-transports-http-jetty-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/cxf-rt-ws-addr-2.7.10.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/asm-3.3.1.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/geronimo-javamail_1.4_spec-1.7.1.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jaxb-impl-2.2.6.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jetty-continuation-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jetty-http-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jetty-io-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jetty-security-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jetty-server-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/jetty-util-8.1.14.v20131031.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/js-1.7R2.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/neethi-3.0.3.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/slf4j-jdk14-1.7.5.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/stax2-api-3.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/woodstox-core-asl-4.2.0.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/wsdl4j-1.6.3.jar"/>
+	<classpathentry kind="lib" path="libs/cxf/lib/xmlschema-core-2.1.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
