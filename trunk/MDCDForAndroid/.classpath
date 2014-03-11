@@ -11,6 +11,7 @@
 	<classpathentry kind="lib" path="libs/org.xbill.dns_2.1.6.jar"/>
 	<classpathentry kind="lib" path="libs/org.xbill.mdns_2.1.5.jar"/>
 	<classpathentry kind="lib" path="libs/org.smpte.st2071.mdcd_1.0.0.jar"/>
-	<classpathentry kind="lib" path="libs/jax-ws/android-ws-combine.jar"/>
+	<classpathentry kind="lib" path="libs/jsr181-api.jar"/>
+	<classpathentry kind="lib" path="libs/jax-ws/jaxws-api.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

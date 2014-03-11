@@ -8,13 +8,22 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.smpte.st2071.mdcd.android.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:icon="@drawable/ic_launcher" android:name=".MDCDService" android:stopWithTask="false" android:logo="@drawable/ic_launcher" android:singleUser="true" android:label="@string/app_name" android:enabled="true" />
+        <receiver android:name=".StartupIntentReceiver" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">  
+            <intent-filter>  
+                <action android:name="android.intent.action.BOOT_COMPLETED" />  
+            </intent-filter>  
+        </receiver>
     </application>
 
 </manifest>
