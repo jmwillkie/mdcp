@@ -19,13 +19,11 @@ import org.xbill.mDNS.MulticastDNSService;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.nsd.NsdManager;
 import android.os.IBinder;
+import android.util.Log;
 
 public class MDCDService extends Service implements DiscoveryService
 {
-    NsdManager discoverManager;
-    
     MulticastDNSService mdnsService;
     
     
@@ -38,6 +36,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public IBinder onBind(Intent intent)
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onBind()");
         // TODO Auto-generated method stub
         return null;
     }
@@ -46,6 +45,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onConfigurationChanged()");
         // TODO Auto-generated method stub
         super.onConfigurationChanged(newConfig);
     }
@@ -56,6 +56,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public void onCreate()
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onCreate()");
         super.onCreate();
         
         hello = new HelloImpl();
@@ -75,6 +76,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public void onDestroy()
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onDestroy()");
         // TODO Auto-generated method stub
         super.onDestroy();
     }
@@ -83,6 +85,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public void onLowMemory()
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onLowMemory()");
         // TODO Auto-generated method stub
         super.onLowMemory();
     }
@@ -91,6 +94,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public void onRebind(Intent intent)
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onRebind()");
         // TODO Auto-generated method stub
         super.onRebind(intent);
     }
@@ -99,6 +103,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onStartCommand()");
         // TODO Auto-generated method stub
         return super.onStartCommand(intent, flags, startId);
     }
@@ -107,6 +112,7 @@ public class MDCDService extends Service implements DiscoveryService
     @Override
     public boolean onUnbind(Intent intent)
     {
+        Log.i(Constants.LOG_TAG, getClass().getSimpleName() + ".onUnbind()");
         // TODO Auto-generated method stub
         return super.onUnbind(intent);
     }
