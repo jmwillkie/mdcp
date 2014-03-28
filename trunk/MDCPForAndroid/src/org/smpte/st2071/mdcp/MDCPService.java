@@ -8,6 +8,7 @@ import net.posick.ws.soap.SOAPServerService;
 import net.posick.ws.xml.Name;
 import net.posick.ws.xml.XmlAttribute;
 import net.posick.ws.xml.XmlElement;
+import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -17,6 +18,7 @@ import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.ServiceConnection;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -68,7 +70,56 @@ public class MDCPService extends Service implements IMDCPService
         public void onReceive(Context context, Intent intent)
         {
             Log.i(LOG_TAG, getClass().getSimpleName() + ".onReceive(\"" + context + "\", \"" + intent + "\")");
-            onHandleIntent(intent);
+            
+            if (intent != null)
+            {
+                String action = intent.getAction();
+                
+                Log.i(LOG_TAG, "!!!!! Intent \"" + action + "\" received by \"" + getClass().getSimpleName() + "\" !!!!!");
+                XmlElement response = null;
+                
+                try
+                {
+                    Bundle bundle = getResultExtras(true);
+                    setResultExtras(bundle);
+                    
+                    if (Constants.INTENT_GET_UDN.equals(action))
+                    {
+                        bundle.putString(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_UDN);
+                        response = getUDN();
+                    } else if (Constants.INTENT_GET_ONLINE.equals(action))
+                    {
+                        bundle.putString(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_ONLINE);
+                        response = getOnline();
+                    } else if (Constants.INTENT_GET_NAME.equals(action))
+                    {
+                        bundle.putString(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_NAME);
+                        response = getName();
+                    } else if (Constants.INTENT_GET_CAPABILITIES.equals(action))
+                    {
+                        bundle.putString(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_CAPABILITIES);
+                        response = getCapabilities();
+                    } else if (Constants.INTENT_GET_ATTRIBUTES.equals(action))
+                    {
+                        bundle.putString(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_ATTRIBUTES);
+                        response = getAttributes();
+                    } else if (Constants.INTENT_GET_URLS.equals(action))
+                    {
+                        bundle.putString(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_URLS);
+                        response = getURLs();
+                    }
+                    
+                    if (response != null)
+                    {
+                        setResultCode(Activity.RESULT_OK);
+                        setResultData(response.toString());
+                        bundle.putSerializable(net.posick.ws.Constants.EXTRA_RESPONSE, response);
+                    }
+                } catch (Exception e)
+                {
+                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_FAULT, e);
+                }
+            }
         }
     }
     
@@ -230,71 +281,16 @@ public class MDCPService extends Service implements IMDCPService
     @Override
     public void onStart(Intent intent, int startId)
     {
-        onHandleIntent(intent);
     }
     
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        onHandleIntent(intent);
-        
         return START_NOT_STICKY;
     }
 
     
-//    @Override
-    public void onHandleIntent(Intent intent)
-    {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onHandleIntent(\"" + intent + "\")");
-        
-        if (intent != null)
-        {
-            String action = intent.getAction();
-            
-            Log.i(LOG_TAG, "!!!!! Intent \"" + action + "\" received by \"" + getClass().getSimpleName() + "\" !!!!!");
-            XmlElement response = null;
-            
-            try
-            {
-                if (Constants.INTENT_GET_UDN.equals(action))
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_UDN);
-                    response = getUDN();
-                } else if (Constants.INTENT_GET_ONLINE.equals(action))
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_ONLINE);
-                    response = getOnline();
-                } else if (Constants.INTENT_GET_NAME.equals(action))
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_NAME);
-                    response = getName();
-                } else if (Constants.INTENT_GET_CAPABILITIES.equals(action))
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_CAPABILITIES);
-                    response = getCapabilities();
-                } else if (Constants.INTENT_GET_ATTRIBUTES.equals(action))
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_ATTRIBUTES);
-                    response = getAttributes();
-                } else if (Constants.INTENT_GET_URLS.equals(action))
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_ACTION_RESPONSE, Constants.SOAP_RESPONSE_URLS);
-                    response = getURLs();
-                }
-                
-                if (response != null)
-                {
-                    intent.putExtra(net.posick.ws.Constants.EXTRA_RESPONSE, response);
-                }
-            } catch (Exception e)
-            {
-                intent.putExtra(net.posick.ws.Constants.EXTRA_SOAP_FAULT, e);
-            }
-        }
-    }
-    
-
     public Intent lookup(String pattern, String action)
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".lookup(\"" + pattern + "\", \"" + action + "\")");
