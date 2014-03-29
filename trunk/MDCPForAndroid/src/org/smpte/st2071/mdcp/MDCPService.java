@@ -1,13 +1,25 @@
 package org.smpte.st2071.mdcp;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 import net.posick.ws.soap.ISOAPServerService;
 import net.posick.ws.soap.SOAPServerService;
 import net.posick.ws.xml.Name;
-import net.posick.ws.xml.XmlAttribute;
+import net.posick.ws.xml.Namespace;
 import net.posick.ws.xml.XmlElement;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -361,8 +373,8 @@ public class MDCPService extends Service implements IMDCPService
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".getUDN()");
         
-        XmlElement udnResponse = new XmlElement(new Name("device:getUDNResponse"), new XmlAttribute(new Name("xmlns:device"), "http://www.smpte-ra.org/schemas/st2071/2014/device"));
-        XmlElement udn = new XmlElement(new Name("identity:UDN"), new XmlAttribute(new Name("xmlns:identity"), "http://www.smpte-ra.org/schemas/st2071/2014/identity"));
+        XmlElement udnResponse = new XmlElement(new Name("device:getUDNResponse")).setNamespace(new Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"));
+        XmlElement udn = new XmlElement(new Name("identity:UDN")).setNamespace(new Namespace("identity", "http://www.smpte-ra.org/schemas/st2071/2014/identity"));
         // TODO: Implement UDN value
         udn.setValue("urn:smpte:udn:net.posick.test:test=1");
         udnResponse.addChild(udn);
@@ -375,8 +387,8 @@ public class MDCPService extends Service implements IMDCPService
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".getOnline()");
         
-        XmlElement onlineResponse = new XmlElement(new Name("device:getOnlineResponse"), new XmlAttribute(new Name("xmlns:device"), "http://www.smpte-ra.org/schemas/st2071/2014/device"));
-        XmlElement online = new XmlElement(new Name("types:Boolean"), new XmlAttribute(new Name("xmlns:types"), "http://www.smpte-ra.org/schemas/st2071/2014/types"));
+        XmlElement onlineResponse = new XmlElement(new Name("device:getOnlineResponse")).setNamespace(new Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"));
+        XmlElement online = new XmlElement(new Name("types:Boolean")).setNamespace(new Namespace("types", "http://www.smpte-ra.org/schemas/st2071/2014/types"));
         
         online.setValue("true");
         onlineResponse.addChild(online);
@@ -389,8 +401,8 @@ public class MDCPService extends Service implements IMDCPService
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".getName()");
         
-        XmlElement nameResponse = new XmlElement(new Name("device:getNameResponse"), new XmlAttribute(new Name("xmlns:device"), "http://www.smpte-ra.org/schemas/st2071/2014/device"));
-        XmlElement name = new XmlElement(new Name("types:String"), new XmlAttribute(new Name("xmlns:types"), "http://www.smpte-ra.org/schemas/st2071/2014/types"));
+        XmlElement nameResponse = new XmlElement(new Name("device:getNameResponse")).setNamespace(new Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"));
+        XmlElement name = new XmlElement(new Name("types:String")).setNamespace(new Namespace("types", "http://www.smpte-ra.org/schemas/st2071/2014/types"));
         // TODO: Implement Name value
         name.setValue("Test");
         nameResponse.addChild(name);
