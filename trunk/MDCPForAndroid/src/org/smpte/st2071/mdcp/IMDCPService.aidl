@@ -7,6 +7,9 @@ import android.content.Intent;
  */
 interface IMDCPService
 {
+    boolean isOnline();
+    
+    
     Intent lookup(String pattern, String action);
     
     

@@ -1,25 +1,13 @@
 package org.smpte.st2071.mdcp;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
 import net.posick.ws.soap.ISOAPServerService;
 import net.posick.ws.soap.SOAPServerService;
 import net.posick.ws.xml.Name;
 import net.posick.ws.xml.Namespace;
 import net.posick.ws.xml.XmlElement;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -51,6 +39,13 @@ public class MDCPService extends Service implements IMDCPService
         
     private final IMDCPService.Stub mBinder = new IMDCPService.Stub()
     {
+        @Override
+        public boolean isOnline()
+        throws RemoteException
+        {
+            return MDCPService.this.isOnline();
+        }
+        
         @Override
         public Intent lookup(String pattern, String action)
         throws RemoteException
@@ -148,8 +143,20 @@ public class MDCPService extends Service implements IMDCPService
             soapService = ISOAPServerService.Stub.asInterface(binder);
             Log.i(LOG_TAG, getClass().getSimpleName() + ".onServiceConnected(\"" + className.flattenToString() + "\") sucessfully casted IBinder to \"" + ISOAPServerService.class.getName() + "\".");
             
+            
             try
             {
+                while (!soapService.isOnline())
+                {
+                    try
+                    {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e)
+                    {
+                        // ignore
+                    }
+                }
+                
                 final String[] PATHS = new String[]
                 {
                      Constants.PATH_UDN,
@@ -301,8 +308,17 @@ public class MDCPService extends Service implements IMDCPService
     {
         return START_NOT_STICKY;
     }
+    
+    
+    @Override
+    public boolean isOnline()
+    throws RemoteException
+    {
+        return soapService != null && soapService.isOnline();
+    }
 
     
+    @Override
     public Intent lookup(String pattern, String action)
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".lookup(\"" + pattern + "\", \"" + action + "\")");
@@ -325,6 +341,7 @@ public class MDCPService extends Service implements IMDCPService
     }
 
 
+    @Override
     public Intent register(String pattern, String action, Intent intent)
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".register(\"" + pattern + "\", \"" + action + "\")");
@@ -347,6 +364,7 @@ public class MDCPService extends Service implements IMDCPService
     }
 
 
+    @Override
     public Intent unregister(String pattern, String action)
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".unregister(\"" + pattern + "\", \"" + action + "\")");
