@@ -1,6 +1,9 @@
 package org.smpte.st2071.mdcp;
 
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import net.posick.ws.soap.ISOAPServerService;
@@ -275,9 +278,11 @@ public class MDCPService extends Service implements IMDCPService
                 Log.e(LOG_TAG, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\" or \"" + SOAPServerService.class.getName() + "\"!");
             }
         }
+        
+        populateDeviceInformation();
     }
-    
-    
+
+
     @Override
     public void onDestroy()
     {
@@ -307,6 +312,42 @@ public class MDCPService extends Service implements IMDCPService
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         return START_NOT_STICKY;
+    }
+    
+    
+    protected void populateDeviceInformation()
+    {
+        // TODO Auto-generated method stub
+        String mac = null;
+        // Get Unique Device ID and domain names (if any)
+        try
+        {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            if (ifaces != null)
+            {
+                while (ifaces.hasMoreElements())
+                {
+                    NetworkInterface iface = ifaces.nextElement();
+                    byte[] address = iface.getHardwareAddress();
+                    if (address != null && address.length > 0)
+                    {
+                        StringBuilder builder = new StringBuilder();
+                        for (byte octet : address)
+                        {
+                            builder.append(Integer.toHexString(octet & 0x0FF));
+                        }
+                        if (builder.length() > 0)
+                        {
+                            mac = builder.toString();
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e)
+        {
+            
+        }
     }
     
     
