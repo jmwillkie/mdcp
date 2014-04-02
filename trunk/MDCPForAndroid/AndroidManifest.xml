@@ -5,10 +5,12 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="18" />
     
     <uses-permission android:name="net.posick.ws.REGISTER_ENDPOINT" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -30,5 +32,15 @@
                 <category android:name="net.posick.ws.ENDPOINT_CALLBACK" />
             </intent-filter>
         </service>
+        <service android:icon="@drawable/ic_launcher" android:name="org.smpte.st2071.mdcd.MDCDService" android:stopWithTask="true" android:logo="@drawable/ic_launcher" android:singleUser="false" android:exported="false" android:label="@string/app_name" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </service>
+        <receiver android:name="org.smpte.st2071.mdcd.NetworkConnectivityReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
         </application>
 </manifest>

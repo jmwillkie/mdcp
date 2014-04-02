@@ -1,5 +1,7 @@
 package org.smpte.st2071.mdcp;
 
+import org.smpte.st2071.mdcd.MDCDService;
+
 import android.app.Application;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -24,6 +26,9 @@ public class MDCPForAndroid extends Application
         
         Intent mdcpServiceIntent = new Intent(this, MDCPService.class);
         startService(mdcpServiceIntent);
+        
+        Intent mdcdServiceIntent = new Intent(this, MDCDService.class);
+        startService(mdcdServiceIntent);
     }
     
     
