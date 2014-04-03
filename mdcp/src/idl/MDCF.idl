@@ -3,7 +3,7 @@ typedef sequence<wstring> Strings;
 typedef octet bits128[16];
 typedef sequence<octet> RawData;
                 
-module org { module smpte { module st2071 { module _2013 {
+module org { module smpte { module st2071 { module _2014 {
 module types
 {
     valuetype Map;
@@ -222,8 +222,8 @@ module types
     valuetype Capability
     {
         readonly attribute Map Attributes;
-        readonly attribute org::smpte::st2071::_2013::identity::UCN UCN;
-        readonly attribute org::smpte::st2071::_2013::identity::URLs URLs;
+        readonly attribute org::smpte::st2071::_2014::identity::UCN UCN;
+        readonly attribute org::smpte::st2071::_2014::identity::URLs URLs;
     };
     
     typedef sequence<Capability> Capabilities;
@@ -236,7 +236,7 @@ module security
     {
         readonly attribute wstring Mechanism;
         readonly attribute RawData Data;
-        readonly attribute org::smpte::st2071::_2013::types::DateTime ValidTill;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime ValidTill;
     };
     
     valuetype Role
@@ -280,7 +280,7 @@ module security
         readonly attribute Roles Roles;
         readonly attribute boolean Allow;
         readonly attribute Permissions PERMISSION_TYPE;
-        readonly attribute org::smpte::st2071::_2013::identity::URI Resource;
+        readonly attribute org::smpte::st2071::_2014::identity::URI Resource;
     };
     
     exception SecurityException
@@ -301,7 +301,7 @@ module security
             _EXPIRED
         } Status;
         
-        org::smpte::st2071::_2013::identity::URI Resource;
+        org::smpte::st2071::_2014::identity::URI Resource;
         Subject Subject;
     };
     
@@ -311,7 +311,7 @@ module security
 
         readonly attribute Strings Mechanisms;
         
-        Subject authorize(in Subject subject, in org::smpte::st2071::_2013::identity::URI uri)
+        Subject authorize(in Subject subject, in org::smpte::st2071::_2014::identity::URI uri)
         raises(SecurityException);
     };
     
@@ -335,14 +335,14 @@ module event
     valuetype Event 
     {
         readonly attribute wstring Type;
-        readonly attribute org::smpte::st2071::_2013::identity::RN RN;
-        readonly attribute org::smpte::st2071::_2013::types::DateTime EventTime;
+        readonly attribute org::smpte::st2071::_2014::identity::RN RN;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime EventTime;
     };
         
     valuetype StatusEvent supports Event
     {
         readonly attribute boolean Ready;
-        readonly attribute org::smpte::st2071::_2013::types::STATUS Status;
+        readonly attribute org::smpte::st2071::_2014::types::STATUS Status;
         readonly attribute wstring Message;
     };
         
@@ -351,7 +351,7 @@ module event
         // UCN = "urn:smpte:ucn:org.smpte.st2071:event_support_v1.0";
             
         readonly attribute StatusEvent Status; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
     };
         
 
@@ -359,31 +359,31 @@ module event
     {
         oneway void callback(in Event event);
             
-        oneway void registered(in org::smpte::st2071::_2013::identity::URI callback);
+        oneway void registered(in org::smpte::st2071::_2014::identity::URI callback);
             
-        oneway void unregistered(in org::smpte::st2071::_2013::identity::URI callback);
+        oneway void unregistered(in org::smpte::st2071::_2014::identity::URI callback);
             
-        boolean heartbeat(in org::smpte::st2071::_2013::identity::UDN eventBroadcaster);
+        boolean heartbeat(in org::smpte::st2071::_2014::identity::UDN eventBroadcaster);
     };
         
     interface Eventer
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:event:eventer_v1.0";
             
-        Event poll(in org::smpte::st2071::_2013::identity::URI uri, 
+        Event poll(in org::smpte::st2071::_2014::identity::URI uri, 
                        in unsigned long timeout)
-        raises(org::smpte::st2071::_2013::security::SecurityException);
+        raises(org::smpte::st2071::_2014::security::SecurityException);
     };
         
     interface EventBroadcaster
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:event:event_broadcaster_v1.0";
             
-        boolean registerCallback(in org::smpte::st2071::_2013::identity::URI uri)
-        raises(org::smpte::st2071::_2013::security::SecurityException);
+        boolean registerCallback(in org::smpte::st2071::_2014::identity::URI uri)
+        raises(org::smpte::st2071::_2014::security::SecurityException);
             
-        boolean unregisterCallback(in org::smpte::st2071::_2013::identity::URI uri)
-        raises(org::smpte::st2071::_2013::security::SecurityException);
+        boolean unregisterCallback(in org::smpte::st2071::_2014::identity::URI uri)
+        raises(org::smpte::st2071::_2014::security::SecurityException);
     };
 };
 
@@ -393,7 +393,7 @@ module mode
     valuetype Mode
     {
         readonly attribute wstring Name;
-        readonly attribute org::smpte::st2071::_2013::types::Capabilities Capabilities;
+        readonly attribute org::smpte::st2071::_2014::types::Capabilities Capabilities;
     };
         
     typedef sequence<Mode> Modes;
@@ -415,13 +415,13 @@ module mode
         // UCN = "urn:smpte:ucn:org.smpte.st2071:mode_support_v1.0";
             
         readonly attribute Modes Modes; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute Mode ActiveMode; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
             
         void changeMode(in Mode mode)
         raises (InvalidMode, ModeException,
-                org::smpte::st2071::_2013::security::SecurityException);
+                org::smpte::st2071::_2014::security::SecurityException);
     };
         
     /*
@@ -430,7 +430,7 @@ module mode
      * Valid Device Type Values
      *     'ModeChanged' : Indicates that the device's mode has changed.
      */
-    valuetype ModeEvent supports org::smpte::st2071::_2013::event::StatusEvent
+    valuetype ModeEvent supports org::smpte::st2071::_2014::event::StatusEvent
     {
         readonly attribute Mode Mode;
     };
@@ -439,66 +439,66 @@ module mode
 
 module device
 {
-    interface Device : org::smpte::st2071::_2013::query::Queryable
+    interface Device : org::smpte::st2071::_2014::query::Queryable
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:device_v1.0";
         
-        readonly attribute org::smpte::st2071::_2013::identity::UDN UDN; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::identity::URLs URLs; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::identity::UDN UDN; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::identity::URLs URLs; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute wstring Name; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute boolean Online; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::Map Attributes;
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::Capabilities Capabilities; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::Map Attributes;
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::Capabilities Capabilities; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
     };
     
     valuetype DeviceInformation supports Device
     {
-        readonly attribute org::smpte::st2071::_2013::types::DateTime ValidTill;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime ValidTill;
     };
     
     typedef sequence<DeviceInformation> DeviceInformations;
     
     exception DeviceNotFound
     {
-        org::smpte::st2071::_2013::identity::UDN UDN;
+        org::smpte::st2071::_2014::identity::UDN UDN;
         wstring Message;
     };
     
     exception DeviceNotBound
     {
-        org::smpte::st2071::_2013::identity::UDN UDN;
-        org::smpte::st2071::_2013::identity::UDN parentUDN;
-        org::smpte::st2071::_2013::identity::URLs urls;
+        org::smpte::st2071::_2014::identity::UDN UDN;
+        org::smpte::st2071::_2014::identity::UDN parentUDN;
+        org::smpte::st2071::_2014::identity::URLs urls;
         wstring name;
-        org::smpte::st2071::_2013::types::Capabilities capabilities;
+        org::smpte::st2071::_2014::types::Capabilities capabilities;
         wstring Message;
     };
     
     exception DeviceException
     {
-        org::smpte::st2071::_2013::identity::UDN UDN;
+        org::smpte::st2071::_2014::identity::UDN UDN;
         wstring Message;
     };
     
     exception DeviceNotUnbound
     {
-        org::smpte::st2071::_2013::identity::UDN UDN;
-        org::smpte::st2071::_2013::identity::UDN parentUDN;
-        org::smpte::st2071::_2013::identity::URLs urls;
+        org::smpte::st2071::_2014::identity::UDN UDN;
+        org::smpte::st2071::_2014::identity::UDN parentUDN;
+        org::smpte::st2071::_2014::identity::URLs urls;
         wstring name;
-        org::smpte::st2071::_2013::types::Capabilities capabilities;
+        org::smpte::st2071::_2014::types::Capabilities capabilities;
         wstring Message;
     };
     
     exception DeviceAlreadyBound
     {
-        org::smpte::st2071::_2013::identity::UDN UDN;
+        org::smpte::st2071::_2014::identity::UDN UDN;
         wstring Message;
     };
     
@@ -507,53 +507,53 @@ module device
         // UCN = "urn:smpte:ucn:org.smpte.st2071:device_directory_v1.0";
         
         readonly attribute DeviceInformation ParentDeviceDirectory; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::identity::UDNs Namespaces; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::identity::UDNs Namespaces; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         
-        DeviceInformations ancestors(in org::smpte::st2071::_2013::identity::UDN udn)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        DeviceInformations ancestors(in org::smpte::st2071::_2014::identity::UDN udn)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::security::SecurityException);
         
-        DeviceInformation lookup(in org::smpte::st2071::_2013::identity::UDN udn)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        DeviceInformation lookup(in org::smpte::st2071::_2014::identity::UDN udn)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::security::SecurityException);
         
-        DeviceInformation parent(in org::smpte::st2071::_2013::identity::UDN udn)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        DeviceInformation parent(in org::smpte::st2071::_2014::identity::UDN udn)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::security::SecurityException);
         
-        DeviceInformations children(in org::smpte::st2071::_2013::identity::UDN udn, 
-                                    in org::smpte::st2071::_2013::query::QueryExpression filter)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::query::InvalidQuery,
-                org::smpte::st2071::_2013::security::SecurityException);
+        DeviceInformations children(in org::smpte::st2071::_2014::identity::UDN udn, 
+                                    in org::smpte::st2071::_2014::query::QueryExpression filter)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::query::InvalidQuery,
+                org::smpte::st2071::_2014::security::SecurityException);
         
-        DeviceInformations siblings(in org::smpte::st2071::_2013::identity::UDN udn, 
-                                    in org::smpte::st2071::_2013::query::QueryExpression filter)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::query::InvalidQuery,
-                org::smpte::st2071::_2013::security::SecurityException);
+        DeviceInformations siblings(in org::smpte::st2071::_2014::identity::UDN udn, 
+                                    in org::smpte::st2071::_2014::query::QueryExpression filter)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::query::InvalidQuery,
+                org::smpte::st2071::_2014::security::SecurityException);
         
-        DeviceInformations search(in org::smpte::st2071::_2013::identity::UDN udn, 
-                                  in org::smpte::st2071::_2013::query::QueryExpression filter)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::query::InvalidQuery,
-                org::smpte::st2071::_2013::security::SecurityException);
+        DeviceInformations search(in org::smpte::st2071::_2014::identity::UDN udn, 
+                                  in org::smpte::st2071::_2014::query::QueryExpression filter)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::query::InvalidQuery,
+                org::smpte::st2071::_2014::security::SecurityException);
     };
     
     interface DeviceRegistry
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:device_registry_v1.0";
         
-        void bind(in org::smpte::st2071::_2013::identity::UDN udn, 
-                  in org::smpte::st2071::_2013::identity::UDN parentUDN, 
-                  in org::smpte::st2071::_2013::identity::URLs urls, 
+        void bind(in org::smpte::st2071::_2014::identity::UDN udn, 
+                  in org::smpte::st2071::_2014::identity::UDN parentUDN, 
+                  in org::smpte::st2071::_2014::identity::URLs urls, 
                   in wstring name, 
-                  in org::smpte::st2071::_2013::types::Capabilities capabilities)
+                  in org::smpte::st2071::_2014::types::Capabilities capabilities)
         raises (DeviceNotFound, DeviceNotBound, DeviceAlreadyBound,
-                org::smpte::st2071::_2013::security::SecurityException);
+                org::smpte::st2071::_2014::security::SecurityException);
         
-        void unbind(in org::smpte::st2071::_2013::identity::UDN udn)
+        void unbind(in org::smpte::st2071::_2014::identity::UDN udn)
         raises (DeviceNotFound, DeviceNotUnbound,
-                org::smpte::st2071::_2013::security::SecurityException);
+                org::smpte::st2071::_2014::security::SecurityException);
         
-        boolean setOnline(in org::smpte::st2071::_2013::identity::UDN udn, in boolean online)
-        raises (DeviceNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        boolean setOnline(in org::smpte::st2071::_2014::identity::UDN udn, in boolean online)
+        raises (DeviceNotFound, org::smpte::st2071::_2014::security::SecurityException);
     };
     
     /*
@@ -569,7 +569,7 @@ module device
      *     'Locked'   : Indicates that a device has been locked.
      *     'Unlocked' : Indicates that a device has been unlocked.
      */
-    valuetype DeviceEvent supports org::smpte::st2071::_2013::event::StatusEvent
+    valuetype DeviceEvent supports org::smpte::st2071::_2014::event::StatusEvent
     {
         readonly attribute DeviceInformation Device;
     };
@@ -580,10 +580,10 @@ module session
 {
     valuetype Session
     {
-        readonly attribute org::smpte::st2071::_2013::identity::URI ID;
+        readonly attribute org::smpte::st2071::_2014::identity::URI ID;
         readonly attribute wstring Who;
         readonly attribute wstring Name;
-        readonly attribute org::smpte::st2071::_2013::types::DateTime AcquiredAt;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime AcquiredAt;
         readonly attribute boolean IsLock;
     };
     
@@ -591,59 +591,59 @@ module session
     
     exception NotAcquired
     {
-        org::smpte::st2071::_2013::identity::RN RN;
+        org::smpte::st2071::_2014::identity::RN RN;
         wstring Message;
     };
     
     exception NotLocked
     {
-        org::smpte::st2071::_2013::identity::RN RN;
+        org::smpte::st2071::_2014::identity::RN RN;
         wstring Message;
     };
     
     exception Locked
     {
-        org::smpte::st2071::_2013::identity::RN RN;
+        org::smpte::st2071::_2014::identity::RN RN;
         wstring Message;
     };
     
     exception TooManySessions
     {
-        org::smpte::st2071::_2013::identity::RN RN;
+        org::smpte::st2071::_2014::identity::RN RN;
         wstring Message;
     };
     
     exception NameInUse
     {
-        org::smpte::st2071::_2013::identity::RN RN;
+        org::smpte::st2071::_2014::identity::RN RN;
         wstring Message;
     };
     
     exception SessionNotFound
     {
-        org::smpte::st2071::_2013::identity::RN RN;
-        org::smpte::st2071::_2013::identity::URI ID;
+        org::smpte::st2071::_2014::identity::RN RN;
+        org::smpte::st2071::_2014::identity::URI ID;
         wstring Message;
     };
     
     exception RequestNotFound
     {
-        org::smpte::st2071::_2013::identity::RN RN;
-        org::smpte::st2071::_2013::identity::URI ID;
+        org::smpte::st2071::_2014::identity::RN RN;
+        org::smpte::st2071::_2014::identity::URI ID;
         wstring Message;
     };
     
     exception RequestExpired
     {
-        org::smpte::st2071::_2013::identity::RN RN;
-        org::smpte::st2071::_2013::identity::URI ID;
+        org::smpte::st2071::_2014::identity::RN RN;
+        org::smpte::st2071::_2014::identity::URI ID;
         wstring Message;
     };
     
     exception RequestDenied
     {
-        org::smpte::st2071::_2013::identity::RN RN;
-        org::smpte::st2071::_2013::identity::URI ID;
+        org::smpte::st2071::_2014::identity::RN RN;
+        org::smpte::st2071::_2014::identity::URI ID;
         wstring Message;
     };
     
@@ -652,17 +652,17 @@ module session
         // UCN = "urn:smpte:ucn:org.smpte.st2071:acquirable_v1.0";
         
         readonly attribute boolean Acquired; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute Sessions AcquiredBy; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         
-        org::smpte::st2071::_2013::identity::URI acquire(in wstring name)
+        org::smpte::st2071::_2014::identity::URI acquire(in wstring name)
         raises (NotAcquired, Locked, TooManySessions, NameInUse,
-                org::smpte::st2071::_2013::security::SecurityException);
+                org::smpte::st2071::_2014::security::SecurityException);
         
-        boolean release(in org::smpte::st2071::_2013::identity::URI session)
+        boolean release(in org::smpte::st2071::_2014::identity::URI session)
         raises (NotAcquired, Locked, SessionNotFound, 
-                org::smpte::st2071::_2013::security::SecurityException);
+                org::smpte::st2071::_2014::security::SecurityException);
     };
     
     interface Lockable
@@ -670,45 +670,45 @@ module session
         // UCN = "urn:smpte:ucn:org.smpte.st2071:lockable_v1.0";
         
         readonly attribute boolean Locked; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute Session LockedBy; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         
-        org::smpte::st2071::_2013::identity::URI lock(
-                           in org::smpte::st2071::_2013::identity::URI session, in wstring name)
+        org::smpte::st2071::_2014::identity::URI lock(
+                           in org::smpte::st2071::_2014::identity::URI session, in wstring name)
         raises(SessionNotFound, NotAcquired, NotLocked, 
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        boolean unlock(in org::smpte::st2071::_2013::identity::URI lock)
-        raises (SessionNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        boolean unlock(in org::smpte::st2071::_2014::identity::URI lock)
+        raises (SessionNotFound, org::smpte::st2071::_2014::security::SecurityException);
     };
     
     interface Requestable
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:requestable_v1.0";
         
-        org::smpte::st2071::_2013::identity::URI request(
-                                        in org::smpte::st2071::_2013::identity::URI session, 
+        org::smpte::st2071::_2014::identity::URI request(
+                                        in org::smpte::st2071::_2014::identity::URI session, 
                                         in wstring name, in wstring message)
         raises(SessionNotFound, RequestDenied, NotAcquired,
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        void approve(in org::smpte::st2071::_2013::identity::URI request)
+        void approve(in org::smpte::st2071::_2014::identity::URI request)
         raises(RequestNotFound, RequestExpired, 
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        void deny(in org::smpte::st2071::_2013::identity::URI request, in wstring message)
+        void deny(in org::smpte::st2071::_2014::identity::URI request, in wstring message)
         raises(RequestNotFound, RequestExpired, 
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        org::smpte::st2071::_2013::identity::URI take(
-                                        in org::smpte::st2071::_2013::identity::URI session, 
+        org::smpte::st2071::_2014::identity::URI take(
+                                        in org::smpte::st2071::_2014::identity::URI session, 
                                         in wstring name, in wstring message)
         raises(SessionNotFound, NotAcquired,
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
     };
     
-    valuetype SessionEvent supports org::smpte::st2071::_2013::event::StatusEvent
+    valuetype SessionEvent supports org::smpte::st2071::_2014::event::StatusEvent
     {
         readonly attribute Session Session;
     };
@@ -735,81 +735,114 @@ module session
 
 module service
 {
-    valuetype ServiceTemplate supports org::smpte::st2071::_2013::query::Queryable
+    valuetype ServiceTemplate supports org::smpte::st2071::_2014::query::Queryable
     {
-        readonly attribute org::smpte::st2071::_2013::identity::USN USN; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::Map Attributes; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::Capabilities Capabilities; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::identity::USN USN; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::Map Attributes; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::Capabilities Capabilities; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
     };
     
     typedef sequence<ServiceTemplate> ServiceTemplates;
     
-    interface Service : org::smpte::st2071::_2013::query::Queryable
+    interface Service : org::smpte::st2071::_2014::query::Queryable
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:service_v1.0";
         
-        readonly attribute org::smpte::st2071::_2013::identity::USN USN; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::identity::USN USN; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute ServiceTemplate Type; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::identity::URLs URLs; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::Map Attributes; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::Capabilities Capabilities; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::identity::URLs URLs; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::Map Attributes; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::Capabilities Capabilities; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
     };
     
     valuetype ServiceInformation supports Service
     {
-        readonly attribute org::smpte::st2071::_2013::types::DateTime Created; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::DateTime Created; 
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         readonly attribute wstring CreatedBy; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
-        readonly attribute org::smpte::st2071::_2013::types::DateTime ValidTill;
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        readonly attribute org::smpte::st2071::_2014::types::DateTime ValidTill;
     };
     
     typedef sequence<ServiceInformation> ServiceInformations;
     
     exception ServiceNotFound
     {
-        org::smpte::st2071::_2013::identity::USN USN;
+        org::smpte::st2071::_2014::identity::USN USN;
+        wstring Message;
+    };
+    
+    exception ServiceNotBound
+    {
+        org::smpte::st2071::_2014::identity::USN USN;
+        wstring Message;
+    };
+    
+    exception ServiceAlreadyBound
+    {
+        org::smpte::st2071::_2014::identity::USN USN;
+        wstring Message;
+    };
+    
+    exception ServiceNotUnbound
+    {
+        org::smpte::st2071::_2014::identity::USN USN;
         wstring Message;
     };
     
     exception ServiceException
     {
-        org::smpte::st2071::_2013::identity::USN USN;
+        org::smpte::st2071::_2014::identity::USN USN;
         wstring Message;
     };
     
+    interface ServiceDirectory
+    {
+        // UCN = "urn:smpte:ucn:org.smpte.st2071:service_directory_v1.0";
+        
+        readonly attribute org::smpte::st2071::_2014::identity::USNs Namespaces; 
+
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
+        void bind(in ServiceInformation service)
+        raises(ServiceNotBound, ServiceAlreadyBound, org::smpte::st2071::_2014::security::SecurityException);
+        
+        void unbind(in org::smpte::st2071::_2014::identity::USN usn)
+        raises(ServiceNotFound, ServiceNotUnbound, org::smpte::st2071::_2014::security::SecurityException);        
+    };
+
+    interface ServiceRegistry
+    {
+        // UCN = "urn:smpte:ucn:org.smpte.st2071:service_registry_v1.0";
+        
+        ServiceInformation lookup(in org::smpte::st2071::_2014::identity::USN usn)
+        raises(ServiceException, org::smpte::st2071::_2014::security::SecurityException);
+        
+        ServiceInformations search(in org::smpte::st2071::_2014::query::QueryExpression query)
+        raises(ServiceException, org::smpte::st2071::_2014::security::SecurityException);        
+    };
+
     interface ServiceFactory
     {
-        // UCN = "urn:smpte:ucn:org.smpte.st2071:service_factory_v1.0";
+        ServiceTemplates listTemplates(
+                                     in org::smpte::st2071::_2014::query::QueryExpression filter)
+        raises(ServiceException, org::smpte::st2071::_2014::security::SecurityException);
         
-        readonly attribute org::smpte::st2071::_2013::identity::USNs Namespaces; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        org::smpte::st2071::_2014::identity::USN create(
+                                       in org::smpte::st2071::_2014::identity::USN usn, 
+                                       in org::smpte::st2071::_2014::types::Map parameters)
+        raises(ServiceException, org::smpte::st2071::_2014::security::SecurityException);
         
-        ServiceTemplates listTemplates(in org::smpte::st2071::_2013::query::QueryExpression filter)
-        raises(ServiceException, org::smpte::st2071::_2013::security::SecurityException);
-        
-        org::smpte::st2071::_2013::identity::USN create(
-                                       in org::smpte::st2071::_2013::identity::USN usn, 
-                                       in org::smpte::st2071::_2013::types::Map parameters)
-        raises(ServiceException, org::smpte::st2071::_2013::security::SecurityException);
-        
-        org::smpte::st2071::_2013::identity::USN destroy(
-                                       in org::smpte::st2071::_2013::identity::USN usn)
-        raises(ServiceException, org::smpte::st2071::_2013::security::SecurityException);
-        
-        ServiceInformation lookup(in org::smpte::st2071::_2013::identity::USN usn)
-        raises(ServiceException, org::smpte::st2071::_2013::security::SecurityException);
-        
-        ServiceInformations search(in org::smpte::st2071::_2013::query::QueryExpression query)
-        raises(ServiceException, org::smpte::st2071::_2013::security::SecurityException);
+        org::smpte::st2071::_2014::identity::USN destroy(
+                                       in org::smpte::st2071::_2014::identity::USN usn)
+        raises(ServiceException, org::smpte::st2071::_2014::security::SecurityException);     
     };
 };
 
@@ -825,30 +858,30 @@ module media
         _DATA
     };
     
-    valuetype Media supports org::smpte::st2071::_2013::query::Queryable
+    valuetype Media supports org::smpte::st2071::_2014::query::Queryable
     {
-        readonly attribute org::smpte::st2071::_2013::identity::UMN UMN;
+        readonly attribute org::smpte::st2071::_2014::identity::UMN UMN;
         readonly attribute wstring Name;
-        readonly attribute org::smpte::st2071::_2013::identity::UMN Location;
-        readonly attribute org::smpte::st2071::_2013::types::DateTime Created;
-        readonly attribute org::smpte::st2071::_2013::types::DateTime Modified;
-        readonly attribute org::smpte::st2071::_2013::types::Map Metadata;
+        readonly attribute org::smpte::st2071::_2014::identity::UMN Location;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime Created;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime Modified;
+        readonly attribute org::smpte::st2071::_2014::types::Map Metadata;
     };
     
     valuetype MediaPointer
     {
-        readonly attribute org::smpte::st2071::_2013::identity::UMN Source;
+        readonly attribute org::smpte::st2071::_2014::identity::UMN Source;
         readonly attribute unsigned long long InpointOffset;
         readonly attribute unsigned long long OutpointOffset;
-        readonly attribute org::smpte::st2071::_2013::types::OFFSET_TYPE OffsetType;
+        readonly attribute org::smpte::st2071::_2014::types::OFFSET_TYPE OffsetType;
         readonly attribute short Track;
     };
     
     valuetype MediaSegment supports MediaPointer, Media
     {
-        readonly attribute org::smpte::st2071::_2013::types::DateTime Inpoint;
-        readonly attribute org::smpte::st2071::_2013::types::DateTime Outpoint;
-        readonly attribute org::smpte::st2071::_2013::identity::URI Format;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime Inpoint;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime Outpoint;
+        readonly attribute org::smpte::st2071::_2014::identity::URI Format;
         readonly attribute wstring TrackName;
         readonly attribute TRACK_TYPE TrackType;
     };
@@ -858,12 +891,12 @@ module media
     
     valuetype MediaContainer supports Media
     {
-        readonly attribute org::smpte::st2071::_2013::identity::UDN UDN;
+        readonly attribute org::smpte::st2071::_2014::identity::UDN UDN;
     };
     
     valuetype MediaAsset supports Media
     {
-        readonly attribute org::smpte::st2071::_2013::types::DateTime Duration;
+        readonly attribute org::smpte::st2071::_2014::types::DateTime Duration;
         readonly attribute MediaSegments Composition;
     };
     
@@ -875,7 +908,7 @@ module media
     
     valuetype MediaInstance supports MediaFile, MediaAsset
     {
-        // readonly attribute org::smpte::st2071::_2013::types::FramedTime Duration;
+        // readonly attribute org::smpte::st2071::_2014::types::FramedTime Duration;
         // readonly attribute MediaFormatSegments Composition;
     };
     
@@ -885,7 +918,7 @@ module media
     
     exception MediaNotFound
     {
-        org::smpte::st2071::_2013::identity::UMN UMN;
+        org::smpte::st2071::_2014::identity::UMN UMN;
         wstring Message;
     };
     
@@ -914,45 +947,45 @@ module media
         // UCN = "urn:smpte:ucn:org.smpte.st2071:media_directory_v1.0";
         
         readonly attribute MediaContainer MediaContainer; 
-        // raises (org::smpte::st2071::_2013::security::SecurityException);
+        // raises (org::smpte::st2071::_2014::security::SecurityException);
         
         Media create(in Media media, in MediaPointers pointers)
         raises(MediaNotFound, MediaCreationFailed,
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        Media delete(in org::smpte::st2071::_2013::identity::UMN umn)
+        Media delete(in org::smpte::st2071::_2014::identity::UMN umn)
         raises(MediaNotFound, MediaDeletionFailed, 
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        MediaList list(in org::smpte::st2071::_2013::identity::UMN container, 
-                       in org::smpte::st2071::_2013::query::QueryExpression filter)
-        raises(MediaNotFound, org::smpte::st2071::_2013::query::InvalidQuery, 
-               org::smpte::st2071::_2013::security::SecurityException);
+        MediaList list(in org::smpte::st2071::_2014::identity::UMN container, 
+                       in org::smpte::st2071::_2014::query::QueryExpression filter)
+        raises(MediaNotFound, org::smpte::st2071::_2014::query::InvalidQuery, 
+               org::smpte::st2071::_2014::security::SecurityException);
         
-        Media lookup(in org::smpte::st2071::_2013::identity::UMN umn)
-        raises(MediaNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        Media lookup(in org::smpte::st2071::_2014::identity::UMN umn)
+        raises(MediaNotFound, org::smpte::st2071::_2014::security::SecurityException);
         
         MediaAsset lookupAsset(in wstring mid)
-        raises(MediaNotFound, org::smpte::st2071::_2013::security::SecurityException);
+        raises(MediaNotFound, org::smpte::st2071::_2014::security::SecurityException);
         
-        MediaList search(in org::smpte::st2071::_2013::identity::UMN container, 
-                         in org::smpte::st2071::_2013::query::QueryExpression filter)
-        raises(MediaNotFound, org::smpte::st2071::_2013::query::InvalidQuery,
-               org::smpte::st2071::_2013::security::SecurityException);
+        MediaList search(in org::smpte::st2071::_2014::identity::UMN container, 
+                         in org::smpte::st2071::_2014::query::QueryExpression filter)
+        raises(MediaNotFound, org::smpte::st2071::_2014::query::InvalidQuery,
+               org::smpte::st2071::_2014::security::SecurityException);
         
         Media update(in Media media)
         raises(MediaNotFound, MediaUpdateFailed, 
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
     };
     
     interface MediaAccess
     {
         // UCN = "urn:smpte:ucn:org.smpte.st2071:media_access_v1.0";
         
-        org::smpte::st2071::_2013::identity::URLs lookupURLs(
-                                              in org::smpte::st2071::_2013::identity::UMN umn)
+        org::smpte::st2071::_2014::identity::URLs lookupURLs(
+                                              in org::smpte::st2071::_2014::identity::UMN umn)
         raises(MediaNotFound,
-               org::smpte::st2071::_2013::security::SecurityException);
+               org::smpte::st2071::_2014::security::SecurityException);
     };
 
     /*
@@ -963,7 +996,7 @@ module media
      *     'Updated'  : Indicates that a Media has been updated.
      *     'Deleted'  : Indicates that a Media has been deleted.
      */
-    valuetype MediaEvent supports org::smpte::st2071::_2013::event::StatusEvent
+    valuetype MediaEvent supports org::smpte::st2071::_2014::event::StatusEvent
     {
         readonly attribute Media Media;
     };
@@ -994,21 +1027,21 @@ module query
     
     valuetype CONTAINS supports Expression
     {
-        factory init(in org::smpte::st2071::_2013::media::MediaPointer segment);
+        factory init(in org::smpte::st2071::_2014::media::MediaPointer segment);
     };
     
     valuetype IMPLEMENTS supports Expression
     {
-        factory init(in org::smpte::st2071::_2013::mode::Mode mode, 
-                     in org::smpte::st2071::_2013::types::Capabilities interfaces);
-        factory init(in org::smpte::st2071::_2013::types::Capabilities interfaces);
+        factory init(in org::smpte::st2071::_2014::mode::Mode mode, 
+                     in org::smpte::st2071::_2014::types::Capabilities interfaces);
+        factory init(in org::smpte::st2071::_2014::types::Capabilities interfaces);
     };
     
     valuetype LESS_THAN supports Expression
     {
         factory init(in wstring field, in long long number);
         factory init(in wstring field, in double number);
-        factory init(in wstring field, in org::smpte::st2071::_2013::types::DateTime time);
+        factory init(in wstring field, in org::smpte::st2071::_2014::types::DateTime time);
         factory init(in wstring field, in any serializable);
     };
     
@@ -1016,7 +1049,7 @@ module query
     {
         factory init(in wstring field, in long long number);
         factory init(in wstring field, in double number);
-        factory init(in wstring field, in org::smpte::st2071::_2013::types::DateTime time);
+        factory init(in wstring field, in org::smpte::st2071::_2014::types::DateTime time);
         factory init(in wstring field, in any serializable);
     };
     
@@ -1024,8 +1057,9 @@ module query
     {
         factory init(in wstring field, in long long number);
         factory init(in wstring field, in double number);
-        factory init(in wstring field, in org::smpte::st2071::_2013::types::DateTime time);
+        factory init(in wstring field, in org::smpte::st2071::_2014::types::DateTime time);
         factory init(in wstring field, in any serializable);
     };
 };
 };};};};
+
