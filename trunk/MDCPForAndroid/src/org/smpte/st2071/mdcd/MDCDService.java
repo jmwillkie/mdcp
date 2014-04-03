@@ -20,8 +20,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import net.posick.net.DHCPClient;
-
 import org.smpte.st2071.identity.RN;
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
 import org.smpte.st2071.mdcd.Utils.AccountUtils;
@@ -51,7 +49,6 @@ import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -63,7 +60,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.UserManager;
-import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
