@@ -28,16 +28,13 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver
             NetworkInfo[] networkInfos = connMgr.getAllNetworkInfo();
             for (NetworkInfo networkInfo : networkInfos)
             {
+                if (networkInfo.isAvailable())
+                {
+                    available.add(networkInfo.getType());
+                }
                 if (networkInfo.isConnected())
                 {
-                    if (networkInfo.isAvailable())
-                    {
-                        available.add(networkInfo.getType());
-                    }
-                    if (networkInfo.isConnected())
-                    {
-                        connected.add(networkInfo.getType());
-                    }
+                    connected.add(networkInfo.getType());
                 }
             }
             

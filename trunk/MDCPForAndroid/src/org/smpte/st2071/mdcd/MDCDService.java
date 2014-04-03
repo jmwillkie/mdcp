@@ -2,21 +2,30 @@ package org.smpte.st2071.mdcd;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import net.posick.net.DHCPClient;
+
 import org.smpte.st2071.identity.RN;
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
+import org.smpte.st2071.mdcd.Utils.AccountUtils;
+import org.smpte.st2071.mdcd.Utils.AccountUtils.UserProfile;
 import org.smpte.st2071.mdcp.Constants;
 import org.smpte.st2071.query.QueryExpression;
 import org.smpte.st2071.types.Resource;
@@ -26,8 +35,10 @@ import org.xbill.DNS.Name;
 import org.xbill.DNS.PTRRecord;
 import org.xbill.DNS.Rcode;
 import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
 import org.xbill.DNS.ResolverListener;
 import org.xbill.DNS.Section;
+import org.xbill.DNS.SimpleResolver;
 import org.xbill.DNS.Type;
 import org.xbill.mDNS.Browse;
 import org.xbill.mDNS.MulticastDNSQuerier;
@@ -35,13 +46,25 @@ import org.xbill.mDNS.MulticastDNSService;
 import org.xbill.mDNS.Resolve;
 import org.xbill.mDNS.Resolve.Domain;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
+import android.os.UserManager;
+import android.provider.ContactsContract;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class MDCDService extends Service
@@ -87,7 +110,7 @@ public class MDCDService extends Service
         
         private long delay = 0;
         
-        private List<String> defaultDomains = new ArrayList<String>();
+        private Set<String> searchDomains = new LinkedHashSet<String>();
         
         private Set<String> domains = new LinkedHashSet<String>();
         
@@ -100,7 +123,7 @@ public class MDCDService extends Service
             
             if (defaultDomains != null)
             {
-                this.defaultDomains.addAll(Arrays.asList(defaultDomains));
+                this.searchDomains.addAll(Arrays.asList(defaultDomains));
             }
             
             switch (type)
@@ -116,6 +139,11 @@ public class MDCDService extends Service
             }
             this.browser = new Browse(queryNames);
             this.resolver = new Resolve(queryNames);
+        }
+        
+        public void addSearchDomain(Set<String> domains)
+        {
+            searchDomains.addAll(domains);
         }
         
         public Set<String> getDomains()
@@ -158,7 +186,7 @@ public class MDCDService extends Service
                         // Add newly discovered Domain names to list.
                         Set<String> names = new LinkedHashSet<String>();
                         
-                        List<String> defaultDomains = this.defaultDomains; // avoid getfield opcode
+                        Set<String> defaultDomains = this.searchDomains; // avoid getfield opcode
                         for (String defaultDomain : defaultDomains)
                         {
                             if (!copy.contains(defaultDomain))
@@ -270,6 +298,8 @@ public class MDCDService extends Service
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
     
+    protected ExecutorService cachedExcecutor = Executors.newCachedThreadPool();
+    
     protected ScheduledExecutorService executor;
     
     protected ListenerProcessor<DiscoveryListener> discoveryListener = new ListenerProcessor<DiscoveryListener>(DiscoveryListener.class);
@@ -311,59 +341,14 @@ public class MDCDService extends Service
     {
         super.onStartCommand(intent, flags, startId);
         
-        boolean canConnect = false;
-        ArrayList<Integer> availableNetworks = intent.getIntegerArrayListExtra(EXTRA_AVAILABLE_NETWORKS);
-        ArrayList<Integer> connectedNetworks = intent.getIntegerArrayListExtra(EXTRA_CONNECTED_NETWORKS);
-
-        if (connectedNetworks != null)
+        if (intent != null)
         {
-            for (int networkType : connectedNetworks)
-            {
-                switch (networkType)
-                {
-                    case ConnectivityManager.TYPE_ETHERNET:
-                    case ConnectivityManager.TYPE_WIFI:
-                        canConnect = true;
-                        break;
-                    case ConnectivityManager.TYPE_MOBILE:
-                        canConnect = false;
-                        break;
-                    default:
-                        canConnect = false;
-                        break;
-                }
-            }
+            ArrayList<Integer> availableNetworks = intent.getIntegerArrayListExtra(EXTRA_AVAILABLE_NETWORKS);
+            ArrayList<Integer> connectedNetworks = intent.getIntegerArrayListExtra(EXTRA_CONNECTED_NETWORKS);
+            startOrStopNetwork(availableNetworks, connectedNetworks);
         }
         
-        if (availableNetworks != null)
-        {
-            for (int networkType : availableNetworks)
-            {
-                switch (networkType)
-                {
-                    case ConnectivityManager.TYPE_ETHERNET:
-                    case ConnectivityManager.TYPE_WIFI:
-                        canConnect = true;
-                        break;
-                    case ConnectivityManager.TYPE_MOBILE:
-                        canConnect = false;
-                        break;
-                    default:
-                        canConnect = false;
-                        break;
-                }
-            }
-        }
-        
-        if (canConnect)
-        {
-            startupNetwork();
-            return START_STICKY;
-        } else
-        {
-            shutdownNetwork();
-            return START_STICKY;
-        }
+        return START_STICKY;
     }
 
 
@@ -383,25 +368,19 @@ public class MDCDService extends Service
                 NetworkInfo[] networkInfos = connMgr.getAllNetworkInfo();
                 for (NetworkInfo networkInfo : networkInfos)
                 {
+                    if (networkInfo.isAvailable())
+                    {
+                        available.add(networkInfo.getType());
+                    }
+                    
                     if (networkInfo.isConnected())
                     {
-                        if (networkInfo.isAvailable())
-                        {
-                            available.add(networkInfo.getType());
-                        }
-                        
-                        if (networkInfo.isConnected())
-                        {
-                            connected.add(networkInfo.getType());
-                        }
+                        connected.add(networkInfo.getType());
                     }
                 }
             }
             
-            if (connected.size() > 0 || available.size() > 0)
-            {
-                startupNetwork();
-            } else
+            if (!startOrStopNetwork(available, connected))
             {
                 throw new IOException("Cannot start MDCDService -> No networks available.");
             }
@@ -431,19 +410,112 @@ public class MDCDService extends Service
     }
     
     
+    protected boolean startOrStopNetwork(List<Integer> availableNetworks, List<Integer> connectedNetworks)
+    {
+        boolean canConnect = false;
+        
+        if ((connectedNetworks != null && connectedNetworks.size() > 0) || (availableNetworks != null && availableNetworks.size() > 0))
+        {
+            if (connectedNetworks != null)
+            {
+                outer:
+                for (int networkType : connectedNetworks)
+                {
+                    switch (networkType)
+                    {
+                        case ConnectivityManager.TYPE_ETHERNET:
+                        case ConnectivityManager.TYPE_WIFI:
+                            canConnect = true;
+                            break outer;
+                        case ConnectivityManager.TYPE_MOBILE:
+                            canConnect = false;
+                            break;
+                        default:
+                            canConnect = false;
+                            break;
+                    }
+                }
+            }
+            
+            if (!canConnect && availableNetworks != null)
+            {
+                outer:
+                for (int networkType : availableNetworks)
+                {
+                    switch (networkType)
+                    {
+                        case ConnectivityManager.TYPE_ETHERNET:
+                        case ConnectivityManager.TYPE_WIFI:
+                            canConnect = true;
+                            break outer;
+                        case ConnectivityManager.TYPE_MOBILE:
+                            canConnect = false;
+                            break;
+                        default:
+                            canConnect = false;
+                            break;
+                    }
+                }
+            }
+            
+            if (canConnect)
+            {
+                cachedExcecutor.execute(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        startupNetwork();
+                    }
+                });
+                return true;
+            } else
+            {
+                cachedExcecutor.execute(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        shutdownNetwork();
+                    }
+                });
+                return false;
+            }
+        }
+        
+        return false;
+    }
+    
+    
     protected synchronized void startupNetwork()
     {
+        DeviceInfo info = gatherDeviceInformation();
+        
         try
         {
             if (querier == null)
             {
-                querier = new MulticastDNSQuerier(true, true);
+                Set<InetAddress> dnsServers = info.getDNSServers();
+                List<Resolver> resolvers = new ArrayList<Resolver>();
+                
+                if (dnsServers != null && dnsServers.size() > 0)
+                {
+                    for (InetAddress dnsServer : dnsServers)
+                    {
+                        resolvers.add(new SimpleResolver(dnsServer.toString()));
+                    }
+                }
+                
+                querier = new MulticastDNSQuerier(true, true, resolvers.toArray(new Resolver[resolvers.size()]));
             }
             
-            if (service != null)
+            if (service == null)
             {
                 service = new MulticastDNSService();
                 service.setQuerier(querier);
+                
+                Set<String> domains = info.getDomains();
+                service.setSearchPath(domains.toArray(new String[domains.size()]));
             }
         } catch (IOException e)
         {
@@ -488,6 +560,8 @@ public class MDCDService extends Service
             executor.execute(new RunnableTask(browseDomains));
             executor.execute(new RunnableTask(registrationDomains));
         }
+        
+        gatherDeviceInformation();
         
         networkRunning = true;
     }
@@ -549,7 +623,217 @@ public class MDCDService extends Service
             }
         }
         
-        networkRunning = true;
+        networkRunning = false;
+    }
+
+
+    protected DeviceInfo gatherDeviceInformation()
+    {
+        String simId = null;
+        String mac = null;
+        String name = null;
+        String hostname = null;
+        DeviceInfo info = new DeviceInfo();
+
+        TelephonyManager teleMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        if (teleMgr != null)
+        {
+            simId = teleMgr.getSimSerialNumber();
+        }
+        
+        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (wifiMgr != null)
+        {
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            mac = wifiInfo.getMacAddress();
+            DhcpInfo dhcpInfo = wifiMgr.getDhcpInfo();
+            if (dhcpInfo != null)
+            {
+                Set<InetAddress> servers = new LinkedHashSet<InetAddress>();
+                byte[] raw = new byte[4];
+                
+                if (dhcpInfo.dns1 != 0)
+                {
+                    raw[0] = (byte) (dhcpInfo.dns1 & 0x0FF);
+                    raw[1] = (byte) ((dhcpInfo.dns1 & 0x0FF00) >> 8);
+                    raw[2] = (byte) ((dhcpInfo.dns1 & 0x0FF0000) >> 16);
+                    raw[3] = (byte) ((dhcpInfo.dns1 & 0x0FF000000) >> 24);
+                    try
+                    {
+                        servers.add(InetAddress.getByAddress(raw));
+                    } catch (UnknownHostException e)
+                    {
+                        Log.e(LOG_TAG, "Error Setting DNS Address \"" + Integer.toHexString(dhcpInfo.dns1) + "\" -> " + e.getMessage());
+                    }
+                }
+                
+                if (dhcpInfo.dns2 != 0)
+                {
+                    raw[0] = (byte) (dhcpInfo.dns2 & 0x0FF);
+                    raw[1] = (byte) ((dhcpInfo.dns2 & 0x0FF00) >> 8);
+                    raw[2] = (byte) ((dhcpInfo.dns2 & 0x0FF0000) >> 16);
+                    raw[3] = (byte) ((dhcpInfo.dns2 & 0x0FF000000) >> 24);
+                    try
+                    {
+                        servers.add(InetAddress.getByAddress(raw));
+                    } catch (UnknownHostException e)
+                    {
+                        Log.e(LOG_TAG, "Error Setting DNS Address \"" + Integer.toHexString(dhcpInfo.dns2) + "\" -> " + e.getMessage());
+                    }
+                }
+                
+                if (servers.size() > 0)
+                {
+                    info.setDNSServers(servers);
+                }
+            }
+        }
+        
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter != null)
+        {
+            name = btAdapter.getName();
+        }
+        
+        try
+        {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            if (ifaces != null)
+            {
+                while (ifaces.hasMoreElements())
+                {
+                    NetworkInterface iface = ifaces.nextElement();
+                    byte[] hwAddress = iface.getHardwareAddress();
+                    if (hwAddress != null && hwAddress.length > 0)
+                    {
+                        if (mac == null || mac.length() == 0)
+                        {
+                            StringBuilder builder = new StringBuilder();
+                            for (byte octet : hwAddress)
+                            {
+                                builder.append(Integer.toHexString(octet & 0x0FF));
+                            }
+                            if (builder.length() > 0)
+                            {
+                                mac = builder.toString();
+                                break;
+                            }
+                        }
+                        
+                        Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                        while (addresses.hasMoreElements())
+                        {
+                            InetAddress address = addresses.nextElement();
+                            
+                            Set<String> hostnames = hostnamesByAddress.get(address);
+                            if (hostnames == null)
+                            {
+                                hostnames = new LinkedHashSet<String>();
+                                hostnamesByAddress.put(address, hostnames);
+                            }
+                            
+                            try
+                            {
+                                hostnames.add(address.getHostName());
+                            } catch (Exception e)
+                            {
+                                Log.e(LOG_TAG, "Could not get Hostname for \"" + address + "\" -> " + e.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+            
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (SocketException e)
+        {
+            Log.e(LOG_TAG, "Could not get MAC address for device -> " + e.getMessage(), e);
+        } catch (UnknownHostException e)
+        {
+            Log.e(LOG_TAG, "Could not get name of localhost -> " + e.getMessage(), e);
+        }
+        
+        if (name == null || name.length() == 0)
+        {
+            name = getProfileName();
+        }
+        
+        if (name == null || name.length() == 0)
+        {
+            name = getUserName();
+        }
+        
+        if (name == null || name.length() == 0)
+        {
+            try
+            {
+                AccountManager acctMgr = AccountManager.get(this);
+                if (acctMgr != null)
+                {
+                    Account[] accounts = acctMgr.getAccounts();
+                    if (accounts != null)
+                    {
+                        for (Account account : accounts)
+                        {
+                            if ("com.google".equalsIgnoreCase(account.type))
+                            {
+                                name = account.name;
+                            }
+                        }
+                    }
+                }
+            } catch (SecurityException e)
+            {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+        
+        if (simId != null && simId.length() > 0)
+        {
+            info.setId(simId);
+        } else if (mac != null && mac.length() > 0)
+        {
+            info.setId(mac);
+        }
+        
+        info.setName(name);
+        
+        if (!"localhost".equalsIgnoreCase(hostname))
+        {
+            info.setHostname(hostname);
+        } else
+        {
+            info.setHostname(name + ".local");
+        }
+        
+        return info;
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    protected String getUserName()
+    {
+        UserManager userMgr = (UserManager) getSystemService(Context.USER_SERVICE);
+        if (userMgr != null)
+        {
+            return userMgr.getUserName();
+        }
+        
+        return null;
+    }
+
+
+    protected String getProfileName()
+    {
+        UserProfile profile = AccountUtils.getUserProfile(this);
+        List<String> names = profile.possibleNames();
+        if (names != null && names.size() > 0)
+        {
+            return names.get(0);
+        } else
+        {
+            return null;
+        }
     }
 
 
