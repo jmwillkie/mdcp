@@ -17,7 +17,7 @@ public class DeviceInfo implements Serializable
     
     private Set<String> domains = new LinkedHashSet<String>();
 
-    private Set<InetAddress> dns;
+    private Set<InetAddress> dns = new LinkedHashSet<InetAddress>();
     
     
     public DeviceInfo()
