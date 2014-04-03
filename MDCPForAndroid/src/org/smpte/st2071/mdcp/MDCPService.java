@@ -21,6 +21,7 @@ import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.ServiceConnection;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -318,36 +319,6 @@ public class MDCPService extends Service implements IMDCPService
     protected void populateDeviceInformation()
     {
         // TODO Auto-generated method stub
-        String mac = null;
-        // Get Unique Device ID and domain names (if any)
-        try
-        {
-            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-            if (ifaces != null)
-            {
-                while (ifaces.hasMoreElements())
-                {
-                    NetworkInterface iface = ifaces.nextElement();
-                    byte[] address = iface.getHardwareAddress();
-                    if (address != null && address.length > 0)
-                    {
-                        StringBuilder builder = new StringBuilder();
-                        for (byte octet : address)
-                        {
-                            builder.append(Integer.toHexString(octet & 0x0FF));
-                        }
-                        if (builder.length() > 0)
-                        {
-                            mac = builder.toString();
-                            break;
-                        }
-                    }
-                }
-            }
-        } catch (SocketException e)
-        {
-            
-        }
     }
     
     
