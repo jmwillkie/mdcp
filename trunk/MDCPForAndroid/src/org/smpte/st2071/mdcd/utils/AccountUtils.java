@@ -1,4 +1,4 @@
-package org.smpte.st2071.mdcd;
+package org.smpte.st2071.mdcd.utils;
 
 import java.util.ArrayList;
 import java.util.List;
