@@ -24,9 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.smpte.st2071.identity.RN;
+import org.smpte.st2071.mdcd.AccountUtils.UserProfile;
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
-import org.smpte.st2071.mdcd.Utils.AccountUtils;
-import org.smpte.st2071.mdcd.Utils.AccountUtils.UserProfile;
 import org.smpte.st2071.mdcd.Utils.NetworkUtils;
 import org.smpte.st2071.mdcp.Constants;
 import org.smpte.st2071.query.QueryExpression;
