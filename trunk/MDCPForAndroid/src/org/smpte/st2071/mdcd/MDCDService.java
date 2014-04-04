@@ -1,16 +1,17 @@
 package org.smpte.st2071.mdcd;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +20,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.smpte.st2071.identity.RN;
 import org.smpte.st2071.mdcd.DiscoveryListener.DomainType;
 import org.smpte.st2071.mdcd.Utils.AccountUtils;
 import org.smpte.st2071.mdcd.Utils.AccountUtils.UserProfile;
+import org.smpte.st2071.mdcd.Utils.NetworkUtils;
 import org.smpte.st2071.mdcp.Constants;
 import org.smpte.st2071.query.QueryExpression;
 import org.smpte.st2071.types.Resource;
@@ -498,7 +502,9 @@ public class MDCDService extends Service
                 {
                     for (InetAddress dnsServer : dnsServers)
                     {
-                        resolvers.add(new SimpleResolver(dnsServer.toString()));
+                        SimpleResolver r = new SimpleResolver();
+                        r.setAddress(dnsServer);
+                        resolvers.add(r);
                     }
                 }
                 
@@ -645,108 +651,126 @@ public class MDCDService extends Service
             DhcpInfo dhcpInfo = wifiMgr.getDhcpInfo();
             if (dhcpInfo != null)
             {
-                Set<InetAddress> servers = new LinkedHashSet<InetAddress>();
-                byte[] raw = new byte[4];
-                
+                Set<InetAddress> dnsServers = new LinkedHashSet<InetAddress>();
                 if (dhcpInfo.dns1 != 0)
                 {
-                    raw[0] = (byte) (dhcpInfo.dns1 & 0x0FF);
-                    raw[1] = (byte) ((dhcpInfo.dns1 & 0x0FF00) >> 8);
-                    raw[2] = (byte) ((dhcpInfo.dns1 & 0x0FF0000) >> 16);
-                    raw[3] = (byte) ((dhcpInfo.dns1 & 0x0FF000000) >> 24);
                     try
                     {
-                        servers.add(InetAddress.getByAddress(raw));
+                        dnsServers.add(NetworkUtils.toInetAddress(dhcpInfo.dns1));
                     } catch (UnknownHostException e)
                     {
-                        Log.e(LOG_TAG, "Error Setting DNS Address \"" + Integer.toHexString(dhcpInfo.dns1) + "\" -> " + e.getMessage());
+                        Log.e(LOG_TAG, "Error creating address for DNS Server \"" + dhcpInfo.dns1 + "\" - > " + e.getMessage(), e);
                     }
                 }
                 
                 if (dhcpInfo.dns2 != 0)
                 {
-                    raw[0] = (byte) (dhcpInfo.dns2 & 0x0FF);
-                    raw[1] = (byte) ((dhcpInfo.dns2 & 0x0FF00) >> 8);
-                    raw[2] = (byte) ((dhcpInfo.dns2 & 0x0FF0000) >> 16);
-                    raw[3] = (byte) ((dhcpInfo.dns2 & 0x0FF000000) >> 24);
                     try
                     {
-                        servers.add(InetAddress.getByAddress(raw));
+                        dnsServers.add(NetworkUtils.toInetAddress(dhcpInfo.dns2));
                     } catch (UnknownHostException e)
                     {
-                        Log.e(LOG_TAG, "Error Setting DNS Address \"" + Integer.toHexString(dhcpInfo.dns2) + "\" -> " + e.getMessage());
+                        Log.e(LOG_TAG, "Error creating address for DNS Server \"" + dhcpInfo.dns2 + "\" - > " + e.getMessage(), e);
                     }
                 }
                 
-                if (servers.size() > 0)
+                if (dnsServers.size() > 0)
                 {
-                    info.setDNSServers(servers);
+                    info.addDNSServers(dnsServers);
                 }
             }
+        }
+        
+        if (mac == null || mac.length() == 0)
+        {
+            mac = NetworkUtils.getMAC();
         }
         
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter != null)
         {
             name = btAdapter.getName();
+            if (mac == null || mac.length() == 0)
+            {
+                mac = btAdapter.getAddress();
+            }
         }
         
-        try
+        Pattern dnsPattern = Pattern.compile("(.*\\.dns(\\d+))");
+        Pattern domainPattern = Pattern.compile("(.*\\.domain)");
+        Pattern hostnamePattern = Pattern.compile("(.*\\.hostname)");
+        Map<String, String> dnsServers = new LinkedHashMap<String, String>();
+        Map<String, String> domains = new LinkedHashMap<String, String>();
+        Map<String, String> hostnames = new LinkedHashMap<String, String>();
+        
+        Map<String, String> props = getProps();
+        for (Map.Entry<String, String> entry : props.entrySet())
         {
-            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-            if (ifaces != null)
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            Matcher m = dnsPattern.matcher(key);
+            if (m.matches())
             {
-                while (ifaces.hasMoreElements())
+                dnsServers.put(key, value);
+            }
+            
+            m = domainPattern.matcher(key);
+            if (m.matches())
+            {
+                domains.put(key, value);
+            }
+            
+            m = hostnamePattern.matcher(key);
+            if (m.matches())
+            {
+                hostnames.put(key, value);
+            }
+        }
+        
+        if (dnsServers.size() > 0)
+        {
+            for (Map.Entry<String, String> entry : dnsServers.entrySet())
+            {
+                String value = entry.getValue();
+                if (value != null && value.length() > 0)
                 {
-                    NetworkInterface iface = ifaces.nextElement();
-                    byte[] hwAddress = iface.getHardwareAddress();
-                    if (hwAddress != null && hwAddress.length > 0)
+                    try
                     {
-                        if (mac == null || mac.length() == 0)
+                        info.addDNSServer(NetworkUtils.toInetAddress(value));
+                    } catch (UnknownHostException e)
+                    {
+                        Log.e(LOG_TAG, "Error creating address for DNS Server \"" + value + "\" - > " + e.getMessage(), e);
+                    }
+                }
+            }
+        }
+        
+        if (domains.size() > 0)
+        {
+            info.addDomains(new LinkedHashSet<String>(domains.values()));
+        }
+        
+        if (hostnames.size() > 0)
+        {
+            hostname = hostnames.get("net.hostname");
+            if (hostname == null || hostname.length() == 0)
+            {
+                for (String key : hostnames.keySet())
+                {
+                    if (key.startsWith("net.") && key.contains("hostname"))
+                    {
+                        hostname = hostnames.get(key);
+                        if (hostname != null && hostname.length() > 0)
                         {
-                            StringBuilder builder = new StringBuilder();
-                            for (byte octet : hwAddress)
-                            {
-                                builder.append(Integer.toHexString(octet & 0x0FF));
-                            }
-                            if (builder.length() > 0)
-                            {
-                                mac = builder.toString();
-                                break;
-                            }
-                        }
-                        
-                        Enumeration<InetAddress> addresses = iface.getInetAddresses();
-                        while (addresses.hasMoreElements())
-                        {
-                            InetAddress address = addresses.nextElement();
-                            
-                            Set<String> hostnames = hostnamesByAddress.get(address);
-                            if (hostnames == null)
-                            {
-                                hostnames = new LinkedHashSet<String>();
-                                hostnamesByAddress.put(address, hostnames);
-                            }
-                            
-                            try
-                            {
-                                hostnames.add(address.getHostName());
-                            } catch (Exception e)
-                            {
-                                Log.e(LOG_TAG, "Could not get Hostname for \"" + address + "\" -> " + e.getMessage());
-                            }
+                            break;
                         }
                     }
                 }
             }
-            
-            hostname = InetAddress.getLocalHost().getHostName();
-        } catch (SocketException e)
+        } else
         {
-            Log.e(LOG_TAG, "Could not get MAC address for device -> " + e.getMessage(), e);
-        } catch (UnknownHostException e)
-        {
-            Log.e(LOG_TAG, "Could not get name of localhost -> " + e.getMessage(), e);
+            hostname = NetworkUtils.getHostname();
         }
         
         if (name == null || name.length() == 0)
@@ -790,6 +814,9 @@ public class MDCDService extends Service
         } else if (mac != null && mac.length() > 0)
         {
             info.setId(mac);
+        } else
+        {
+            
         }
         
         info.setName(name);
@@ -799,10 +826,49 @@ public class MDCDService extends Service
             info.setHostname(hostname);
         } else
         {
-            info.setHostname(name + ".local");
+            info.setHostname(name);
         }
         
         return info;
+    }
+    
+    /**
+     * Parses the output of getprop, which is the only way to get DNS
+     * info on Android. getprop might disappear in future releases, so
+     * this code comes with a use-by date.
+     */
+    private Map<String, String> getProps()
+    {
+        Map<String, String> props = new LinkedHashMap<String, String>();
+        
+        try
+        {
+            String line;
+            Process p = Runtime.getRuntime().exec("getprop");
+            InputStream in = p.getInputStream();
+            InputStreamReader isr = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(isr);
+            while ((line = br.readLine()) != null)
+            {
+                try
+                {
+                    String[] parts = line.split(":");
+                    String name = parts[0].trim();
+                    name = name.replaceAll("[ \\[\\]]", "").trim();
+                    String value = parts[1].trim();
+                    value = value.replaceAll("[ \\[\\]]", "").trim();
+                    props.put(name, value);
+                } catch (Exception e)
+                {
+                    Log.e(LOG_TAG, "Error parsing property -> " + e.getMessage());
+                }
+            }
+        } catch (Exception e)
+        {
+            Log.e(LOG_TAG, "Error parsing properties -> " + e.getMessage());
+        }
+        
+        return props;
     }
 
 

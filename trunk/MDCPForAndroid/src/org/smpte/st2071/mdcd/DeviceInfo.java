@@ -2,6 +2,7 @@ package org.smpte.st2071.mdcd;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -92,9 +93,49 @@ public class DeviceInfo implements Serializable
     }
 
 
+    public void addDomains(Set<String> domains)
+    {
+        if (this.domains == null)
+        {
+            this.domains = new LinkedHashSet<String>();
+        }
+        this.domains.addAll(domains);
+    }
+
+
+    public void addDomains(String... domains)
+    {
+        if (this.domains == null)
+        {
+            this.domains = new LinkedHashSet<String>();
+        }
+        this.domains.addAll(Arrays.asList(domains));
+    }
+
+
     public void setDNSServers(Set<InetAddress> dns)
     {
         this.dns = dns;
+    }
+
+
+    public void addDNSServers(Set<InetAddress> addresses)
+    {
+        if (this.dns == null)
+        {
+            this.dns = new LinkedHashSet<InetAddress>();
+        }
+        this.dns.addAll(addresses);
+    }
+
+
+    public void addDNSServer(InetAddress... addresses)
+    {
+        if (this.dns == null)
+        {
+            this.dns = new LinkedHashSet<InetAddress>();
+        }
+        this.dns.addAll(Arrays.asList(addresses));
     }
 
 
