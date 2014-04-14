@@ -563,8 +563,6 @@ public class MDCDService extends Service
             executor.execute(new RunnableTask(registrationDomains));
         }
         
-        gatherDeviceInformation();
-        
         networkRunning = true;
     }
 
