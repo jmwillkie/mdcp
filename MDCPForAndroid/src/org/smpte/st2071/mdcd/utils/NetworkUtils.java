@@ -46,40 +46,51 @@ public class NetworkUtils
     }
     
     
-    public static InetAddress toInetAddress(String value)
+    public static InetAddress toInetAddress(String addr)
     throws UnknownHostException
     {
-        // TODO Auto-generated method stub
-        return null;
+        InetAddress[] addrs = InetAddress.getAllByName(addr);
+        return addrs.length > 0 ? addrs[0] : null;
     }
     
     
     public static String getMAC()
-    throws SocketException
     {
-        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-        while (ifaces.hasMoreElements())
+        try
         {
-            NetworkInterface iface = ifaces.nextElement();
-            if (!iface.isLoopback() && !iface.isVirtual())
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            while (ifaces.hasMoreElements())
             {
-                byte[] hwAddr = iface.getHardwareAddress();
-                if (hwAddr != null && hwAddr.length > 0)
+                NetworkInterface iface = ifaces.nextElement();
+                if (!iface.isLoopback() && !iface.isVirtual())
                 {
-                    StringBuilder builder = new StringBuilder();
-                    
-                    for (byte octet : hwAddr)
+                    try
                     {
-                        builder.append(Integer.toHexString((octet & 0x0FF))).append(":");
-                    }
-                    
-                    if (builder.length() > 1)
+                        byte[] hwAddr = iface.getHardwareAddress();
+                        if (hwAddr != null && hwAddr.length > 0)
+                        {
+                            StringBuilder builder = new StringBuilder();
+                            
+                            for (byte octet : hwAddr)
+                            {
+                                builder.append(Integer.toHexString((octet & 0x0FF))).append(":");
+                            }
+                            
+                            if (builder.length() > 1)
+                            {
+                                builder.setLength(builder.length() - 1);
+                            }
+                            return builder.toString();
+                        }
+                    } catch (SocketException e)
                     {
-                        builder.setLength(builder.length() - 1);
+                        System.err.println("Couldn't get hardware address for \"" + iface.getName() + "\" - " + e.getMessage());
                     }
-                    return builder.toString();
                 }
             }
+        } catch (SocketException e)
+        {
+            System.err.println("Couldn't get network interfaces - " + e.getMessage());
         }
         
         return null;
@@ -87,26 +98,37 @@ public class NetworkUtils
     
     
     public static String getHostname()
-    throws SocketException
     {
-        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-        while (ifaces.hasMoreElements())
+        try
         {
-            NetworkInterface iface = ifaces.nextElement();
-            if (!iface.isLoopback() && !iface.isVirtual())
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            while (ifaces.hasMoreElements())
             {
-                Enumeration<InetAddress> addrs = iface.getInetAddresses();
-                while (addrs != null && addrs.hasMoreElements())
+                NetworkInterface iface = ifaces.nextElement();
+                try
                 {
-                    InetAddress addr = addrs.nextElement();
-                    String hostname = addr.getHostName();
-                    String hostAddr = addr.getHostAddress();
-                    if (!"localhost".equalsIgnoreCase(hostname) && !hostname.startsWith(hostAddr))
+                    if (!iface.isLoopback() && !iface.isVirtual())
                     {
-                        return hostname;
+                        Enumeration<InetAddress> addrs = iface.getInetAddresses();
+                        while (addrs != null && addrs.hasMoreElements())
+                        {
+                            InetAddress addr = addrs.nextElement();
+                            String hostname = addr.getHostName();
+                            String hostAddr = addr.getHostAddress();
+                            if (!"localhost".equalsIgnoreCase(hostname) && !hostname.startsWith(hostAddr))
+                            {
+                                return hostname;
+                            }
+                        }
                     }
+                } catch (SocketException e)
+                {
+                    System.err.println("Couldn't get network interface - " + e.getMessage());
                 }
             }
+        } catch (SocketException e)
+        {
+            System.err.println("Couldn't get network interfaces - " + e.getMessage());
         }
         
         try
