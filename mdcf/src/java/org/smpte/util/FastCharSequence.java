@@ -183,7 +183,7 @@ public final class FastCharSequence implements CharSequence
             return EMPTY_ARRAY;
         }
         
-        final ArrayList<FastCharSequence> list = new ArrayList<>();
+        final ArrayList<FastCharSequence> list = new ArrayList<FastCharSequence>();
         final CharSequence data = this.source; /* avoid getfield opcode */
         final char[] delimiter = delimiters.toCharArray();
         int startPos = start;

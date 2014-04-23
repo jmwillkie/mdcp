@@ -18,9 +18,9 @@ public class ServiceTemplate implements Serializable
 
     protected USN usn;
     
-    protected Map<String, Object> attributes = new HashMap<>();
+    protected Map<String, Object> attributes = new HashMap<String, Object>();
     
-    protected List<Capability> capabilities = new ArrayList<>();
+    protected List<Capability> capabilities = new ArrayList<Capability>();
 
     
     public ServiceTemplate(org.smpte_ra.schemas.st2071._2014.service.ServiceTemplate service)
