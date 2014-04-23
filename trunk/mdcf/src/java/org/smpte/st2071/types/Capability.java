@@ -14,11 +14,11 @@ public class Capability
 {
     protected UCN ucn;
     
-    protected List<String> keys = new ArrayList<>();
+    protected List<String> keys = new ArrayList<String>();
     
-    protected Map<String, Object> attributes = new HashMap<>();
+    protected Map<String, Object> attributes = new HashMap<String, Object>();
     
-    protected List<URL> urls = new ArrayList<>();
+    protected List<URL> urls = new ArrayList<URL>();
 
     
     public Capability(org.smpte_ra.schemas.st2071._2014.types.Capability capability)

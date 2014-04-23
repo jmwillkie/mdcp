@@ -1,0 +1,7 @@
+org.smpte.st2071
+org.smpte.st2071.device
+org.smpte.st2071.identity
+org.smpte.st2071.query
+org.smpte.st2071.service
+org.smpte.st2071.types
+org.smpte.util

@@ -19,9 +19,9 @@ public class IdentifierRN extends RN
     
     protected CharSequence attributeText;
     
-    protected List<CharSequence> keys = new ArrayList<>();
+    protected List<CharSequence> keys = new ArrayList<CharSequence>();
     
-    protected Map<CharSequence, CharSequence> attributes = new HashMap<>();
+    protected Map<CharSequence, CharSequence> attributes = new HashMap<CharSequence, CharSequence>();
     
     
     protected IdentifierRN()
