@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DeviceEventServices"
+    targetNamespace="http://www.smpte-ra.org/schemas/st2071/2014/event"
+    xmlns:event="http://www.smpte-ra.org/schemas/st2071/2014/event"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <wsdl:import namespace="http://www.smpte-ra.org/schemas/st2071/2014/event" 
+        location="file:///Users/Shared/DropBox/Dropbox/SMPTE/MDC/workspace/MDC/MDCF/src/main/xml/st2071-2l.wsdl" />
+    
+    <wsdl:service name="DeviceService">
+        <wsdl:port name="StatusSupportPort" binding="event:StatusSupportHTTPBinding">
+            <soap11:address location="http://localhost:8088/StatusSupport"/>
+        </wsdl:port>
+        <wsdl:port name="EventerPort" binding="event:EventerHTTPBinding">
+            <soap11:address location="http://localhost:8088/Eventer"/>
+        </wsdl:port>
+        <wsdl:port name="EventBroadcasterPort" binding="event:EventBroadcasterHTTPBinding">
+            <soap11:address location="http://localhost:8088/EventBroadcaster"/>
+        </wsdl:port>
+        <wsdl:port name="CallbackHandlerPort" binding="event:CallbackHandlerHTTPBinding">
+            <soap11:address location="http://localhost:8088/CallbackHandler"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
