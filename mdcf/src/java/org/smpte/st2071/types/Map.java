@@ -53,9 +53,15 @@ public class Map implements Serializable
     
     public void put(String key, Serializable value)
     {
-        MapEntry entry = new MapEntry(key, value);
+        MapEntry entry = newMapEntry(key, value);
         entries.add(entry);
         index.put(key, entry);
+    }
+
+
+    protected MapEntry newMapEntry(String key, Serializable value)
+    {
+        return new MapEntry(key, value);
     }
 
 
