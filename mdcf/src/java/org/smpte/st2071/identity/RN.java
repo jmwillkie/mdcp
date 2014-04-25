@@ -1,6 +1,5 @@
 package org.smpte.st2071.identity;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 
@@ -8,7 +7,12 @@ import org.smpte.util.ExecutionTimer;
 import org.smpte.util.ExecutionTimer.Time;
 import org.smpte.util.FastCharSequence;
 
-public abstract class RN implements Serializable
+/**
+ * TODO: implement
+ *
+ * @author Steve Posick
+ */
+public abstract class RN extends URN
 {
     private static final long serialVersionUID = 201402051137L;
 
@@ -16,9 +20,7 @@ public abstract class RN implements Serializable
 
     protected static final String TXT_SMPTE = "smpte";
 
-    protected static final String TXT_URN = "urn";
-
-    protected static final String URN_NAMESPACE = TXT_URN + COLON + TXT_SMPTE;
+    protected static final String URN_NAMESPACE = URN_SCHEME + COLON + TXT_SMPTE;
 
     protected static final String RN_FORMAT_PREFIX = URN_NAMESPACE + ":(ucn | udn | umn | usn)";
     
@@ -125,6 +127,7 @@ public abstract class RN implements Serializable
     
     protected RN()
     {
+        super();
     }
     
     
@@ -276,10 +279,10 @@ public abstract class RN implements Serializable
     {
         if (parts.length >= INDEX_TYPE)
         {
-            if (parts[0].length() == TXT_URN.length() && 
-                (parts[0].charAt(0) == TXT_URN.charAt(0) || Character.toLowerCase(parts[0].charAt(0)) == TXT_URN.charAt(0)) && 
-                (parts[0].charAt(1) == TXT_URN.charAt(1) || Character.toLowerCase(parts[0].charAt(1)) == TXT_URN.charAt(1)) && 
-                (parts[0].charAt(2) == TXT_URN.charAt(2) || Character.toLowerCase(parts[0].charAt(2)) == TXT_URN.charAt(2)))
+            if (parts[0].length() == URN_SCHEME.length() && 
+                (parts[0].charAt(0) == URN_SCHEME.charAt(0) || Character.toLowerCase(parts[0].charAt(0)) == URN_SCHEME.charAt(0)) && 
+                (parts[0].charAt(1) == URN_SCHEME.charAt(1) || Character.toLowerCase(parts[0].charAt(1)) == URN_SCHEME.charAt(1)) && 
+                (parts[0].charAt(2) == URN_SCHEME.charAt(2) || Character.toLowerCase(parts[0].charAt(2)) == URN_SCHEME.charAt(2)))
             {
                 if (parts[1].length() == TXT_SMPTE.length() && 
                     (parts[1].charAt(0) == TXT_SMPTE.charAt(0) || Character.toLowerCase(parts[1].charAt(0)) == TXT_SMPTE.charAt(0)) && 
@@ -303,7 +306,7 @@ public abstract class RN implements Serializable
                 }
             } else
             {
-                throw new ParseException("RN must start with \"" + TXT_URN + "\".", parts[INDEX_URN].getStartPosInSource());
+                throw new ParseException("RN must start with \"" + URN_SCHEME + "\".", parts[INDEX_URN].getStartPosInSource());
             }
         } else
         {
