@@ -7,35 +7,14 @@ import java.text.ParseException;
  *
  * @author Steve Posick
  */
-public class URL
+public class URL extends URI
 {
-    protected CharSequence url;
+    private static final long serialVersionUID = 201404251050L;
     
     
     public URL(CharSequence url)
     throws ParseException
     {
-        this.url = url;
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        return url.hashCode();
-    }
-
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        return url.equals(obj);
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return url.toString();
+        super(url);
     }
 }

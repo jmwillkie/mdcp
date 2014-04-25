@@ -4,6 +4,11 @@ import java.text.ParseException;
 
 import org.smpte.util.FastCharSequence;
 
+/**
+ * TODO: implement
+ *
+ * @author Steve Posick
+ */
 public class UDN extends IdentifierRN
 {
     private static final long serialVersionUID = 201402051137L;
