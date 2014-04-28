@@ -56,8 +56,8 @@ interface IMDCService
     String stopBrowse(in Intent intent);
     
     
-    String register(in String ucn, in String path, in String action, in String domain, in Intent intent);
+    Capability register(in String path, in String action, in String domain, in Capability capability, in Intent intent);
     
 
-    void unregister(in String serviceName);
+    void unregister(in Capability capability);
 }
