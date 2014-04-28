@@ -27,7 +27,6 @@ import org.smpte.mdc4android.xml.XmlUtils;
 import org.xbill.DNS.Name;
 import org.xbill.DNS.Resolver;
 import org.xbill.DNS.SimpleResolver;
-import org.xbill.DNS.Update;
 import org.xbill.mDNS.Lookup;
 import org.xbill.mDNS.Lookup.Domain;
 import org.xbill.mDNS.MulticastDNSQuerier;
@@ -44,11 +43,14 @@ import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MDCService extends Service implements IMDCService, Device
 {
@@ -335,6 +337,8 @@ public class MDCService extends Service implements IMDCService, Device
     protected Set<String> urls = new LinkedHashSet<String>();
     
     Set<Capability> capabilities = new LinkedHashSet<Capability>();
+
+    private LocalBroadcastManager localBroadcaster;
     
     
     @Override
@@ -358,6 +362,8 @@ public class MDCService extends Service implements IMDCService, Device
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onCreate()");
         super.onCreate();
+        localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
+        
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null)
         {
@@ -437,15 +443,6 @@ public class MDCService extends Service implements IMDCService, Device
             this.udn = "urn:smpte:udn:" + scope + ":id=" + id + ";hostname=" + hostname; 
             this.name = name != null ? name : hostname;
             
-            if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
-            {
-                Log.i(LOG_TAG, "Binding to Service \"" + SOAPServerService.class.getName() + "\".");
-                if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
-                {
-                    Log.e(LOG_TAG, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\" or \"" + SOAPServerService.class.getName() + "\"!");
-                }
-            }
-            
             try
             {
                 if (querier == null)
@@ -474,6 +471,27 @@ public class MDCService extends Service implements IMDCService, Device
                 RuntimeException re = new RuntimeException(e.getMessage());
                 re.setStackTrace(e.getStackTrace());
                 throw re;
+            }
+            
+            if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
+            {
+                Log.e(LOG_TAG, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                try
+                {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                    startActivity(intent);
+                } catch (android.content.ActivityNotFoundException anfe)
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
+                }
+                Intent intent = new Intent(MainActivity.MESSAGE_DISPLAY_TEXT);
+                intent.putExtra(MainActivity.EXTRA_TEXT, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                localBroadcaster.sendBroadcast(intent);
+                
+                intent = new Intent(MainActivity.MESSAGE_ERROR_ON_STARTUP);
+                intent.putExtra(MainActivity.EXTRA_TEXT, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                localBroadcaster.sendBroadcast(intent);
             }
             
             networkStarted = true;
@@ -516,8 +534,8 @@ public class MDCService extends Service implements IMDCService, Device
             }
         }
     }
-
-
+    
+    
     @Override
     public String getRN()
     {

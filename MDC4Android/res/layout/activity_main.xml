@@ -8,28 +8,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:autoLink="web|email|phone|map|all"
-        android:ems="10"
-        android:enabled="true"
+        android:clickable="false"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/fading_edge_margin"
-        android:freezesText="true"
-        android:gravity="start"
-        android:inputType="textMultiLine"
-        android:scrollbars="vertical"
-        android:text="@string/hello_world"
-        android:typeface="sans"
-        android:visibility="visible" />
+        android:gravity="center|fill"
+        android:longClickable="false"
+        android:overScrollMode="ifContentScrolls"
+        android:singleLine="false"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
