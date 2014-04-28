@@ -1,0 +1,574 @@
+package org.smpte.mdc4android.net;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.smpte.mdc4android.MDC4Android;
+import org.smpte.mdc4android.account.AccountUtils;
+import org.smpte.mdc4android.account.AccountUtils.UserProfile;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.os.UserManager;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+
+public class NetworkUtils
+{
+    public static final String LOG_TAG = MDC4Android.LOG_TAG + "." + NetworkUtils.class.getSimpleName();
+    
+    public static InetAddress toInetAddress(int value)
+    throws UnknownHostException
+    {
+        byte[] addr = new byte[4];
+        
+        addr[0] = (byte) (value & 0x0FF);
+        addr[1] = (byte) ((value >> 8) & 0x0FF);
+        addr[2] = (byte) ((value >> 16) & 0x0FF);
+        addr[3] = (byte) ((value >> 24) & 0x0FF);
+        
+        return InetAddress.getByAddress(addr);
+    }
+    
+    
+    public static InetAddress toInetAddress(long value)
+    throws UnknownHostException
+    {
+        byte[] addr = new byte[8];
+        
+        if (value < 0x100000000l)
+        {
+            return toInetAddress((int) value);
+        } else
+        {
+            addr[0] = (byte) (value & 0x0FF);
+            addr[1] = (byte) ((value >> 8) & 0x0FF);
+            addr[2] = (byte) ((value >> 16) & 0x0FF);
+            addr[3] = (byte) ((value >> 24) & 0x0FF);
+            addr[4] = (byte) ((value >> 32) & 0x0FF);
+            addr[5] = (byte) ((value >> 40) & 0x0FF);
+            addr[6] = (byte) ((value >> 48) & 0x0FF);
+            addr[7] = (byte) ((value >> 56) & 0x0FF);
+            
+            return InetAddress.getByAddress(addr);
+        }
+    }
+    
+    
+    public static InetAddress toInetAddress(String addr)
+    throws UnknownHostException
+    {
+        InetAddress[] addrs = InetAddress.getAllByName(addr);
+        return addrs.length > 0 ? addrs[0] : null;
+    }
+    
+    
+    public static String getMAC()
+    {
+        try
+        {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            while (ifaces.hasMoreElements())
+            {
+                NetworkInterface iface = ifaces.nextElement();
+                if (!iface.isLoopback() && !iface.isVirtual() && !iface.isPointToPoint())
+                {
+                    try
+                    {
+                        byte[] hwAddr = iface.getHardwareAddress();
+                        if (hwAddr != null && hwAddr.length > 0)
+                        {
+                            StringBuilder builder = new StringBuilder();
+                            
+                            for (byte octet : hwAddr)
+                            {
+                                builder.append(Integer.toHexString((octet & 0x0FF))).append(":");
+                            }
+                            
+                            if (builder.length() > 1)
+                            {
+                                builder.setLength(builder.length() - 1);
+                            }
+                            return builder.toString();
+                        }
+                    } catch (SocketException e)
+                    {
+                        System.err.println("Couldn't get hardware address for \"" + iface.getName() + "\" - " + e.getMessage());
+                    }
+                }
+            }
+        } catch (SocketException e)
+        {
+            System.err.println("Couldn't get network interfaces - " + e.getMessage());
+        }
+        
+        return null;
+    }
+    
+    
+    public static String getHostname()
+    {
+        try
+        {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            while (ifaces.hasMoreElements())
+            {
+                NetworkInterface iface = ifaces.nextElement();
+                try
+                {
+                    if (!iface.isLoopback() && !iface.isVirtual())
+                    {
+                        Enumeration<InetAddress> addrs = iface.getInetAddresses();
+                        while (addrs != null && addrs.hasMoreElements())
+                        {
+                            InetAddress addr = addrs.nextElement();
+                            String hostname = addr.getHostName();
+                            String hostAddr = addr.getHostAddress();
+                            if (!"localhost".equalsIgnoreCase(hostname) && !hostname.startsWith(hostAddr))
+                            {
+                                return hostname;
+                            }
+                        }
+                    }
+                } catch (SocketException e)
+                {
+                    System.err.println("Couldn't get network interface - " + e.getMessage());
+                }
+            }
+        } catch (SocketException e)
+        {
+            System.err.println("Couldn't get network interfaces - " + e.getMessage());
+        }
+        
+        try
+        {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e)
+        {
+            return null;
+        }
+    }
+    
+    
+    /**
+     * Parses the output of getprop, which is the only way to get DNS
+     * info on Android. getprop might disappear in future releases, so
+     * this code comes with a use-by date.
+     */
+    public static Map<String, String> getProps()
+    {
+        Map<String, String> props = new LinkedHashMap<String, String>();
+        
+        try
+        {
+            String line;
+            Process p = Runtime.getRuntime().exec("getprop");
+            InputStream in = p.getInputStream();
+            InputStreamReader isr = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(isr);
+            while ((line = br.readLine()) != null)
+            {
+                try
+                {
+                    String[] parts = line.split(":");
+                    String name = parts[0].trim();
+                    name = name.replaceAll("[ \\[\\]]", "").trim();
+                    String value = parts[1].trim();
+                    value = value.replaceAll("[ \\[\\]]", "").trim();
+                    props.put(name, value);
+                } catch (Exception e)
+                {
+                    Log.e(LOG_TAG, "Error parsing property -> " + e.getMessage());
+                }
+            }
+        } catch (Exception e)
+        {
+            Log.e(LOG_TAG, "Error parsing properties -> " + e.getMessage());
+        }
+        
+        return props;
+    }
+
+
+    public static Set<NetworkInterface> getNetworkInterfaces()
+    {
+        Set<NetworkInterface> results = new LinkedHashSet<NetworkInterface>();
+        try
+        {
+            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+            while (ifaces.hasMoreElements())
+            {
+                NetworkInterface iface = ifaces.nextElement();
+                if (!iface.isLoopback() && !iface.isVirtual() && !iface.isPointToPoint())
+                {
+                    results.add(iface);
+                }
+            }
+        } catch (SocketException e)
+        {
+            e.printStackTrace(System.err);
+        }
+        
+        return results;
+    }
+
+
+    public static DeviceInfo gatherDeviceInformation(Context context)
+    {
+        String simId = null;
+        String mac = null;
+        String name = null;
+        String hostname = null;
+        DeviceInfo info = new DeviceInfo();
+        
+        try
+        {
+            TelephonyManager teleMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (teleMgr != null)
+            {
+                simId = teleMgr.getSimSerialNumber();
+            }
+        } catch (Exception e)
+        {
+            Log.e(LOG_TAG, "Error getting SIM SerialNumber - > " + e.getMessage(), e);
+        }
+        
+        WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiMgr != null)
+        {
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            mac = wifiInfo.getMacAddress();
+            DhcpInfo dhcpInfo = wifiMgr.getDhcpInfo();
+            if (dhcpInfo != null)
+            {
+                Set<InetAddress> dnsServers = new LinkedHashSet<InetAddress>();
+                if (dhcpInfo.dns1 != 0)
+                {
+                    try
+                    {
+                        dnsServers.add(NetworkUtils.toInetAddress(dhcpInfo.dns1));
+                    } catch (UnknownHostException e)
+                    {
+                        Log.e(LOG_TAG, "Error creating address for DNS Server \"" + dhcpInfo.dns1 + "\" - > " + e.getMessage(), e);
+                    }
+                }
+                
+                if (dhcpInfo.dns2 != 0)
+                {
+                    try
+                    {
+                        dnsServers.add(NetworkUtils.toInetAddress(dhcpInfo.dns2));
+                    } catch (UnknownHostException e)
+                    {
+                        Log.e(LOG_TAG, "Error creating address for DNS Server \"" + dhcpInfo.dns2 + "\" - > " + e.getMessage(), e);
+                    }
+                }
+                
+                if (dnsServers.size() > 0)
+                {
+                    info.addDNSServers(dnsServers);
+                }
+                
+                try
+                {
+                    Field field = DhcpInfo.class.getField("domainName");
+                    field.setAccessible(true);
+                    String domain = (String) field.get(dhcpInfo);
+                    info.addDomain(domain == null ? "local." : domain);
+                } catch (Exception e)
+                {
+                    // ignore
+                }
+            }
+            
+            try
+            {
+                info.setInetAddress(NetworkUtils.toInetAddress(wifiInfo.getIpAddress()));
+            } catch (UnknownHostException e)
+            {
+                Log.e(LOG_TAG, "Could not get InetAddress");
+            }
+        }
+        
+        if (mac == null || mac.length() == 0)
+        {
+            mac = NetworkUtils.getMAC();
+        }
+        
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter != null)
+        {
+            name = btAdapter.getName();
+            if (mac == null || mac.length() == 0)
+            {
+                mac = btAdapter.getAddress();
+            }
+        }
+        
+        Pattern dnsPattern = Pattern.compile("(.*\\.dns(\\d+))");
+        Pattern domainPattern = Pattern.compile("(.*\\.domain)");
+        Pattern hostnamePattern = Pattern.compile("(.*\\.hostname)");
+        Map<String, String> dnsServers = new LinkedHashMap<String, String>();
+        Map<String, String> domains = new LinkedHashMap<String, String>();
+        Map<String, String> hostnames = new LinkedHashMap<String, String>();
+        
+        Map<String, String> props = NetworkUtils.getProps();
+        for (Map.Entry<String, String> entry : props.entrySet())
+        {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            Matcher m = dnsPattern.matcher(key);
+            if (m.matches())
+            {
+                dnsServers.put(key, value);
+            }
+            
+            m = domainPattern.matcher(key);
+            if (m.matches())
+            {
+                domains.put(key, value);
+            }
+            
+            m = hostnamePattern.matcher(key);
+            if (m.matches())
+            {
+                hostnames.put(key, value);
+            }
+        }
+        
+        if (dnsServers.size() > 0)
+        {
+            for (Map.Entry<String, String> entry : dnsServers.entrySet())
+            {
+                String value = entry.getValue();
+                if (value != null && value.length() > 0)
+                {
+                    try
+                    {
+                        info.addDNSServer(NetworkUtils.toInetAddress(value));
+                    } catch (UnknownHostException e)
+                    {
+                        Log.e(LOG_TAG, "Error creating address for DNS Server \"" + value + "\" - > " + e.getMessage(), e);
+                    }
+                }
+            }
+        }
+        
+        if (domains.size() > 0)
+        {
+            info.addDomains(new LinkedHashSet<String>(domains.values()));
+        }
+        
+        if (hostnames.size() > 0)
+        {
+            hostname = hostnames.get("net.hostname");
+            if (hostname == null || hostname.length() == 0)
+            {
+                for (String key : hostnames.keySet())
+                {
+                    if (key.startsWith("net.") && key.contains("hostname"))
+                    {
+                        hostname = hostnames.get(key);
+                        if (hostname != null && hostname.length() > 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        } else
+        {
+            hostname = NetworkUtils.getHostname();
+        }
+        
+        if (name == null || name.length() == 0)
+        {
+            UserProfile profile = AccountUtils.getUserProfile(context);
+            List<String> names = profile.possibleNames();
+            if (names != null && names.size() > 0)
+            {
+                name = names.get(0);
+            } else
+            {
+                return null;
+            }
+        }
+        
+        if (name == null || name.length() == 0)
+        {
+            name = getUserName(context);
+        }
+        
+        if (name == null || name.length() == 0)
+        {
+            try
+            {
+                AccountManager acctMgr = AccountManager.get(context);
+                if (acctMgr != null)
+                {
+                    Account[] accounts = acctMgr.getAccounts();
+                    if (accounts != null)
+                    {
+                        for (Account account : accounts)
+                        {
+                            if ("com.google".equalsIgnoreCase(account.type))
+                            {
+                                name = account.name;
+                            }
+                        }
+                    }
+                }
+            } catch (SecurityException e)
+            {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+        
+        if (simId != null && simId.length() > 0)
+        {
+            info.setId(simId);
+        } else if (mac != null && mac.length() > 0)
+        {
+            info.setId(mac);
+        } else
+        {
+            Log.e(LOG_TAG, "MAC could not be determined!");
+        }
+        
+        info.setName(name);
+        
+        if (!"localhost".equalsIgnoreCase(hostname))
+        {
+            info.setHostname(hostname);
+        } else
+        {
+            info.setHostname(name + cleanupName(info.getId()));
+        }
+        
+        if (info.getInetAddresses() == null || info.getInetAddresses().isEmpty())
+        {
+            Set<NetworkInterface> ifaces = getNetworkInterfaces();
+            if (ifaces != null && ifaces.size() > 0)
+            {
+                for (NetworkInterface netIface : ifaces)
+                {
+                    try
+                    {
+                        if (!netIface.isLoopback() && !netIface.isVirtual() && !netIface.isPointToPoint() && netIface.isUp())
+                        {
+                            Enumeration<InetAddress> addrs = netIface.getInetAddresses();
+                            while (addrs.hasMoreElements())
+                            {
+                                InetAddress addr = addrs.nextElement();
+                                if (addr.getAddress().length == 4)
+                                {
+                                    info.addInetAddress(addr);
+                                }
+                            }
+                        }
+                    } catch (SocketException e)
+                    {
+                        // ignore
+                    }
+                }
+            }
+        }
+        
+        return info;
+    }
+    
+
+    public static String cleanupName(String name)
+    {
+        StringBuilder builder = new StringBuilder();
+        char[] chars = name.toCharArray();
+        for (char c : chars)
+        {
+            if (Character.isLetterOrDigit(c))
+            {
+                builder.append(c);
+            } else
+            {
+                if (c == '=')
+                {
+                    builder.append('-');
+                } else
+                {
+                    builder.append("");
+                }
+            }
+        }
+        
+        if (builder.length() > 63)
+        {
+            builder.setLength(63);
+        } else if (builder.length() < 3)
+        {
+            builder.append("-service");
+        }
+        
+        return builder.toString();
+    }
+
+    
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public static String getUserName(Context context)
+    {
+        UserManager userMgr = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        if (userMgr != null)
+        {
+            return userMgr.getUserName();
+        }
+        
+        return null;
+    }
+
+
+    public static String reverse(String domain)
+    {
+        StringBuilder builder = new StringBuilder();
+        
+        if (domain != null)
+        {
+            String[] parts = domain.split("\\.");
+            if (parts != null)
+            {
+                for (int i = parts.length - 1; i >= 0; i--)
+                {
+                    if (parts[i] != null && parts[i].length() > 0)
+                    {
+                        builder.append(parts[i]).append(".");
+                    }
+                }
+                if (builder.length() > 0)
+                {
+                    builder.setLength(builder.length() - 1);
+                }
+            }
+        }
+        
+        return builder.toString();
+    }
+}
