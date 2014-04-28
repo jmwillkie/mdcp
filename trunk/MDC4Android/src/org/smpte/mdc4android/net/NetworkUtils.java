@@ -3,35 +3,27 @@ package org.smpte.mdc4android.net;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.smpte.mdc4android.MDC4Android;
-import org.smpte.mdc4android.account.AccountUtils;
-import org.smpte.mdc4android.account.AccountUtils.UserProfile;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.UserManager;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class NetworkUtils
@@ -191,10 +183,10 @@ public class NetworkUtils
             {
                 try
                 {
-                    String[] parts = line.split(":");
-                    String name = parts[0].trim();
+                    int pos = line.indexOf(":");
+                    String name = line.substring(0, pos).trim();
+                    String value = line.substring(pos + 1).trim();
                     name = name.replaceAll("[ \\[\\]]", "").trim();
-                    String value = parts[1].trim();
                     value = value.replaceAll("[ \\[\\]]", "").trim();
                     props.put(name, value);
                 } catch (Exception e)
@@ -236,23 +228,10 @@ public class NetworkUtils
 
     public static DeviceInfo gatherDeviceInformation(Context context)
     {
-        String simId = null;
         String mac = null;
         String name = null;
         String hostname = null;
         DeviceInfo info = new DeviceInfo();
-        
-        try
-        {
-            TelephonyManager teleMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            if (teleMgr != null)
-            {
-                simId = teleMgr.getSimSerialNumber();
-            }
-        } catch (Exception e)
-        {
-            Log.e(LOG_TAG, "Error getting SIM SerialNumber - > " + e.getMessage(), e);
-        }
         
         WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (wifiMgr != null)
@@ -289,17 +268,6 @@ public class NetworkUtils
                 {
                     info.addDNSServers(dnsServers);
                 }
-                
-                try
-                {
-                    Field field = DhcpInfo.class.getField("domainName");
-                    field.setAccessible(true);
-                    String domain = (String) field.get(dhcpInfo);
-                    info.addDomain(domain == null ? "local." : domain);
-                } catch (Exception e)
-                {
-                    // ignore
-                }
             }
             
             try
@@ -309,11 +277,6 @@ public class NetworkUtils
             {
                 Log.e(LOG_TAG, "Could not get InetAddress");
             }
-        }
-        
-        if (mac == null || mac.length() == 0)
-        {
-            mac = NetworkUtils.getMAC();
         }
         
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -380,6 +343,7 @@ public class NetworkUtils
         {
             info.addDomains(new LinkedHashSet<String>(domains.values()));
         }
+        info.addDomain("local.");
         
         if (hostnames.size() > 0)
         {
@@ -403,68 +367,46 @@ public class NetworkUtils
             hostname = NetworkUtils.getHostname();
         }
         
-        if (name == null || name.length() == 0)
+        String serial = Build.SERIAL;
+        if (serial != null && serial.length() > 0)
         {
-            UserProfile profile = AccountUtils.getUserProfile(context);
-            List<String> names = profile.possibleNames();
-            if (names != null && names.size() > 0)
+            info.setId(serial);
+        } else 
+        {
+            if (mac != null && mac.length() > 0)
             {
-                name = names.get(0);
+                info.setId(mac);
             } else
             {
-                return null;
-            }
-        }
-        
-        if (name == null || name.length() == 0)
-        {
-            name = getUserName(context);
-        }
-        
-        if (name == null || name.length() == 0)
-        {
-            try
-            {
-                AccountManager acctMgr = AccountManager.get(context);
-                if (acctMgr != null)
+                if (mac == null || mac.length() == 0)
                 {
-                    Account[] accounts = acctMgr.getAccounts();
-                    if (accounts != null)
-                    {
-                        for (Account account : accounts)
-                        {
-                            if ("com.google".equalsIgnoreCase(account.type))
-                            {
-                                name = account.name;
-                            }
-                        }
-                    }
+                    mac = NetworkUtils.getMAC();
                 }
-            } catch (SecurityException e)
+            } 
+            
+            if (mac != null && mac.length() > 0)
             {
-                Log.e(LOG_TAG, e.getMessage());
+                info.setId(mac);
+            } else
+            {
+                Log.e(LOG_TAG, "MAC could not be determined!");
             }
         }
-        
-        if (simId != null && simId.length() > 0)
-        {
-            info.setId(simId);
-        } else if (mac != null && mac.length() > 0)
-        {
-            info.setId(mac);
-        } else
-        {
-            Log.e(LOG_TAG, "MAC could not be determined!");
-        }
-        
-        info.setName(name);
         
         if (!"localhost".equalsIgnoreCase(hostname))
         {
             info.setHostname(hostname);
         } else
         {
-            info.setHostname(name + cleanupName(info.getId()));
+            info.setHostname(name + "-" + cleanupName(info.getId()));
+        }
+        
+        if (name != null)
+        {
+            info.setName(name);
+        } else
+        {
+            info.setName(hostname);
         }
         
         if (info.getInetAddresses() == null || info.getInetAddresses().isEmpty())
@@ -503,7 +445,7 @@ public class NetworkUtils
     public static String cleanupName(String name)
     {
         StringBuilder builder = new StringBuilder();
-        char[] chars = name.toCharArray();
+        char[] chars = name.trim().toCharArray();
         for (char c : chars)
         {
             if (Character.isLetterOrDigit(c))
@@ -511,13 +453,7 @@ public class NetworkUtils
                 builder.append(c);
             } else
             {
-                if (c == '=')
-                {
-                    builder.append('-');
-                } else
-                {
-                    builder.append("");
-                }
+                builder.append('-');
             }
         }
         
@@ -531,21 +467,8 @@ public class NetworkUtils
         
         return builder.toString();
     }
-
     
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public static String getUserName(Context context)
-    {
-        UserManager userMgr = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        if (userMgr != null)
-        {
-            return userMgr.getUserName();
-        }
-        
-        return null;
-    }
-
-
+    
     public static String reverse(String domain)
     {
         StringBuilder builder = new StringBuilder();
@@ -570,5 +493,51 @@ public class NetworkUtils
         }
         
         return builder.toString();
+    }
+
+
+    public static String replaceProtocol(String url, String protocol)
+    throws MalformedURLException
+    {
+        int pos = url.indexOf(':');
+        if (pos > 0)
+        {
+            return protocol + url.substring(pos);
+        } else
+        {
+            throw new MalformedURLException("Must be an Absolute URL!");
+        }
+    }
+
+
+    public static String replaceHostname(String url, String hostname)
+    throws MalformedURLException
+    {
+        int firstPos = url.indexOf("://");
+        int secondPos = -1;
+        
+        if (firstPos >= 0)
+        {
+            firstPos += 3;
+            outer:
+            for (int index = firstPos; index < url.length(); index++)
+            {
+                char c = url.charAt(index);
+                switch (c)
+                {
+                    case ':':
+                    case '/':
+                        secondPos = index;
+                        break outer;
+                }
+            }
+            
+            if (secondPos > 0)
+            {
+                return url.substring(0, firstPos) + hostname + url.substring(secondPos);
+            }
+        }
+        
+        throw new MalformedURLException("Must be an Absolute URL!");
     }
 }

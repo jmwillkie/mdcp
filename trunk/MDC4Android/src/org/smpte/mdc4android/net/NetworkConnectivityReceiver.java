@@ -22,7 +22,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver
         if (connMgr != null)
         {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo.isConnected())
+            if (networkInfo != null && networkInfo.isConnected())
             {
                 context.startService(new Intent(MDCService.class.getName()).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, true));
             } else

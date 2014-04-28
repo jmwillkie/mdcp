@@ -2,11 +2,13 @@ package org.smpte.mdc4android;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -25,6 +27,7 @@ import org.smpte.mdc4android.xml.XmlUtils;
 import org.xbill.DNS.Name;
 import org.xbill.DNS.Resolver;
 import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.Update;
 import org.xbill.mDNS.Lookup;
 import org.xbill.mDNS.Lookup.Domain;
 import org.xbill.mDNS.MulticastDNSQuerier;
@@ -115,17 +118,17 @@ public class MDCService extends Service implements IMDCService, Device
         }
 
         @Override
-        public String register(String ucn, String path, String action, String domain, Intent intent)
+        public Capability register(String path, String action, String domain, Capability capability, Intent intent)
         throws RemoteException
         {
-            return MDCService.this.register(ucn, path, action, domain, intent);
+            return MDCService.this.register(path, action, domain, capability, intent);
         }
 
         @Override
-        public void unregister(String serviceName)
+        public void unregister(Capability capability)
         throws RemoteException
         {
-            MDCService.this.unregister(serviceName);
+            MDCService.this.unregister(capability);
         }
     };
     
@@ -241,12 +244,38 @@ public class MDCService extends Service implements IMDCService, Device
                     }
                 }
                 
+                // TODO: Register Device Capability using a single URL for all device endpoints.  
+                //       The soapAction being different for each endpoint/method.
+
+                
                 for (int index = 0; index < PATHS.length; index++)
                 {
                     Intent intent = new Intent(ACTIONS[index]).addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK);
                     
-                    soapService.register(PATHS[index], SOAP_ACTIONS[index], intent);
-                    Log.i(LOG_TAG, "Endpoint: path=\"" + PATHS[index] + "\", action=\"" + SOAP_ACTIONS[index] + "\" registered to Intent Action \"" + ACTIONS[index] + "\" [" + intent + "]");
+                    String url = soapService.register(PATHS[index], SOAP_ACTIONS[index], intent);
+                    Log.i(LOG_TAG, "Endpoint: url=\"" + url + "\" path=\"" + PATHS[index] + "\", action=\"" + SOAP_ACTIONS[index] + "\" registered to Intent Action \"" + ACTIONS[index] + "\" [" + intent + "]");
+                    if (url != null)
+                    {
+                        try
+                        {
+                            String newURL = NetworkUtils.replaceProtocol(url, "mdcp");
+                            String hostname = deviceInfo.getHostname();
+                            for (String domain : deviceInfo.getDomains())
+                            {
+                                String fqn = hostname + "." + domain;
+                                try
+                                {
+                                    urls.add(NetworkUtils.replaceHostname(newURL, (fqn.endsWith(".") ? fqn.substring(0, fqn.length() - 1) : fqn)));
+                                } catch (Exception e)
+                                {
+                                    Log.e(LOG_TAG, "Hostname \"" + fqn + "\" is not valid - " + e.getMessage(), e);
+                                }
+                            }
+                        } catch (MalformedURLException e)
+                        {
+                            Log.e(LOG_TAG, "URL \"" + url + "\" returned from SOAPServerService is not an absolute URL!", e);
+                        }
+                    }
                 }
                 
                 IntentFilter filter = new IntentFilter();
@@ -254,7 +283,6 @@ public class MDCService extends Service implements IMDCService, Device
                 {
                     filter.addDataType(net.posick.ws.Constants.MEDIA_TYPE_SOAP);
                     filter.addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK);
-//                    filter.addCategory("net.posick.ws.ENDPOINT_CALLBACK");
                     for (String action : ACTIONS)
                     {
                         filter.addAction(action);
@@ -306,6 +334,8 @@ public class MDCService extends Service implements IMDCService, Device
     
     protected Set<String> urls = new LinkedHashSet<String>();
     
+    Set<Capability> capabilities = new LinkedHashSet<Capability>();
+    
     
     @Override
     public IBinder asBinder()
@@ -328,20 +358,11 @@ public class MDCService extends Service implements IMDCService, Device
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onCreate()");
         super.onCreate();
-        if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
-        {
-            Log.i(LOG_TAG, "Binding to Service \"" + SOAPServerService.class.getName() + "\".");
-            if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
-            {
-                Log.e(LOG_TAG, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\" or \"" + SOAPServerService.class.getName() + "\"!");
-            }
-        }
-        
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null)
         {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo.isConnected())
+            if (networkInfo != null && networkInfo.isConnected())
             {
                 startNetwork();
             } else
@@ -359,7 +380,7 @@ public class MDCService extends Service implements IMDCService, Device
     public void onDestroy()
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onDestroy()");
-        unbindService(soapServiceConnection);
+        stopNetwork();
         super.onDestroy();
     }
 
@@ -398,6 +419,7 @@ public class MDCService extends Service implements IMDCService, Device
             deviceInfo = NetworkUtils.gatherDeviceInformation(this);
             
             Set<String> domains = deviceInfo.getDomains();
+            String id = deviceInfo.getId();
             String name = deviceInfo.getName();
             String hostname = deviceInfo.getHostname();
             
@@ -412,20 +434,17 @@ public class MDCService extends Service implements IMDCService, Device
                 scope = "local";
             }
             
-            this.udn = "urn:smpte:udn:" + scope + ":" + hostname; 
+            this.udn = "urn:smpte:udn:" + scope + ":id=" + id + ";hostname=" + hostname; 
             this.name = name != null ? name : hostname;
             
-            /*
-            java.util.Map<String, String> props = NetworkUtils.getProps();
-            if (props != null)
+            if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
             {
-                Map attributes = this.attributes;
-                for (java.util.Map.Entry<String, String> entry : props.entrySet())
+                Log.i(LOG_TAG, "Binding to Service \"" + SOAPServerService.class.getName() + "\".");
+                if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
                 {
-                    attributes.put(entry.getKey(), entry.getValue());
+                    Log.e(LOG_TAG, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\" or \"" + SOAPServerService.class.getName() + "\"!");
                 }
             }
-            */
             
             try
             {
@@ -468,6 +487,8 @@ public class MDCService extends Service implements IMDCService, Device
         
         if (!networkStarted)
         {
+            unbindService(soapServiceConnection);
+            
             networkStarted = false;
             
             if (querier != null)
@@ -535,14 +556,18 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public Capability[] getCapabilities()
     {
-        Set<Capability> capabilities = new LinkedHashSet<Capability>();
+        List<Capability> capabilities = new LinkedList<Capability>();
+        synchronized (this.capabilities)
+        {
+            capabilities.addAll(this.capabilities);
+        }
         
         Capability deviceCapability = new Capability();
         deviceCapability.setUcn("urn:smpte:ucn:org.smpte.st2071:device_v1.0");
         deviceCapability.setUrls(getURLs());
         deviceCapability.setAttributes(getAttributes());
-        capabilities.add(deviceCapability);
-
+        capabilities.add(0, deviceCapability);
+        
         return capabilities.toArray(new Capability[capabilities.size()]);
     }
 
@@ -723,7 +748,7 @@ public class MDCService extends Service implements IMDCService, Device
 
 
     @Override
-    public String register(String ucn, String path, String action, String domain, Intent intent)
+    public Capability register(String path, String action, String domain, Capability capability, Intent intent)
     throws RemoteException
     {
         // TODO Auto-generated method stub
@@ -732,7 +757,7 @@ public class MDCService extends Service implements IMDCService, Device
 
 
     @Override
-    public void unregister(String serviceName)
+    public void unregister(Capability capability)
     throws RemoteException
     {
         // TODO Auto-generated method stub

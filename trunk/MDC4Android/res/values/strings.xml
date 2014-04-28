@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">MDC4Android</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">MDC4Android</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 

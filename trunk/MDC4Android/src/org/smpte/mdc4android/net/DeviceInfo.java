@@ -98,6 +98,17 @@ public class DeviceInfo implements Serializable
             this.hostname = sanitizedHostname;
         }
     }
+    
+    
+    public String getPrimaryDomain()
+    {
+        for (String domain : domains)
+        {
+            return domain;
+        }
+        
+        return "local.";
+    }
 
 
     public Set<String> getDomains()
@@ -187,13 +198,13 @@ public class DeviceInfo implements Serializable
         {
             StringBuilder builder = new StringBuilder();
             
-            char[] chars = hostname.toCharArray();
+            char[] chars = hostname.trim().toCharArray();
             for (char c : chars)
             {
                 if (Character.isWhitespace(c))
                 {
                     builder.append("-");
-                } else if (Character.isLetterOrDigit(c) || c == '.')
+                } else if (Character.isLetterOrDigit(c) || c == '.' || c == '-')
                 {
                     builder.append(c);
                 }
