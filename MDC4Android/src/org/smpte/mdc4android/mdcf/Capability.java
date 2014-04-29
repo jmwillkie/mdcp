@@ -28,11 +28,7 @@ public class Capability implements Parcelable
 
     private Capability(Parcel in) 
     {
-        ucn = in.readString();
-        attributes = (Map) in.readParcelable(Map.class.getClassLoader());
-        String[] urls = in.createStringArray();
-        in.readStringArray(urls);
-        this.urls = urls;
+        readFromParcel(in);
     }
     
     
@@ -76,6 +72,22 @@ public class Capability implements Parcelable
     }
 
 
+    public void addUrls(String[] urls)
+    {
+        String[] temp = this.urls;
+        if (temp == null)
+        {
+            this.urls = urls;
+        } else
+        {
+            String[] newUrls = new String[temp.length + urls.length];
+            System.arraycopy(temp, 0, newUrls, 0, temp.length);
+            System.arraycopy(urls, 0, newUrls, temp.length, urls.length);
+            this.urls = newUrls;
+        }
+    }
+
+
     public Map getAttributes()
     {
         return attributes;
@@ -101,6 +113,29 @@ public class Capability implements Parcelable
 
 
     @Override
+    public boolean equals(Object o)
+    {
+        if (o instanceof Capability)
+        {
+            Capability that = (Capability) o;
+            return (this.ucn == null && that.ucn == null) || this.ucn.equals(that.ucn);
+        } else if (o instanceof String)
+        {
+            return (this.ucn == null && o == null) || this.ucn.equals(o);
+        }
+        
+        return false;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return this.ucn == null ? 0 : this.ucn.hashCode();
+    }
+
+
+    @Override
     public int describeContents()
     {
         return 0;
@@ -113,5 +148,15 @@ public class Capability implements Parcelable
         dest.writeString(ucn);
         dest.writeParcelable(attributes, 0);
         dest.writeStringArray(urls);
+    }
+    
+    
+    public void readFromParcel(Parcel in)
+    {
+        ucn = in.readString();
+        attributes = (Map) in.readParcelable(Map.class.getClassLoader());
+        String[] urls = in.createStringArray();
+        in.readStringArray(urls);
+        this.urls = urls;
     }
 }

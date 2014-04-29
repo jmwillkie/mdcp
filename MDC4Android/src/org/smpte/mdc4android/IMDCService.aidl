@@ -3,6 +3,7 @@ package org.smpte.mdc4android;
 import android.content.Intent;
 import android.os.Bundle;
 import org.smpte.mdc4android.mdcf.Capability;
+//import org.smpte.mdc4android.mdcf.Map;
 
 /**
  * The MDCService Service  
@@ -28,7 +29,7 @@ interface IMDCService
     Capability[] getCapabilities();
     
     
-    Bundle getAttributes();
+    org.smpte.mdc4android.mdcf.Map getAttributes();
     */
     
     
@@ -56,7 +57,7 @@ interface IMDCService
     String stopBrowse(in Intent intent);
     
     
-    Capability register(in String path, in String action, in String domain, in Capability capability, in Intent intent);
+    Capability register(in String path, in String domain, inout Capability capability, in Map actionIntentMap);
     
 
     void unregister(in Capability capability);
