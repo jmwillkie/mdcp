@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +16,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import net.posick.ws.soap.ISOAPServerService;
-import net.posick.ws.soap.SOAPServerService;
 import net.posick.ws.xml.Namespace;
 import net.posick.ws.xml.XmlElement;
 
@@ -50,15 +50,64 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MDCService extends Service implements IMDCService, Device
 {
+    private static final String MDC_URL_PROTOCOL = "mdcp";
+
     public static final String LOG_TAG = MDC4Android.LOG_TAG + "." + MDCService.class.getSimpleName();
     
     public static final String EXTRA_CONNECT_TO_NETWORK = "ConnectToNetwork";
 
     public static final String ACTION_GET_UDN = "org.smpte.st2071.device.Device/getUDN";
+    
+    public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+
+    
+    
+    protected static class RegistrationInformation
+    {
+        private String path;
+        
+        private String domain;
+        
+        private Capability capability;
+        
+        private java.util.Map<String, Intent> actionIntentMap;
+        
+        
+        protected RegistrationInformation(String path, String domain, Capability capability, java.util.Map<String, Intent> actionIntentMap)
+        {
+            this.path = path;
+            this.domain = domain;
+            this.capability = capability;
+            this.actionIntentMap = actionIntentMap;
+        }
+
+
+        public String getPath()
+        {
+            return path;
+        }
+
+
+        public String getDomain()
+        {
+            return domain;
+        }
+
+
+        public Capability getCapability()
+        {
+            return capability;
+        }
+
+
+        public java.util.Map<String, Intent> getActionIntentMap()
+        {
+            return actionIntentMap;
+        }
+    }
     
     
     private final IMDCService.Stub mBinder = new IMDCService.Stub()
@@ -120,10 +169,11 @@ public class MDCService extends Service implements IMDCService, Device
         }
 
         @Override
-        public Capability register(String path, String action, String domain, Capability capability, Intent intent)
+        @SuppressWarnings("rawtypes")
+        public Capability register(String path, String domain, Capability capability, java.util.Map actionIntentMap)
         throws RemoteException
         {
-            return MDCService.this.register(path, action, domain, capability, intent);
+            return MDCService.this.register(path, domain, capability, actionIntentMap);
         }
 
         @Override
@@ -246,38 +296,14 @@ public class MDCService extends Service implements IMDCService, Device
                     }
                 }
                 
-                // TODO: Register Device Capability using a single URL for all device endpoints.  
-                //       The soapAction being different for each endpoint/method.
-
+                // TODO: Remove When testing is done!
+                soapService.register("/Device/Capabilities", "", actionIntentMap.get(Device.INTENT_GET_CAPABILITIES));
                 
-                for (int index = 0; index < PATHS.length; index++)
+                // Register Device Capability using a single URL for all device endpoints.  
+                // The soapAction being different for each endpoint/method.
+                for (String domain : deviceInfo.getDomains())
                 {
-                    Intent intent = new Intent(ACTIONS[index]).addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK);
-                    
-                    String url = soapService.register(PATHS[index], SOAP_ACTIONS[index], intent);
-                    Log.i(LOG_TAG, "Endpoint: url=\"" + url + "\" path=\"" + PATHS[index] + "\", action=\"" + SOAP_ACTIONS[index] + "\" registered to Intent Action \"" + ACTIONS[index] + "\" [" + intent + "]");
-                    if (url != null)
-                    {
-                        try
-                        {
-                            String newURL = NetworkUtils.replaceProtocol(url, "mdcp");
-                            String hostname = deviceInfo.getHostname();
-                            for (String domain : deviceInfo.getDomains())
-                            {
-                                String fqn = hostname + "." + domain;
-                                try
-                                {
-                                    urls.add(NetworkUtils.replaceHostname(newURL, (fqn.endsWith(".") ? fqn.substring(0, fqn.length() - 1) : fqn)));
-                                } catch (Exception e)
-                                {
-                                    Log.e(LOG_TAG, "Hostname \"" + fqn + "\" is not valid - " + e.getMessage(), e);
-                                }
-                            }
-                        } catch (MalformedURLException e)
-                        {
-                            Log.e(LOG_TAG, "URL \"" + url + "\" returned from SOAPServerService is not an absolute URL!", e);
-                        }
-                    }
+                    register(PATH, domain, deviceCapability, actionIntentMap);
                 }
                 
                 IntentFilter filter = new IntentFilter();
@@ -332,13 +358,17 @@ public class MDCService extends Service implements IMDCService, Device
 
     protected String name;
 
-//    protected Map attributes;
-    
     protected Set<String> urls = new LinkedHashSet<String>();
     
-    Set<Capability> capabilities = new LinkedHashSet<Capability>();
+    protected Set<Capability> capabilities = new LinkedHashSet<Capability>();
 
-    private LocalBroadcastManager localBroadcaster;
+    protected LocalBroadcastManager localBroadcaster;
+    
+    protected java.util.Map<String, RegistrationInformation> registeredCapabilities = new LinkedHashMap<String, RegistrationInformation>();
+    
+    protected Capability deviceCapability = new Capability();
+
+    protected java.util.Map<String, Intent> actionIntentMap;
     
     
     @Override
@@ -355,13 +385,14 @@ public class MDCService extends Service implements IMDCService, Device
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onBind()");
         return mBinder;
     }
-
+    
 
     @Override
     public void onCreate()
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onCreate()");
         super.onCreate();
+        
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
         
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -414,8 +445,55 @@ public class MDCService extends Service implements IMDCService, Device
         
         return START_STICKY;
     }
-
-
+    
+    
+    protected void initDevice()
+    {
+        Set<String> domains = deviceInfo.getDomains();
+        String id = deviceInfo.getId();
+        String name = deviceInfo.getName();
+        String hostname = deviceInfo.getHostname();
+        
+        String scope = "";
+        if (domains != null && domains.size() > 0)
+        {
+            scope = NetworkUtils.reverse(domains.toArray(new String[domains.size()])[0]);
+        }
+        
+        if (scope == null || scope.length() == 0)
+        {
+            scope = "local";
+        }
+        
+        this.udn = "urn:smpte:udn:" + scope + ":id=" + id + ";hostname=" + hostname; 
+        this.name = name != null ? name : hostname;
+        
+        Map attributes = new Map();
+        attributes.put("hostname", deviceInfo.getHostname());
+        attributes.put("os", "Android");
+        attributes.put("brand", Build.BRAND);
+        attributes.put("host", Build.HOST);
+        attributes.put("device", Build.DEVICE);
+        attributes.put("manufacturer", Build.MANUFACTURER);
+        attributes.put("model", Build.MODEL);
+        attributes.put("product", Build.PRODUCT);
+        attributes.put("sdk", Build.VERSION.SDK_INT);
+        
+        java.util.Map<String, Intent> actionIntentMap = new LinkedHashMap<String, Intent>();
+        
+        Capability deviceCapability = new Capability();
+        deviceCapability.setUcn(Device.UCN);
+        deviceCapability.setAttributes(attributes);
+        for (int index = 0; index < ACTIONS.length; index++)
+        {
+            actionIntentMap.put(ACTIONS[index], new Intent(ACTIONS[index]).addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK));
+        }
+        this.capabilities.add(deviceCapability);
+        this.deviceCapability = deviceCapability;
+        this.actionIntentMap = actionIntentMap;
+    }
+    
+    
     protected synchronized void startNetwork()
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".startupNetwork()");
@@ -423,25 +501,7 @@ public class MDCService extends Service implements IMDCService, Device
         if (!networkStarted)
         {
             deviceInfo = NetworkUtils.gatherDeviceInformation(this);
-            
-            Set<String> domains = deviceInfo.getDomains();
-            String id = deviceInfo.getId();
-            String name = deviceInfo.getName();
-            String hostname = deviceInfo.getHostname();
-            
-            String scope = "";
-            if (domains != null && domains.size() > 0)
-            {
-                scope = NetworkUtils.reverse(domains.toArray(new String[domains.size()])[0]);
-            }
-            
-            if (scope == null || scope.length() == 0)
-            {
-                scope = "local";
-            }
-            
-            this.udn = "urn:smpte:udn:" + scope + ":id=" + id + ";hostname=" + hostname; 
-            this.name = name != null ? name : hostname;
+            initDevice();
             
             try
             {
@@ -485,13 +545,10 @@ public class MDCService extends Service implements IMDCService, Device
                 {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
                 }
-                Intent intent = new Intent(MainActivity.MESSAGE_DISPLAY_TEXT);
-                intent.putExtra(MainActivity.EXTRA_TEXT, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                localBroadcaster.sendBroadcast(intent);
                 
-                intent = new Intent(MainActivity.MESSAGE_ERROR_ON_STARTUP);
-                intent.putExtra(MainActivity.EXTRA_TEXT, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                localBroadcaster.sendBroadcast(intent);
+                displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                return;
             }
             
             networkStarted = true;
@@ -499,6 +556,22 @@ public class MDCService extends Service implements IMDCService, Device
     }
 
 
+    protected void displayText(String text)
+    {
+        Intent intent = new Intent(MainActivity.MESSAGE_DISPLAY_TEXT);
+        intent.putExtra(MainActivity.EXTRA_TEXT, text);
+        localBroadcaster.sendBroadcast(intent);
+    }
+
+
+    protected void errorOnStartupt(String text)
+    {
+        Intent intent = new Intent(MainActivity.MESSAGE_ERROR_ON_STARTUP);
+        intent.putExtra(MainActivity.EXTRA_TEXT, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+        localBroadcaster.sendBroadcast(intent);
+    }
+    
+    
     protected synchronized void stopNetwork()
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".shutdownNetwork()");
@@ -580,12 +653,6 @@ public class MDCService extends Service implements IMDCService, Device
             capabilities.addAll(this.capabilities);
         }
         
-        Capability deviceCapability = new Capability();
-        deviceCapability.setUcn("urn:smpte:ucn:org.smpte.st2071:device_v1.0");
-        deviceCapability.setUrls(getURLs());
-        deviceCapability.setAttributes(getAttributes());
-        capabilities.add(0, deviceCapability);
-        
         return capabilities.toArray(new Capability[capabilities.size()]);
     }
 
@@ -593,20 +660,11 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public Map getAttributes()
     {
-        Map attributes = new Map();
-        attributes.put("hostname", deviceInfo.getHostname());
-        attributes.put("os", "Android");
-        attributes.put("brand", Build.BRAND);
-        attributes.put("host", Build.HOST);
-        attributes.put("device", Build.DEVICE);
-        attributes.put("manufacturer", Build.MANUFACTURER);
-        attributes.put("model", Build.MODEL);
-        attributes.put("product", Build.PRODUCT);
-        attributes.put("sdk", Build.VERSION.SDK_INT);
-        
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
-        attributes.put("time", format.format(new Date()));
-        
+        Map attributes = deviceCapability.getAttributes();
+        synchronized (format)
+        {
+            attributes.put("time", format.format(new Date()));
+        }
         return attributes;
     }
 
@@ -763,16 +821,80 @@ public class MDCService extends Service implements IMDCService, Device
         // TODO Auto-generated method stub
         return null;
     }
-
-
+    
+    
     @Override
-    public Capability register(String path, String action, String domain, Capability capability, Intent intent)
+    @SuppressWarnings("rawtypes")
+    public Capability register(String path, String domain, Capability capability, java.util.Map actionIntentMap)
     throws RemoteException
     {
-        // TODO Auto-generated method stub
-        return null;
+        LinkedHashMap<String, Intent> actionMap = new LinkedHashMap<String, Intent>();
+        for (Object o : actionIntentMap.keySet())
+        {
+            String key = (String) o;
+            Intent intent = (Intent) actionIntentMap.get(key);
+            actionMap.put(key, intent);
+        }
+        
+        RegistrationInformation regInfo = new RegistrationInformation(path, domain, capability, actionMap);
+        registeredCapabilities.put(capability.getUCN(), regInfo);
+        
+        Set<String> urls = _register(regInfo);
+        capability.addUrls(urls.toArray(new String[urls.size()]));
+        
+        return capability;
     }
-
+    
+    
+    protected Set<String> _register(RegistrationInformation regInfo)
+    {
+        Set<String> urls = new LinkedHashSet<String>();
+        
+        ISOAPServerService soapService = this.soapService;
+        if (soapService != null)
+        {
+            java.util.Map<String, Intent> actionMap = regInfo.getActionIntentMap();
+            String path = regInfo.getPath();
+            String domain = regInfo.getDomain();
+            
+            for (java.util.Map.Entry<String, Intent> entry : actionMap.entrySet())
+            {
+                String action = entry.getKey();
+                Intent intent = entry.getValue();
+                String fqn = deviceInfo.getHostname() + "." + (domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain);
+                
+                try
+                {
+                    Intent registeredIntent = soapService.lookup(path, action);
+                    String url = null;
+                    if (registeredIntent == null)
+                    {
+                        url = soapService.register(path, action, intent);
+                    } else
+                    {
+                        url = soapService.lookupUrl(path, action);
+                        Log.i(LOG_TAG, "Endpoint for \"Path=\"" + path + " & Action=\"" + action + "\" already registered to URL \"" + url + "\".");
+                    }
+                    if (url != null)
+                    {
+                        urls.add(NetworkUtils.replaceHostname(NetworkUtils.replaceProtocol(url, MDC_URL_PROTOCOL), fqn));
+                    } else
+                    {
+                        throw new MalformedURLException("No URL was returned from soapService.register(\"Path=\"" + path + " & Action=\"" + action + "\")");
+                    }
+                } catch (MalformedURLException e)
+                {
+                    Log.e(LOG_TAG, "Hostname \"" + fqn + "\" is not valid - " + e.getMessage(), e);
+                } catch (Exception e)
+                {
+                    Log.e(LOG_TAG, "Error registering endpoint for Capability");
+                }
+            }
+        }
+        
+        return urls;
+    }
+    
 
     @Override
     public void unregister(Capability capability)
