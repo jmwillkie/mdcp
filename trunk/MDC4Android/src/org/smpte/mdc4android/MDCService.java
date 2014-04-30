@@ -170,17 +170,17 @@ public class MDCService extends Service implements IMDCService, Device
 
         @Override
         @SuppressWarnings("rawtypes")
-        public Capability register(String path, String domain, Capability capability, java.util.Map actionIntentMap)
+        public boolean register(Capability capability, String path, String domain, java.util.Map actionIntentMap)
         throws RemoteException
         {
-            return MDCService.this.register(path, domain, capability, actionIntentMap);
+            return MDCService.this.register(capability, path, domain, actionIntentMap);
         }
 
         @Override
-        public void unregister(Capability capability)
+        public Capability unregister(String ucn)
         throws RemoteException
         {
-            MDCService.this.unregister(capability);
+            return MDCService.this.unregister(ucn);
         }
     };
     
@@ -303,7 +303,16 @@ public class MDCService extends Service implements IMDCService, Device
                 // The soapAction being different for each endpoint/method.
                 for (String domain : deviceInfo.getDomains())
                 {
-                    register(PATH, domain, deviceCapability, actionIntentMap);
+                    try
+                    {
+                        if (!register(deviceCapability, PATH, domain, actionIntentMap))
+                        {
+                            Log.e(LOG_TAG, "Error registering Device Capability!");
+                        }
+                    } catch (Exception e)
+                    {
+                        Log.e(LOG_TAG, "Error registering Device Capability - " + e.getMessage(), e);
+                    }
                 }
                 
                 IntentFilter filter = new IntentFilter();
@@ -550,6 +559,8 @@ public class MDCService extends Service implements IMDCService, Device
                 errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
                 return;
             }
+            
+            // TODO: Register Device Capability for Discovery.
             
             networkStarted = true;
         }
@@ -825,7 +836,7 @@ public class MDCService extends Service implements IMDCService, Device
     
     @Override
     @SuppressWarnings("rawtypes")
-    public Capability register(String path, String domain, Capability capability, java.util.Map actionIntentMap)
+    public boolean register(Capability capability, String path, String domain, java.util.Map actionIntentMap)
     throws RemoteException
     {
         LinkedHashMap<String, Intent> actionMap = new LinkedHashMap<String, Intent>();
@@ -837,12 +848,22 @@ public class MDCService extends Service implements IMDCService, Device
         }
         
         RegistrationInformation regInfo = new RegistrationInformation(path, domain, capability, actionMap);
-        registeredCapabilities.put(capability.getUCN(), regInfo);
-        
         Set<String> urls = _register(regInfo);
         capability.addUrls(urls.toArray(new String[urls.size()]));
         
-        return capability;
+        synchronized (registeredCapabilities)
+        {
+            try
+            {
+                registeredCapabilities.put(capability.getUCN(), regInfo);
+                return true;
+            } catch (Exception e)
+            {
+                Log.e(LOG_TAG, "Error registering capability \"" + capability.getUCN() + "\" - " + e.getMessage(), e);
+            }
+        }
+        
+        return false;
     }
     
     
@@ -865,8 +886,8 @@ public class MDCService extends Service implements IMDCService, Device
                 
                 try
                 {
-                    Intent registeredIntent = soapService.lookup(path, action);
                     String url = null;
+                    Intent registeredIntent = soapService.lookup(path, action);
                     if (registeredIntent == null)
                     {
                         url = soapService.register(path, action, intent);
@@ -897,11 +918,48 @@ public class MDCService extends Service implements IMDCService, Device
     
 
     @Override
-    public void unregister(Capability capability)
+    public Capability unregister(String ucn)
     throws RemoteException
     {
-        // TODO Auto-generated method stub
+        Capability capability = null;
         
+        synchronized (registeredCapabilities)
+        {
+            RegistrationInformation regInfo = registeredCapabilities.get(ucn);
+            if (regInfo != null)
+            {
+                String path = regInfo.getPath();
+                java.util.Map<String, Intent> actionMap = regInfo.getActionIntentMap();
+                if (soapService != null)
+                {
+                    for (java.util.Map.Entry<String, Intent> entry : actionMap.entrySet())
+                    {
+                        String action = entry.getKey();
+                        if (soapService.lookup(path, action) != null)
+                        {
+                            try
+                            {
+                                if (!soapService.unregister(path, action))
+                                {
+                                    Log.w(LOG_TAG, "Endpoint Path=\"" + path + "\" Action=\"" + action + "\" was NOT unregistered.");
+                                }
+                            } catch (Exception e)
+                            {
+                                Log.e(LOG_TAG, "Error unregistering endpoint Path=\"" + path + "\" Action=\"" + action + "\" - " + e.getMessage(), e);
+                            }
+                        }
+                    }
+                }
+                capability = regInfo.getCapability();
+                if (capability != null)
+                {
+                    capability.setUrls(new String[0]);
+                }
+                registeredCapabilities.remove(path);
+            }
+        }
+        
+        return capability;
     }
     
     

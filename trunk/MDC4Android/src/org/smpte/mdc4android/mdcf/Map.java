@@ -34,8 +34,20 @@ public class Map extends org.smpte.st2071.types.Map implements Parcelable
     private Map(Parcel in)
     {
         this();
-        super.entries.clear();
-        super.entries.addAll(Arrays.asList((MapEntry[]) in.readParcelableArray(MapEntry.class.getClassLoader())));
+        entries.clear();
+        entries.addAll(Arrays.asList((MapEntry[]) in.readParcelableArray(MapEntry.class.getClassLoader())));
+    }
+
+
+    public Map(java.util.Map<? extends CharSequence, ? extends Serializable> map)
+    {
+        if (map != null)
+        {
+            for (java.util.Map.Entry<? extends CharSequence, ? extends Serializable> entry : map.entrySet())
+            {
+                put(entry.getKey().toString(), entry.getValue());
+            }
+        }
     }
 
 
