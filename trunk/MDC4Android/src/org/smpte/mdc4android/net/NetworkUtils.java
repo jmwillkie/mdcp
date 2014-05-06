@@ -302,22 +302,25 @@ public class NetworkUtils
             String key = entry.getKey();
             String value = entry.getValue();
             
-            Matcher m = dnsPattern.matcher(key);
-            if (m.matches())
+            if (value != null && value.length() > 0)
             {
-                dnsServers.put(key, value);
-            }
-            
-            m = domainPattern.matcher(key);
-            if (m.matches())
-            {
-                domains.put(key, value);
-            }
-            
-            m = hostnamePattern.matcher(key);
-            if (m.matches())
-            {
-                hostnames.put(key, value);
+                Matcher m = dnsPattern.matcher(key);
+                if (m.matches())
+                {
+                    dnsServers.put(key, value);
+                }
+                
+                m = domainPattern.matcher(key);
+                if (m.matches())
+                {
+                    domains.put(key, value);
+                }
+                
+                m = hostnamePattern.matcher(key);
+                if (m.matches())
+                {
+                    hostnames.put(key, value);
+                }
             }
         }
         
@@ -539,5 +542,32 @@ public class NetworkUtils
         }
         
         throw new MalformedURLException("Must be an Absolute URL!");
+    }
+
+
+    /**
+     * Returns the 2 DNS PTR names for the ucn or an array of empty strings, if an invalid ucn is specified.
+     * 
+     * @param ucn The ucn to create DNS PTR names for.
+     * @return The 2 DNS PTR names for the ucn or an array of empty strings, if an invalid ucn is specified
+     */
+    public static String[] ucnToServiceNames(String ucn)
+    {
+        "urn:smpte:ucn:org.smpte.st2071:device_v1.0".toCharArray();
+        String[] results = new String[2];
+        String[] sections = ucn.split(":");
+        if (sections.length == 5)
+        {
+            if ("ucn".equals(sections[2]))
+            {
+                String iface = sections[4];
+                String mdcPTR = "_mdc._tcp";
+                String devicePTR = "_" + sections[3] + ":" + iface + "._sub." + mdcPTR;
+                results[0] = devicePTR;
+                results[1] = mdcPTR;
+            }
+        }
+        
+        return results;
     }
 }

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +21,14 @@ public class MainActivity extends Activity
     public static final String MESSAGE_DISPLAY_TEXT = "DisplayText";
     
     public static final String EXTRA_TEXT = "Text";
+
+    protected static final String MESSAGE_PROGRESS = "Progress";
+
+    protected static final String EXTRA_PROGRESS = "Progress";
+
+    public static final String MESSAGE_SHOW_PROGRESS = "ShowProgress";
+
+    protected static final String EXTRA_SHOW_PROGRESS = null;
     
     
     private BroadcastReceiver errorReceiver = new BroadcastReceiver()
@@ -60,6 +70,56 @@ public class MainActivity extends Activity
             }
         }
     };
+    
+    private BroadcastReceiver progressReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String action = intent.getAction();
+            
+            if (MESSAGE_PROGRESS.equals(action))
+            {
+                ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                if (progressBar != null)
+                {
+                    if (intent.getBooleanExtra(EXTRA_SHOW_PROGRESS, false))
+                    {
+                        progressBar.setVisibility(View.VISIBLE);
+                    } else
+                    {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                    
+                    double progress = intent.getDoubleExtra(EXTRA_PROGRESS, Double.NaN);
+                    if (progress != Double.NaN)
+                    {
+                        if (progress < 0)
+                        {
+                            progressBar.setIndeterminate(true);
+                        } else
+                        {
+                            progressBar.setMax(100);
+                            progressBar.setProgress((int) Math.floor(100 * progress));
+                        }
+                    }
+                }
+            } else if (MESSAGE_SHOW_PROGRESS.equals(action))
+            {
+                ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                if (progressBar != null)
+                {
+                    if (intent.getBooleanExtra(EXTRA_SHOW_PROGRESS, false))
+                    {
+                        progressBar.setVisibility(View.VISIBLE);
+                    } else
+                    {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+            }
+        }
+    };
 
     private LocalBroadcastManager localBroadcaster;
     
@@ -69,9 +129,15 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setMax(100);
+        progressBar.bringToFront();
+
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
         localBroadcaster.registerReceiver(errorReceiver, new IntentFilter(MESSAGE_ERROR_ON_STARTUP));
         localBroadcaster.registerReceiver(displayReceiver, new IntentFilter(MESSAGE_DISPLAY_TEXT));
+        localBroadcaster.registerReceiver(progressReceiver, new IntentFilter(MESSAGE_PROGRESS));
     }
     
     

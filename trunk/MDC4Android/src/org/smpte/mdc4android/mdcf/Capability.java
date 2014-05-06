@@ -1,5 +1,7 @@
 package org.smpte.mdc4android.mdcf;
 
+import java.util.Set;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -21,7 +23,7 @@ public class Capability implements Parcelable
     
     protected String ucn;
     
-    protected Map attributes;
+    protected Map attributes = new Map();
     
     protected String[] urls;
     
@@ -97,6 +99,16 @@ public class Capability implements Parcelable
     public void setAttributes(Map attributes)
     {
         this.attributes = attributes;
+    }
+
+
+    public void putAttributes(Map attributes)
+    {
+        Set<String> keys = attributes.keySet();
+        for (String key : keys)
+        {
+            this.attributes.put(key, attributes.get(key));
+        }
     }
     
     

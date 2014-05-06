@@ -24,7 +24,16 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected())
             {
-                context.startService(new Intent(MDCService.class.getName()).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, true));
+                switch (networkInfo.getType())
+                {
+                    case ConnectivityManager.TYPE_ETHERNET:
+                    case ConnectivityManager.TYPE_WIFI:
+                        context.startService(new Intent(context, MDCService.class).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, true));
+                        break;
+                    default:
+                        context.startService(new Intent(context, MDCService.class).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, false));
+                        break;
+                }
             } else
             {
                 context.startService(new Intent(MDCService.class.getName()).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, false));
