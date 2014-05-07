@@ -537,7 +537,7 @@ public class NetworkUtils
             
             if (secondPos > 0)
             {
-                return url.substring(0, firstPos) + hostname + url.substring(secondPos);
+                return url.substring(0, firstPos) + (hostname.endsWith(".") ? hostname.substring(0, hostname.length() - 1) : hostname) + url.substring(secondPos);
             }
         }
         

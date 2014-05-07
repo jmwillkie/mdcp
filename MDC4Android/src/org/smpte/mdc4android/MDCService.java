@@ -26,8 +26,10 @@ import org.smpte.mdc4android.net.DeviceInfo;
 import org.smpte.mdc4android.net.NetworkUtils;
 import org.smpte.mdc4android.xml.XmlUtils;
 import org.xbill.DNS.Name;
+import org.xbill.DNS.Record;
 import org.xbill.DNS.Resolver;
 import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.Type;
 import org.xbill.mDNS.Lookup;
 import org.xbill.mDNS.Lookup.Domain;
 import org.xbill.mDNS.MulticastDNSQuerier;
@@ -1085,7 +1087,7 @@ public class MDCService extends Service implements IMDCService, Device
             Capability capability = regInfo.getCapability();
             String path = regInfo.getPath();
             String domain = regInfo.getDomain();
-            String fqn = deviceInfo.getHostname() + "." + (domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain);
+            String hostname = deviceInfo.getHostname() + "." + (domain.endsWith(".") ? domain : domain + ".");
             
             for (java.util.Map.Entry<String, Intent> entry : actionMap.entrySet())
             {
@@ -1107,14 +1109,14 @@ public class MDCService extends Service implements IMDCService, Device
                     
                     if (url != null)
                     {
-                        urls.add(NetworkUtils.replaceHostname(NetworkUtils.replaceProtocol(url, MDC_URL_PROTOCOL), fqn));
+                        urls.add(NetworkUtils.replaceHostname(NetworkUtils.replaceProtocol(url, MDC_URL_PROTOCOL), hostname));
                     } else
                     {
                         throw new MalformedURLException("No URL was returned from soapService.register(\"Path=\"" + path + " & Action=\"" + action + "\")");
                     }
                 } catch (MalformedURLException e)
                 {
-                    Log.e(LOG_TAG, "Hostname \"" + fqn + "\" is not valid - " + e.getMessage(), e);
+                    Log.e(LOG_TAG, "Hostname \"" + hostname + "\" is not valid - " + e.getMessage(), e);
                 } catch (Exception e)
                 {
                     Log.e(LOG_TAG, "Error registering endpoint for Capability");
@@ -1127,19 +1129,56 @@ public class MDCService extends Service implements IMDCService, Device
                 {
                     try
                     {
+                        Name fqn = new Name(hostname);
                         int priority = 10;
                         int weight = 10;
                         int port = NetworkUtils.extractPort(url);
                         String ucnPTRName = NetworkUtils.ucnToServiceName(capability.getUCN());
+                        
                         ServiceName srvName = new ServiceName(deviceInfo.getHostname() + "." + ucnPTRName + "." + (domain.endsWith(".") ? domain : domain + "."));
-                        ServiceInstance serviceInstance = new ServiceInstance(srvName, priority, weight, port, new Name(fqn + "."), deviceInfo.getInetAddresses().toArray(new InetAddress[0]), "textvers=1", "rn=" + getUDN(), "proto=mdcp", "path=" + path); 
+                        
+                        ServiceInstance serviceInstance = new ServiceInstance(srvName, priority, weight, port, fqn, deviceInfo.getInetAddresses().toArray(new InetAddress[0]), "textvers=1", "rn=" + getUDN(), "proto=mdcp", "path=" + path); 
                         ServiceInstance registeredService = service.register(serviceInstance);
                         if (registeredService != null)
                         {
                             Log.i(LOG_TAG, "Services Successfully Registered: \n\t" + registeredService);
                         } else
                         {
-                            Log.e(LOG_TAG, "Services Registration Failed!");
+                            boolean hostnameResolves = false;
+                            
+                            Lookup lookup = new Lookup(fqn);
+                            Record[] rrs = lookup.lookupRecords();
+                            if (rrs != null && rrs.length > 0)
+                            {
+                                outer:
+                                for (Record rr : rrs)
+                                {
+                                    switch (rr.getType())
+                                    {
+                                        case Type.A:
+                                        case Type.A6:
+                                        case Type.AAAA:
+                                        case Type.DNAME:
+                                        case Type.CNAME:
+                                        case Type.PTR:
+                                            if (rr.getName().equals(fqn))
+                                            {
+                                                hostnameResolves = true;
+                                                break outer;
+                                            }
+                                            break;
+                                    }
+                                }
+                            }
+                            
+                            Log.e(LOG_TAG, "Services Registration for UCN \"" + capability.getUCN() + "\" in domain \"" + domain + "\" Failed!");
+                            if (hostnameResolves)
+                            {
+                                Log.i(LOG_TAG, "Hostname \"" + fqn + "\" can be resolved.");
+                            } else
+                            {
+                                Log.e(LOG_TAG, "Hostname \"" + fqn + "\" cannot be resolved!");
+                            }
                         }
                     } catch (Exception e)
                     {
