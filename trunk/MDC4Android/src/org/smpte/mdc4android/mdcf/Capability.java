@@ -27,6 +27,8 @@ public class Capability implements Parcelable
     
     protected String[] urls;
     
+    protected boolean makeDiscoverable;
+    
 
     private Capability(Parcel in) 
     {
@@ -40,13 +42,14 @@ public class Capability implements Parcelable
     }
     
     
-    public Capability(String ucn, Map attributes, String[] urls)
+    public Capability(String ucn, Map attributes, String[] urls, boolean makeDiscoverable)
     {
         super();
         
         this.ucn = ucn;
         this.attributes = attributes;
         this.urls = urls;
+        this.makeDiscoverable = makeDiscoverable;
     }
     
 
@@ -121,6 +124,18 @@ public class Capability implements Parcelable
     public Object get(String key)
     {
         return attributes.get(key);
+    }
+    
+    
+    public boolean makeDiscoverable()
+    {
+        return makeDiscoverable;
+    }
+    
+    
+    public void setMakeDiscoverable(boolean makeDiscoverable)
+    {
+        this.makeDiscoverable = makeDiscoverable;
     }
 
 

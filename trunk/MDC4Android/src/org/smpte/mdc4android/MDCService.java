@@ -32,6 +32,8 @@ import org.xbill.mDNS.Lookup;
 import org.xbill.mDNS.Lookup.Domain;
 import org.xbill.mDNS.MulticastDNSQuerier;
 import org.xbill.mDNS.MulticastDNSService;
+import org.xbill.mDNS.ServiceInstance;
+import org.xbill.mDNS.ServiceName;
 
 import android.app.Activity;
 import android.app.Service;
@@ -303,44 +305,57 @@ public class MDCService extends Service implements IMDCService, Device
                     }
                 }
                 
-                // TODO: Remove When testing is done!
-                soapService.register("/Device/Capabilities", "", actionIntentMap.get(Device.INTENT_GET_CAPABILITIES));
-                
-                // Register Device Capability using a single URL for all device endpoints.  
-                // The soapAction being different for each endpoint/method.
-                
-                if (registeredCapabilities != null && registeredCapabilities.size() > 0)
+                new Thread(new Runnable()
                 {
-                    synchronized (registeredCapabilities)
+
+                    @Override
+                    public void run()
                     {
-                        for (java.util.Map.Entry<String, java.util.Map<String, RegistrationInformation>> entry : registeredCapabilities.entrySet())
+                        try
                         {
-                            java.util.Map<String, RegistrationInformation> domainMap = entry.getValue();
-                            for (java.util.Map.Entry<String, RegistrationInformation> domainEntry : domainMap.entrySet())
+                            // TODO: Remove When testing is done!
+                            soapService.register("/Device/Capabilities", "", actionIntentMap.get(Device.INTENT_GET_CAPABILITIES));
+                            
+                            // Register Device Capability using a single URL for all device endpoints.  
+                            // The soapAction being different for each endpoint/method.
+                            
+                            if (registeredCapabilities != null && registeredCapabilities.size() > 0)
                             {
-                                String domain = domainEntry.getKey();
-                                RegistrationInformation regInfo = domainEntry.getValue();
-                                try
+                                synchronized (registeredCapabilities)
                                 {
-                                    Capability capability = regInfo.getCapability();
-                                    capability.addUrls(_register(regInfo).toArray(new String[urls.size()]));
-                                    displayText("Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
-                                    
-                                    if (!domain.equals(regInfo.getDomain()))
+                                    for (java.util.Map.Entry<String, java.util.Map<String, RegistrationInformation>> entry : registeredCapabilities.entrySet())
                                     {
-                                        Log.e(LOG_TAG, "Domain for Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" does not match its placement in the Map! Map domain: \"" + domain + "\" != RegInfo Domain: \"" + regInfo.getDomain() + "\"!");
+                                        java.util.Map<String, RegistrationInformation> domainMap = entry.getValue();
+                                        for (java.util.Map.Entry<String, RegistrationInformation> domainEntry : domainMap.entrySet())
+                                        {
+                                            String domain = domainEntry.getKey();
+                                            RegistrationInformation regInfo = domainEntry.getValue();
+                                            try
+                                            {
+                                                Capability capability = regInfo.getCapability();
+                                                capability.addUrls(_register(regInfo).toArray(new String[urls.size()]));
+                                                displayText("Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
+                                                
+                                                if (!domain.equals(regInfo.getDomain()))
+                                                {
+                                                    Log.e(LOG_TAG, "Domain for Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" does not match its placement in the Map! Map domain: \"" + domain + "\" != RegInfo Domain: \"" + regInfo.getDomain() + "\"!");
+                                                }
+                                                Log.i(LOG_TAG, "Registered Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
+                                            } catch (Exception e)
+                                            {
+                                                Log.e(LOG_TAG, "Error registering Capability - " + e.getMessage(), e);
+                                            }
+                                        }
                                     }
-                                    Log.i(LOG_TAG, "Registered Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
-                                    
-                                    // TODO: Register Capability for Discovery.
-                                } catch (Exception e)
-                                {
-                                    Log.e(LOG_TAG, "Error registering Capability - " + e.getMessage(), e);
                                 }
                             }
+                        } catch (Exception e)
+                        {
+                            Log.e(LOG_TAG, e.getMessage(), e);
                         }
                     }
-                }
+                    
+                }).start();
                 
                 IntentFilter filter = new IntentFilter();
                 try
@@ -612,6 +627,7 @@ public class MDCService extends Service implements IMDCService, Device
             this.deviceCapability = deviceCapability = new Capability();
         }
         deviceCapability.setUcn(Device.UCN);
+        deviceCapability.setMakeDiscoverable(true);
         deviceCapability.putAttributes(attributes);
         
         for (int index = 0; index < ACTIONS.length; index++)
@@ -686,6 +702,7 @@ public class MDCService extends Service implements IMDCService, Device
                     querier = new MulticastDNSQuerier(true, true, resolvers.toArray(new Resolver[resolvers.size()]));
                 }
                 
+                MulticastDNSService.setDefaultQuerier(querier);
                 service = new MulticastDNSService();
                 service.setQuerier(querier);
             } catch (IOException e)
@@ -1065,14 +1082,15 @@ public class MDCService extends Service implements IMDCService, Device
         if (soapService != null)
         {
             java.util.Map<String, Intent> actionMap = regInfo.getActionIntentMap();
+            Capability capability = regInfo.getCapability();
             String path = regInfo.getPath();
             String domain = regInfo.getDomain();
+            String fqn = deviceInfo.getHostname() + "." + (domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain);
             
             for (java.util.Map.Entry<String, Intent> entry : actionMap.entrySet())
             {
                 String action = entry.getKey();
                 Intent intent = entry.getValue();
-                String fqn = deviceInfo.getHostname() + "." + (domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain);
                 
                 try
                 {
@@ -1086,6 +1104,7 @@ public class MDCService extends Service implements IMDCService, Device
                         url = soapService.lookupUrl(path, action);
                         Log.i(LOG_TAG, "Endpoint for \"Path=\"" + path + " & Action=\"" + action + "\" already registered to URL \"" + url + "\".");
                     }
+                    
                     if (url != null)
                     {
                         urls.add(NetworkUtils.replaceHostname(NetworkUtils.replaceProtocol(url, MDC_URL_PROTOCOL), fqn));
@@ -1099,6 +1118,33 @@ public class MDCService extends Service implements IMDCService, Device
                 } catch (Exception e)
                 {
                     Log.e(LOG_TAG, "Error registering endpoint for Capability");
+                }
+            }
+            
+            for (String url : urls)
+            {
+                if (capability.makeDiscoverable())
+                {
+                    try
+                    {
+                        int priority = 10;
+                        int weight = 10;
+                        int port = NetworkUtils.extractPort(url);
+                        String ucnPTRName = NetworkUtils.ucnToServiceName(capability.getUCN());
+                        ServiceName srvName = new ServiceName(deviceInfo.getHostname() + "." + ucnPTRName + "." + (domain.endsWith(".") ? domain : domain + "."));
+                        ServiceInstance serviceInstance = new ServiceInstance(srvName, priority, weight, port, new Name(fqn + "."), deviceInfo.getInetAddresses().toArray(new InetAddress[0]), "textvers=1", "rn=" + getUDN(), "proto=mdcp", "path=" + path); 
+                        ServiceInstance registeredService = service.register(serviceInstance);
+                        if (registeredService != null)
+                        {
+                            Log.i(LOG_TAG, "Services Successfully Registered: \n\t" + registeredService);
+                        } else
+                        {
+                            Log.e(LOG_TAG, "Services Registration Failed!");
+                        }
+                    } catch (Exception e)
+                    {
+                        Log.e(LOG_TAG, "Error Registering Capability \"" + capability.getUCN() + "\" for Discovery - " + e.getMessage(), e);
+                    }
                 }
             }
         }
