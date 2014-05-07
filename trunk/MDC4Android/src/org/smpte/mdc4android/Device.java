@@ -12,28 +12,28 @@ public interface Device
     
     public static final String SOAP_ACTION_UDN = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/UDN";
     
-    public static final String SOAP_ACTION_ONLINE = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Online";
+    public static final String SOAP_ACTION_ONLINE = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Online";
     
-    public static final String SOAP_ACTION_NAME = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Name";
+    public static final String SOAP_ACTION_NAME = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Name";
     
-    public static final String SOAP_ACTION_CAPABILITIES = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Capabilities";
+    public static final String SOAP_ACTION_CAPABILITIES = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Capabilities";
     
-    public static final String SOAP_ACTION_ATTRIBUTES = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/Attributes";
+    public static final String SOAP_ACTION_ATTRIBUTES = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/Attributes";
     
-    public static final String SOAP_ACTION_URLS = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/URLs";
+    public static final String SOAP_ACTION_URLS = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/URLs";
     
     
     public static final String SOAP_RESPONSE_UDN = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/UDNResponse";
     
-    public static final String SOAP_RESPONSE_ONLINE = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/OnlineResponse";
+    public static final String SOAP_RESPONSE_ONLINE = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/OnlineResponse";
     
-    public static final String SOAP_RESPONSE_NAME = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/NameResponse";
+    public static final String SOAP_RESPONSE_NAME = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/NameResponse";
     
-    public static final String SOAP_RESPONSE_CAPABILITIES = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/CapabilitiesResponse";
+    public static final String SOAP_RESPONSE_CAPABILITIES = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/CapabilitiesResponse";
     
-    public static final String SOAP_RESPONSE_ATTRIBUTES = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/AttributesResponse";
+    public static final String SOAP_RESPONSE_ATTRIBUTES = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/AttributesResponse";
     
-    public static final String SOAP_RESPONSE_URLS = "http://www.smpte-ra.org/schemas/st2071/2014/device/Device/URLsResponse";
+    public static final String SOAP_RESPONSE_URLS = "http://www.smpte-ra.org/wsdl/st2071/2014/device/Device/URLsResponse";
     
     
     public static final String INTENT_GET_UDN = "org.smpte.st2071.device.Device.getUDN";

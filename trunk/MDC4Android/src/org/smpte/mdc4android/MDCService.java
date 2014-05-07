@@ -616,7 +616,7 @@ public class MDCService extends Service implements IMDCService, Device
         
         for (int index = 0; index < ACTIONS.length; index++)
         {
-            actionIntentMap.put(ACTIONS[index], new Intent(ACTIONS[index]).addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK));
+            actionIntentMap.put(SOAP_ACTIONS[index], new Intent(ACTIONS[index]).addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK));
         }
         
         Set<Capability> capabilities = this.capabilities;
