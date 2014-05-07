@@ -545,16 +545,58 @@ public class NetworkUtils
     }
 
 
+    public static int extractPort(String url)
+    throws MalformedURLException
+    {
+        int firstPos = url.indexOf("://");
+        
+        if (firstPos >= 0)
+        {
+            firstPos = url.indexOf(':', firstPos + 3);
+            if (firstPos > 0)
+            {
+                firstPos++;
+                int secondPos = url.indexOf('/', firstPos);
+                if (secondPos > 0)
+                {
+                    String portStr = url.substring(firstPos, secondPos);
+                    if (portStr != null && portStr.length() > 0)
+                    {
+                        return Integer.parseInt(portStr);
+                    } else
+                    {
+                        return 80;
+                    }
+                } else
+                {
+                    String portStr = url.substring(firstPos);
+                    if (portStr != null && portStr.length() > 0)
+                    {
+                        return Integer.parseInt(portStr);
+                    } else
+                    {
+                        return 80;
+                    }
+                }
+            } else
+            {
+                return 80;
+            }
+        }
+        
+        throw new MalformedURLException("Must be an Absolute URL!");
+    }
+
+
     /**
-     * Returns the 2 DNS PTR names for the ucn or an array of empty strings, if an invalid ucn is specified.
+     * Returns the DNS PTR name for the ucn or null if the ucn is not valid.
      * 
      * @param ucn The ucn to create DNS PTR names for.
-     * @return The 2 DNS PTR names for the ucn or an array of empty strings, if an invalid ucn is specified
+     * @return The DNS PTR name for the ucn or null if the ucn is not valid.
      */
-    public static String[] ucnToServiceNames(String ucn)
+    public static String ucnToServiceName(String ucn)
     {
-        "urn:smpte:ucn:org.smpte.st2071:device_v1.0".toCharArray();
-        String[] results = new String[2];
+        String result = null;
         String[] sections = ucn.split(":");
         if (sections.length == 5)
         {
@@ -562,12 +604,11 @@ public class NetworkUtils
             {
                 String iface = sections[4];
                 String mdcPTR = "_mdc._tcp";
-                String devicePTR = "_" + sections[3] + ":" + iface + "._sub." + mdcPTR;
-                results[0] = devicePTR;
-                results[1] = mdcPTR;
+                String fullPTR = "_" + sections[3] + ":" + iface + "._sub." + mdcPTR;
+                result = fullPTR;
             }
         }
         
-        return results;
+        return result;
     }
 }
