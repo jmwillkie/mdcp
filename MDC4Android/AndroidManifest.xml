@@ -14,7 +14,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     
     <permission android:name="org.smpte.mdc4android.MDC" />
-
+    <permission android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
+    
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
