@@ -25,13 +25,17 @@ import org.smpte.mdc4android.mdcf.Map;
 import org.smpte.mdc4android.net.DeviceInfo;
 import org.smpte.mdc4android.net.NetworkUtils;
 import org.smpte.mdc4android.xml.XmlUtils;
+import org.xbill.DNS.Message;
 import org.xbill.DNS.Name;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.Resolver;
 import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 import org.xbill.mDNS.Lookup;
 import org.xbill.mDNS.Lookup.Domain;
+import org.xbill.mDNS.Browse;
+import org.xbill.mDNS.DNSSDListener;
 import org.xbill.mDNS.MulticastDNSQuerier;
 import org.xbill.mDNS.MulticastDNSService;
 import org.xbill.mDNS.ServiceInstance;
@@ -58,17 +62,22 @@ import android.util.Log;
 
 public class MDCService extends Service implements IMDCService, Device
 {
+    protected static final String LOG_TAG = MDC4Android.LOG_TAG + "." + MDCService.class.getSimpleName();
+    
     private static final String MDC_URL_PROTOCOL = "mdcp";
 
-    public static final String LOG_TAG = MDC4Android.LOG_TAG + "." + MDCService.class.getSimpleName();
-    
-    public static final String EXTRA_CONNECT_TO_NETWORK = "ConnectToNetwork";
+    public static final String EXTRA_CONNECT_TO_NETWORK = "org.smpte.mdc4android.ConnectToNetwork";
 
-    public static final String ACTION_GET_UDN = "org.smpte.st2071.device.Device/getUDN";
+    public static final String EXTRA_BROWSE_SERVICE_TYPES = "org.smpte.mdc4android.BrowseServiceTypes";
     
+    public static final String EXTRA_DISCOVERED_SERVICE = "org.smpte.mdc4android.DiscoveredService";;
+
+    public static final String EXTRA_REMOVED_SERVICE = "org.smpte.mdc4android.RemovedService";;
+
+    public static final String PERMISSION_MDC_SERVICE_DISCOVERY = "org.smpte.mdc4android.SERVICE_DISCOVERY";
+
     public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
 
-    
     
     protected static class RegistrationInformation
     {
@@ -120,6 +129,152 @@ public class MDCService extends Service implements IMDCService, Device
         }
     }
     
+    protected static class BrowseOperation implements DNSSDListener
+    {
+        private Object id;
+        
+        private Intent intent;
+        
+        private Set<Name> domains = new LinkedHashSet<Name>();
+        
+        private Context context;
+        
+
+        protected BrowseOperation(Context context, Intent intent, String[] domains)
+        {
+            this.context = context;
+            this.intent = intent;
+            if (domains != null)
+            {
+                for (String domain : domains)
+                {
+                    try
+                    {
+                        addDomain(domain);
+                    } catch (Exception e)
+                    {
+                        Log.e(LOG_TAG, "Error adding domain \".\" to Browse Operation.");
+                    }
+                }
+            } else
+            {
+                try
+                {
+                    addDomain(new Name("."));
+                } catch (Exception e)
+                {
+                    Log.e(LOG_TAG, "Error adding domain \".\" to Browse Operation.");
+                }
+            }
+        }
+
+
+        public void setId(Object id)
+        {
+            this.id = id;
+        }
+
+
+        public Object getId()
+        {
+            return id;
+        }
+
+
+        public Intent getIntent()
+        {
+            return intent;
+        }
+
+
+        public Set<Name> getDomains()
+        {
+            return domains;
+        }
+
+
+        public void addDomain(Name domain)
+        {
+            domains.add(domain);
+        }
+        
+        
+        public void addDomain(String domain)
+        throws TextParseException
+        {
+            if (domain != null)
+            {
+                domains.add(new Name(domain.endsWith(".") ? domain : domain + "."));
+            } else
+            {
+                domains.add(new Name("."));
+            }
+        }
+        
+        
+        public boolean matchesDomain(Name name)
+        {
+            for (Name domain : domains)
+            {
+                if (domain.subdomain(name))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        @Override
+        public void handleException(Object id, Exception e)
+        {
+            Log.w(LOG_TAG, e.getMessage(), e);
+        }
+
+
+        @Override
+        public void receiveMessage(Object id, Message message)
+        {
+            // ignore
+        }
+
+
+        @Override
+        public void serviceDiscovered(Object id, ServiceInstance service)
+        {
+            notifyRegistrants(EXTRA_DISCOVERED_SERVICE, service);
+        }
+
+
+        @Override
+        public void serviceRemoved(Object id, ServiceInstance service)
+        {
+            notifyRegistrants(EXTRA_REMOVED_SERVICE, service);
+        }
+        
+        
+        private void notifyRegistrants(String action, ServiceInstance service)
+        {
+            if (domains != null)
+            {
+                for (Name domain : domains)
+                {
+                    if (domain.subdomain(service.getName()))
+                    {
+                        Intent intent = this.intent.cloneFilter();
+                        intent.putExtra(action, intent);
+                        context.sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
+                        break;
+                    }
+                }
+            } else
+            {
+                Intent intent = this.intent.cloneFilter();
+                intent.putExtra(action, intent);
+                context.sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
+            }
+        }
+    }
     
     private final IMDCService.Stub mBinder = new IMDCService.Stub()
     {
@@ -166,14 +321,14 @@ public class MDCService extends Service implements IMDCService, Device
         }
 
         @Override
-        public Intent browse(String[] ucns, String[] domains, Intent intent)
+        public Intent browse(Intent intent, String[] domains)
         throws RemoteException
         {
-            return MDCService.this.browse(ucns, domains, intent);
+            return MDCService.this.browse(intent, domains);
         }
 
         @Override
-        public String stopBrowse(Intent intent)
+        public boolean stopBrowse(Intent intent)
         throws RemoteException
         {
             return MDCService.this.stopBrowse(intent);
@@ -451,6 +606,8 @@ public class MDCService extends Service implements IMDCService, Device
     protected Capability deviceCapability = new Capability();
 
     protected java.util.Map<String, Intent> actionIntentMap;
+    
+    protected java.util.Map<Intent, BrowseOperation> browseIntents = new LinkedHashMap<Intent, BrowseOperation>();
     
     
     @Override
@@ -1017,23 +1174,68 @@ public class MDCService extends Service implements IMDCService, Device
         }
         return results.toArray(new String[results.size()]);
     }
-
-
+    
+    
     @Override
-    public Intent browse(String[] ucns, String[] domains, Intent intent)
+    public Intent browse(Intent intent, String[] domains)
     throws RemoteException
     {
-        // TODO Auto-generated method stub
-        return null;
+        BrowseOperation browseOp = browseIntents.get(intent);
+        if (browseOp == null)
+        {
+            browseOp = new BrowseOperation(getApplicationContext(), intent, domains);
+            browseIntents.put(intent, browseOp);
+        }
+        
+        Set<Name> serviceTypes = new LinkedHashSet<Name>();
+        for (Name domain : browseOp.getDomains())
+        {
+            try
+            {
+                serviceTypes.add(new Name("_mdc._tcp", domain));
+            } catch (TextParseException e)
+            {
+                Log.e(LOG_TAG, "Error adding service type \"_mdc._tcp." + domain + "\" - " + e.getMessage());
+            }
+        }
+        
+        Name[] serviceTypesArray = serviceTypes.toArray(new Name[serviceTypes.size()]);
+        try
+        {
+            browseOp.setId(service.startServiceDiscovery(new Browse(serviceTypesArray), browseOp));
+            intent.putExtra(EXTRA_BROWSE_SERVICE_TYPES, serviceTypesArray);
+        } catch (IOException e)
+        {
+            Log.e(LOG_TAG, "Error starting service discovery - " + e.getMessage());
+        }
+        
+        if (browseOp.getId() != null)
+        {
+            return intent;
+        } else
+        {
+            return null;
+        }
     }
 
 
     @Override
-    public String stopBrowse(Intent intent)
+    public boolean stopBrowse(Intent intent)
     throws RemoteException
     {
-        // TODO Auto-generated method stub
-        return null;
+        BrowseOperation browseOp = browseIntents.get(intent);
+        if (browseOp != null)
+        {
+            try
+            {
+                return service.stopServiceDiscovery(browseOp.getId());
+            } catch (IOException e)
+            {
+                Log.e(LOG_TAG, "Error starting service discovery - " + e.getMessage());
+            }
+        }
+        
+        return false;
     }
     
     
