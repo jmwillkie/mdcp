@@ -7,7 +7,7 @@ import java.util.Date;
 
 import org.smpte.st2071.identity.URI;
 
-public class MapEntry implements Serializable
+public class MapEntry implements Serializable, java.util.Map.Entry<String, Serializable>
 {
     private static final long serialVersionUID = 201404251036L;
 
@@ -38,7 +38,7 @@ public class MapEntry implements Serializable
     }
 
 
-    public void setValue(Serializable value)
+    public Serializable setValue(Serializable value)
     {
         if (value != null)
         {
@@ -147,6 +147,8 @@ public class MapEntry implements Serializable
             type = DATATYPE.STRING;
             this.value = null;
         }
+        
+        return this.value;
     }
 
 
