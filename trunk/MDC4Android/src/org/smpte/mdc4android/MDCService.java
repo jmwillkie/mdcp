@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
 
 import net.posick.ws.soap.ISOAPServerService;
 import net.posick.ws.xml.Namespace;
@@ -32,10 +30,10 @@ import org.xbill.DNS.Resolver;
 import org.xbill.DNS.SimpleResolver;
 import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
-import org.xbill.mDNS.Lookup;
-import org.xbill.mDNS.Lookup.Domain;
 import org.xbill.mDNS.Browse;
 import org.xbill.mDNS.DNSSDListener;
+import org.xbill.mDNS.Lookup;
+import org.xbill.mDNS.Lookup.Domain;
 import org.xbill.mDNS.MulticastDNSQuerier;
 import org.xbill.mDNS.MulticastDNSService;
 import org.xbill.mDNS.ServiceInstance;
@@ -131,9 +129,9 @@ public class MDCService extends Service implements IMDCService, Device
     
     protected static class BrowseOperation implements DNSSDListener
     {
-        private Object id;
+        private transient Object id;
         
-        private Intent intent;
+        private transient Intent intent;
         
         private Set<Name> domains = new LinkedHashSet<Name>();
         
@@ -259,11 +257,18 @@ public class MDCService extends Service implements IMDCService, Device
             {
                 for (Name domain : domains)
                 {
-                    if (domain.subdomain(service.getName()))
+                    if (service.getName().subdomain(domain))
                     {
-                        Intent intent = this.intent.cloneFilter();
-                        intent.putExtra(action, intent);
-                        context.sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
+                        Intent intent = (Intent) this.intent.clone();
+                        intent.putExtra(action, service);
+                        context.getApplicationContext().sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY, new BroadcastReceiver()
+                        {
+                            @Override
+                            public void onReceive(Context context, Intent intent)
+                            {
+                                Log.i(LOG_TAG, "Received response for Service Discovery broadcast");
+                            }
+                        }, null, Activity.RESULT_OK, null, null);
                         break;
                     }
                 }
@@ -271,7 +276,7 @@ public class MDCService extends Service implements IMDCService, Device
             {
                 Intent intent = this.intent.cloneFilter();
                 intent.putExtra(action, intent);
-                context.sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
+                context.getApplicationContext().sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
             }
         }
     }
@@ -1062,7 +1067,6 @@ public class MDCService extends Service implements IMDCService, Device
     {
         List<String> results = new ArrayList<String>();
         Set<Name> searchPath = new LinkedHashSet<Name>();
-        searchPath.addAll(Arrays.asList(Lookup.ALL_MULTICAST_DNS_DOMAINS));
         for (String domain : deviceInfo.getDomains())
         {
             if (!domain.endsWith("."))
@@ -1077,8 +1081,8 @@ public class MDCService extends Service implements IMDCService, Device
                 Log.w(LOG_TAG, "Error parsing domain \"" + domain + "\" - " + e.getMessage());
             }
         }
-        Set<Domain> domains = getDomains(new String[] {Lookup.DEFAULT_BROWSE_DOMAIN_NAME}, searchPath.toArray(new Name[searchPath.size()]));
-        for (Domain domain : domains)
+        Set<Domain> defaultDomains = service.getDefaultBrowseDomains(searchPath);
+        for (Domain domain : defaultDomains)
         {
             results.add(domain.getName().toString());
         }
@@ -1092,7 +1096,6 @@ public class MDCService extends Service implements IMDCService, Device
     {
         List<String> results = new ArrayList<String>();
         Set<Name> searchPath = new LinkedHashSet<Name>();
-        searchPath.addAll(Arrays.asList(Lookup.ALL_MULTICAST_DNS_DOMAINS));
         for (String domain : deviceInfo.getDomains())
         {
             if (!domain.endsWith("."))
@@ -1107,8 +1110,8 @@ public class MDCService extends Service implements IMDCService, Device
                 Log.w(LOG_TAG, "Error parsing domain \"" + domain + "\" - " + e.getMessage());
             }
         }
-        Set<Domain> domains = getDomains(new String[] {Lookup.DEFAULT_BROWSE_DOMAIN_NAME, Lookup.BROWSE_DOMAIN_NAME, Lookup.LEGACY_BROWSE_DOMAIN_NAME}, searchPath.toArray(new Name[searchPath.size()]));
-        for (Domain domain : domains)
+        Set<Domain> defaultDomains = service.getBrowseDomains(searchPath);
+        for (Domain domain : defaultDomains)
         {
             results.add(domain.getName().toString());
         }
@@ -1122,7 +1125,6 @@ public class MDCService extends Service implements IMDCService, Device
     {
         List<String> results = new ArrayList<String>();
         Set<Name> searchPath = new LinkedHashSet<Name>();
-        searchPath.addAll(Arrays.asList(Lookup.ALL_MULTICAST_DNS_DOMAINS));
         for (String domain : deviceInfo.getDomains())
         {
             if (!domain.endsWith("."))
@@ -1137,8 +1139,8 @@ public class MDCService extends Service implements IMDCService, Device
                 Log.w(LOG_TAG, "Error parsing domain \"" + domain + "\" - " + e.getMessage());
             }
         }
-        Set<Domain> domains = getDomains(new String[] {Lookup.DEFAULT_REGISTRATION_DOMAIN_NAME}, searchPath.toArray(new Name[searchPath.size()]));
-        for (Domain domain : domains)
+        Set<Domain> defaultDomains = service.getDefaultRegistrationDomains(searchPath);
+        for (Domain domain : defaultDomains)
         {
             results.add(domain.getName().toString());
         }
@@ -1152,7 +1154,6 @@ public class MDCService extends Service implements IMDCService, Device
     {
         List<String> results = new ArrayList<String>();
         Set<Name> searchPath = new LinkedHashSet<Name>();
-        searchPath.addAll(Arrays.asList(Lookup.ALL_MULTICAST_DNS_DOMAINS));
         for (String domain : deviceInfo.getDomains())
         {
             if (!domain.endsWith("."))
@@ -1167,8 +1168,8 @@ public class MDCService extends Service implements IMDCService, Device
                 Log.w(LOG_TAG, "Error parsing domain \"" + domain + "\" - " + e.getMessage());
             }
         }
-        Set<Domain> domains = getDomains(new String[] {Lookup.DEFAULT_REGISTRATION_DOMAIN_NAME, Lookup.REGISTRATION_DOMAIN_NAME}, searchPath.toArray(new Name[searchPath.size()]));
-        for (Domain domain : domains)
+        Set<Domain> defaultDomains = service.getRegistrationDomains(searchPath);
+        for (Domain domain : defaultDomains)
         {
             results.add(domain.getName().toString());
         }
@@ -1436,61 +1437,5 @@ public class MDCService extends Service implements IMDCService, Device
         }
         
         return capability;
-    }
-    
-    
-    protected Set<Domain> getDomains(String[] names, Name[] path)
-    {
-        Set<Domain> results = new LinkedHashSet<Domain>();
-        
-        Stack<Name[]> stack = new Stack<Name[]>();
-        stack.push(path);
-        
-        while (!stack.isEmpty())
-        {
-            Name[] searchPath = stack.pop();
-            
-            Lookup lookup = null;
-            try
-            {
-                lookup = new Lookup(names);
-                lookup.setSearchPath(searchPath);
-                lookup.setQuerier(querier);
-                Domain[] domains = lookup.lookupDomains();
-                if (domains != null && domains.length > 0)
-                {
-                    List<Name> newDomains = new ArrayList<Name>();
-                    for (int index = 0; index < domains.length; index++)
-                    {
-                        if (!results.contains(domains[index].getName()))
-                        {
-                            newDomains.add(domains[index].getName());
-                            results.add(domains[index]);
-                        }
-                    }
-                    if (newDomains.size() > 0)
-                    {
-                        stack.push(newDomains.toArray(new Name[newDomains.size()]));
-                    }
-                }
-            } catch (IOException e)
-            {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            } finally
-            {
-                if (lookup != null)
-                {
-                    try
-                    {
-                        lookup.close();
-                    } catch (Exception e)
-                    {
-                        // ignore
-                    }
-                }
-            }
-        }
-        
-        return results;
     }
 }
