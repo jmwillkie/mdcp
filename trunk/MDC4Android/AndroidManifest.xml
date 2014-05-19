@@ -13,8 +13,8 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     
-    <permission android:name="org.smpte.mdc4android.MDC" />
-    <permission android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
+    <uses-permission android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
+    <permission android:protectionLevel="normal" android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
     
     <uses-feature
         android:name="android.hardware.telephony"
@@ -46,7 +46,7 @@
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:logo="@drawable/ic_launcher"
-            android:permission="org.smpte.mdc4android.MDC"
+            android:permission="org.smpte.mdc4android.SERVICE_DISCOVERY"
             android:singleUser="false"
             android:stopWithTask="true" >
             <intent-filter>
@@ -55,13 +55,27 @@
             <intent-filter>
                 <category android:name="org.smpte.mdc4android.MDC" />
             </intent-filter>
-        </service>
+            <intent-filter>
+                <action android:name="org.smpte.mdc4android.IMDCService" />
+            </intent-filter>
+            </service>
 
         <receiver android:name="org.smpte.mdc4android.net.NetworkConnectivityReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
+        <!-- receiver android:name="org.smpte.mdc4android.ServiceDiscoveryBroadcastReceiver" android:permission="org.smpte.mdc4android.SERVICE_DISCOVERY">
+            <intent-filter>
+                <action android:name="org.smpte.MDC_SERVICE_DISCOVERED" />
+                <category android:name="org.smpte.MDC_SERVICE_DISCOVERY" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.smpte.MDC_SERVICE_REMOVED" />
+                <category android:name="org.smpte.MDC_SERVICE_DISCOVERY" />
+            </intent-filter>
+        </receiver -->
 
         <activity
             android:name="org.smpte.mdc4android.MainActivity"
