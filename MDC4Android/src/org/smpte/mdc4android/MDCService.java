@@ -62,15 +62,23 @@ public class MDCService extends Service implements IMDCService, Device
 {
     protected static final String LOG_TAG = MDC4Android.LOG_TAG + "." + MDCService.class.getSimpleName();
     
-    private static final String MDC_URL_PROTOCOL = "mdcp";
+    public static final String MDC_URL_PROTOCOL = "mdcp";
+    
+    public static final String ACTION_SERVICE_DISCOVERED = "org.smpte.MDC_SERVICE_DISCOVERED";
+
+    public static final String ACTION_SERVICE_REMOVED = "org.smpte.MDC_SERVICE_REMOVED";
+
+    public static final String CATEGORY_SERVICE_DISCOVERY = "org.smpte.MDC_SERVICE_DISCOVERY";
 
     public static final String EXTRA_CONNECT_TO_NETWORK = "org.smpte.mdc4android.ConnectToNetwork";
 
     public static final String EXTRA_BROWSE_SERVICE_TYPES = "org.smpte.mdc4android.BrowseServiceTypes";
     
-    public static final String EXTRA_DISCOVERED_SERVICE = "org.smpte.mdc4android.DiscoveredService";;
+    public static final String EXTRA_SERVICE = "org.smpte.mdc4android.Service";
 
-    public static final String EXTRA_REMOVED_SERVICE = "org.smpte.mdc4android.RemovedService";;
+    public static final String EXTRA_SERVICE_DISCOVERED = "org.smpte.mdc4android.ServiceDiscovered";
+
+    public static final String EXTRA_SERVICE_REMOVED = "org.smpte.mdc4android.ServiceRemoved";
 
     public static final String PERMISSION_MDC_SERVICE_DISCOVERY = "org.smpte.mdc4android.SERVICE_DISCOVERY";
 
@@ -142,6 +150,7 @@ public class MDCService extends Service implements IMDCService, Device
         {
             this.context = context;
             this.intent = intent;
+            intent.addCategory(CATEGORY_SERVICE_DISCOVERY);
             if (domains != null)
             {
                 for (String domain : domains)
@@ -233,25 +242,26 @@ public class MDCService extends Service implements IMDCService, Device
         @Override
         public void receiveMessage(Object id, Message message)
         {
-            // ignore
         }
 
 
         @Override
         public void serviceDiscovered(Object id, ServiceInstance service)
         {
-            notifyRegistrants(EXTRA_DISCOVERED_SERVICE, service);
+            Log.i(LOG_TAG, "Service Discovered " + service);
+            notifyRegistrants(service, true);
         }
 
 
         @Override
         public void serviceRemoved(Object id, ServiceInstance service)
         {
-            notifyRegistrants(EXTRA_REMOVED_SERVICE, service);
+            Log.i(LOG_TAG, "Service Removed " + service);
+            notifyRegistrants(service, false);
         }
         
         
-        private void notifyRegistrants(String action, ServiceInstance service)
+        private void notifyRegistrants(ServiceInstance service, boolean discovered)
         {
             if (domains != null)
             {
@@ -259,25 +269,34 @@ public class MDCService extends Service implements IMDCService, Device
                 {
                     if (service.getName().subdomain(domain))
                     {
-                        Intent intent = (Intent) this.intent.clone();
-                        intent.putExtra(action, service);
-                        context.getApplicationContext().sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY, new BroadcastReceiver()
-                        {
-                            @Override
-                            public void onReceive(Context context, Intent intent)
-                            {
-                                Log.i(LOG_TAG, "Received response for Service Discovery broadcast");
-                            }
-                        }, null, Activity.RESULT_OK, null, null);
+                        broadcastIntent(service, discovered, (Intent) this.intent.clone());
                         break;
                     }
                 }
             } else
             {
-                Intent intent = this.intent.cloneFilter();
-                intent.putExtra(action, intent);
-                context.getApplicationContext().sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
+                broadcastIntent(service, discovered, (Intent) this.intent.clone());
             }
+        }
+        
+        private void broadcastIntent(ServiceInstance service, boolean discovered, Intent intent)
+        {
+            Log.i(LOG_TAG, "Broadcasting Intent + \"" + intent + "\"");
+            
+            intent.setAction(discovered ? ACTION_SERVICE_DISCOVERED : ACTION_SERVICE_REMOVED);
+            intent.putExtra(EXTRA_SERVICE_DISCOVERED, discovered);
+            intent.putExtra(EXTRA_SERVICE_REMOVED, !discovered);
+            intent.putExtra(EXTRA_SERVICE, service);
+            
+            context.sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY, new BroadcastReceiver() 
+            {
+                @Override
+                public void onReceive(Context context, Intent intent)
+                {
+                    Log.i(LOG_TAG, "Ordered Broadcast Result");
+                }
+                
+            }, null, Activity.RESULT_OK, null, null);
         }
     }
     
@@ -613,6 +632,8 @@ public class MDCService extends Service implements IMDCService, Device
     protected java.util.Map<String, Intent> actionIntentMap;
     
     protected java.util.Map<Intent, BrowseOperation> browseIntents = new LinkedHashMap<Intent, BrowseOperation>();
+
+    private Intent browseIntent;
     
     
     @Override
@@ -895,6 +916,15 @@ public class MDCService extends Service implements IMDCService, Device
                 return;
             }
             
+            Intent intent = new Intent().addCategory(CATEGORY_SERVICE_DISCOVERY);
+            try
+            {
+                browseIntent = browse(intent, null);
+            } catch (Exception e)
+            {
+                Log.e(LOG_TAG, "Error registering general Service Discovery Intent - " + e.getMessage(), e);
+            }
+            
             networkStarted = true;
         }
     }
@@ -953,6 +983,31 @@ public class MDCService extends Service implements IMDCService, Device
         {
             networkStarted = false;
 
+            if (browseIntent != null)
+            {
+                try
+                {
+                    stopBrowse(browseIntent);
+                } catch (Exception e)
+                {
+                    Log.e(LOG_TAG, "Error stopping general Service Discovery Browse - " + e.getLocalizedMessage(), e);
+                }
+            }
+            
+            if (browseIntents.size() > 0)
+            {
+                for (Intent intent : browseIntents.keySet())
+                {
+                    try
+                    {
+                        stopBrowse(browseIntent);
+                    } catch (Exception e)
+                    {
+                        Log.e(LOG_TAG, "Error stopping Service Discovery Browse for intent \"" + intent + "\" - " + e.getLocalizedMessage(), e);
+                    }
+                }
+            }
+            
             if (soapServiceConnection != null)
             {
                 unbindService(soapServiceConnection);
@@ -1177,6 +1232,25 @@ public class MDCService extends Service implements IMDCService, Device
     }
     
     
+    /**
+     * Registers an Intent to be broadcast whenever a Service is discovered or removed using DNS-SD and mDNS.
+     * The browse operation returns the Intent that will be used for the base of the broadcast Intent.
+     * 
+     * The Action of the Intent will be set to:
+     * <ul>
+     * <li> ACTION_SERVICE_DISCOVERED ("org.smpte.MDC_SERVICE_DISCOVERED") when a service is discovered
+     * <li> ACTION_SERVICE_REMOVED ("org.smpte.MDC_SERVICE_REMOVED") when a service is removed
+     * </ul>
+     * 
+     * The category CATEGORY_SERVICE_DISCOVERY ("org.smpte.mdc4android.SERVICE_DISCOVERY")
+     * will be added to each registered intent to ensure all Intents are categorized properly.
+     * 
+     * @param intent The intent to broadcast when Services are discovered and removed (The action is changed).
+     * @param domains The list of domains to restrict the browse operation to or null for all domains.
+     * 
+     * @return The intent that will be broadcast when Services are discovered or removed and the intent
+     *          to use when stopping the browse operation.
+     */
     @Override
     public Intent browse(Intent intent, String[] domains)
     throws RemoteException
@@ -1184,7 +1258,23 @@ public class MDCService extends Service implements IMDCService, Device
         BrowseOperation browseOp = browseIntents.get(intent);
         if (browseOp == null)
         {
-            browseOp = new BrowseOperation(getApplicationContext(), intent, domains);
+            if (domains == null || domains.length == 0)
+            {
+                browseOp = new BrowseOperation(getApplicationContext(), intent, getDefaultBrowseDomains());
+                for (String domain : getBrowseDomains())
+                {
+                    try
+                    {
+                        browseOp.addDomain(domain);
+                    } catch (Exception e)
+                    {
+                        Log.w(LOG_TAG, "Invalid domain name \"" + domains + "\" - " + e.getMessage(), e);
+                    }
+                }
+            } else
+            {
+                browseOp = new BrowseOperation(getApplicationContext(), intent, domains);
+            }
             browseIntents.put(intent, browseOp);
         }
         
