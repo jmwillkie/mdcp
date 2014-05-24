@@ -902,7 +902,7 @@ public class MDCService extends Service implements IMDCService, Device
             
             try
             {
-                if (!bindService(new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
+                if (!bindService(new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT | Context.BIND_NOT_FOREGROUND | Context.BIND_ABOVE_CLIENT))
                 {
                     Log.e(LOG_TAG, "-----> Could NOT bind to SOAP service using action \"" + SOAPServerService.class.getName() + "\" and Package \"net.posick.ws\" <-----");
                     try
