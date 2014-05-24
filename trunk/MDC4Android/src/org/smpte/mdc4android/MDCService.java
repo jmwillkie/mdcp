@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.posick.ws.soap.ISOAPServerService;
+import net.posick.ws.soap.SOAPServerService;
 import net.posick.ws.xml.Namespace;
 import net.posick.ws.xml.XmlElement;
 
@@ -57,6 +58,8 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.Toast;
 
 public class MDCService extends Service implements IMDCService, Device
 {
@@ -212,20 +215,23 @@ public class MDCService extends Service implements IMDCService, Device
             if (domain != null)
             {
                 domains.add(new Name(domain.endsWith(".") ? domain : domain + "."));
-            } else
-            {
-                domains.add(new Name("."));
             }
         }
         
         
         public boolean matchesDomain(Name name)
         {
-            for (Name domain : domains)
+            if (domains == null || domains.size() == 0)
             {
-                if (domain.subdomain(name))
+                return true;
+            } else
+            {
+                for (Name domain : domains)
                 {
-                    return true;
+                    if (domain.subdomain(name))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -494,12 +500,8 @@ public class MDCService extends Service implements IMDCService, Device
                     {
                         try
                         {
-                            // TODO: Remove When testing is done!
-                            soapService.register("/Device/Capabilities", "", actionIntentMap.get(Device.INTENT_GET_CAPABILITIES));
-                            
                             // Register Device Capability using a single URL for all device endpoints.  
                             // The soapAction being different for each endpoint/method.
-                            
                             if (registeredCapabilities != null && registeredCapabilities.size() > 0)
                             {
                                 synchronized (registeredCapabilities)
@@ -898,22 +900,31 @@ public class MDCService extends Service implements IMDCService, Device
                 throw re;
             }
             
-            if (!bindService(new Intent(ISOAPServerService.class.getName()), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
+            try
             {
-                Log.e(LOG_TAG, "Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                try
+                if (!bindService(new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT| Context.BIND_IMPORTANT))
                 {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                    startActivity(intent);
-                } catch (android.content.ActivityNotFoundException anfe)
-                {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
+                    Log.e(LOG_TAG, "-----> Could NOT bind to SOAP service using action \"" + SOAPServerService.class.getName() + "\" and Package \"net.posick.ws\" <-----");
+                    try
+                    {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                        startActivity(intent);
+                    } catch (android.content.ActivityNotFoundException anfe)
+                    {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
+                    }
+                    
+                    displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                    errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                    return;
                 }
-                
-                displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                return;
+            } catch (Exception e)
+            {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                Toast toast = Toast.makeText(null, "Could NOT bind to service \"" + SOAPServerService.class.getName() + "\".\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
             
             Intent intent = new Intent().addCategory(CATEGORY_SERVICE_DISCOVERY);
