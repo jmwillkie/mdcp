@@ -65,7 +65,14 @@ public class MainActivity extends Activity
                 if (text != null)
                 {
                     TextView textView = (TextView) findViewById(R.id.textView);
-                    textView.setText(textView.getText() + "\n" + text);
+                    CharSequence displayedText = textView.getText();
+                    if (displayedText.length() > 0)
+                    {
+                        textView.setText(displayedText + "\n" + text);
+                    } else
+                    {
+                        textView.setText(text);
+                    }
                 }
             }
         }
@@ -129,18 +136,39 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setMax(100);
-        progressBar.bringToFront();
 
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
         localBroadcaster.registerReceiver(errorReceiver, new IntentFilter(MESSAGE_ERROR_ON_STARTUP));
         localBroadcaster.registerReceiver(displayReceiver, new IntentFilter(MESSAGE_DISPLAY_TEXT));
         localBroadcaster.registerReceiver(progressReceiver, new IntentFilter(MESSAGE_PROGRESS));
+        
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setMax(100);
+        progressBar.bringToFront();
+        
+        if (savedInstanceState != null)
+        {
+            CharSequence text = savedInstanceState.getCharSequence(EXTRA_TEXT);
+            
+            TextView textView = (TextView) findViewById(R.id.textView);
+            
+            if (text != null)
+            {
+                textView.setText(text);
+            }
+        }
     }
     
     
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        TextView textView = (TextView) findViewById(R.id.textView);
+        outState.putCharSequence(EXTRA_TEXT, textView.getText());
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
