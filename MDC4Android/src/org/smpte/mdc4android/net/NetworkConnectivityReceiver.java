@@ -21,23 +21,9 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null)
         {
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected())
-            {
-                switch (networkInfo.getType())
-                {
-                    case ConnectivityManager.TYPE_ETHERNET:
-                    case ConnectivityManager.TYPE_WIFI:
-                        context.startService(new Intent(context, MDCService.class).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, true));
-                        break;
-                    default:
-                        context.startService(new Intent(context, MDCService.class).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, false));
-                        break;
-                }
-            } else
-            {
-                context.startService(new Intent(MDCService.class.getName()).putExtra(MDCService.EXTRA_CONNECT_TO_NETWORK, false));
-            }
+            NetworkInfo info = connMgr.getActiveNetworkInfo();
+            Log.i(LOG_TAG, "Network Connectivity Changed - " + (info != null ? "Connected to \"" + info.getTypeName() + "/" + info.getSubtypeName() + "\"." : "NOT Connected to any network."));
+            context.startService(new Intent(context, MDCService.class));
         } else
         {
             Log.e(LOG_TAG, "ConnectivityManager could not be acquired!");
