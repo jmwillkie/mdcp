@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:background="@color/list_item_alternate_background_color"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:showDividers="middle" >
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelType"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="Type:" />
+    
+        <TextView
+            android:id="@+id/listItemType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/list_item_vertical_margin"
+            android:paddingBottom="0dp"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="Type" />
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelServiceName"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="Name:" />
+    
+        <TextView
+            android:id="@+id/listItemServiceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="Service Name" />
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelResourceName"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="RN:" />
+    
+        <TextView
+            android:id="@+id/listItemResourceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="Resource Name" />
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelHostName"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="Hostname:" />
+    
+        <TextView
+            android:id="@+id/listItemHostName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="Hostname" />
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelAddresses"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="Addresses:" />
+    
+        <TextView
+            android:id="@+id/listItemAddresses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="Addresses" />
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelURLs"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="URLs:" />
+    
+        <TextView
+            android:id="@+id/listItemURLs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="@dimen/list_item_vertical_margin"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="URLs" />
+        </LinearLayout>
+</LinearLayout>
