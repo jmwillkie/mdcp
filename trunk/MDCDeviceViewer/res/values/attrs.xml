@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="list_group_typeface">sans</string>
+    <string name="list_group_text_style">bold</string>
+    <string name="list_item_typeface">sans</string>
+    <string name="list_item_text_style">bold</string>
+</resources>

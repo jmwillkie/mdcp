@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/AppBaseTheme"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:background="@color/list_background_color"
+    android:fadingEdge="horizontal"
+    android:fadingEdgeLength="@dimen/list_faded_edge_margin"
+    android:gravity="top"
+    android:orientation="horizontal"
+    android:showDividers="end" >
+
+    <TextView
+        android:id="@+id/groupListItem"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/list_group_vertical_margin"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingTop="@dimen/list_group_vertical_margin"
+        android:text="@string/no_devices_found"
+        android:textColor="@color/list_group_text_color"
+        android:textSize="@dimen/list_group_text_size"
+        android:textStyle="bold"
+        android:typeface="sans" />
+</LinearLayout>
