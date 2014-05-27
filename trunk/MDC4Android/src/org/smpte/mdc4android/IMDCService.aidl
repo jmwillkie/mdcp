@@ -26,11 +26,12 @@ interface IMDCService
 
     String[] getRegistrationDomains();
     
+
+    void query(in String subType, in String[] domains);
+//    Intent browse(in Intent intent, in String[] domains);
     
-    Intent browse(in Intent intent, in String[] domains);
     
-    
-    boolean stopBrowse(in Intent intent);
+//    boolean stopBrowse(in Intent intent);
     
     
     boolean register(inout Capability capability, in String domain, in String path, in Map actionIntentMap);

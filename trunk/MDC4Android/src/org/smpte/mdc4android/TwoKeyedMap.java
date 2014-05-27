@@ -72,6 +72,24 @@ public class TwoKeyedMap<K1, K2, V>
     }
     
     
+    public Set<K1> keySet()
+    {
+        synchronized (this.map)
+        {
+            return map.keySet();
+        }
+    }
+    
+    
+    public Set<K2> keySet(K1 key1)
+    {
+        synchronized (this.map)
+        {
+            return map.get(key1).keySet();
+        }
+    }
+    
+    
     public boolean containsKey(K1 key1)
     {
         synchronized (this.map)

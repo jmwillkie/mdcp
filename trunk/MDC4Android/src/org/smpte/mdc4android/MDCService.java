@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,6 +55,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -74,7 +74,7 @@ public class MDCService extends Service implements IMDCService, Device
 {
     protected static final String LOG_TAG = MDC4Android.LOG_TAG + "." + MDCService.class.getSimpleName();
     
-    protected static final int NOTIFICATION_ID = 1;
+    protected static final int NOTIFICATION_ID = 20140527;
     
     public static final String MDC_URL_PROTOCOL = "mdcp";
     
@@ -170,14 +170,14 @@ public class MDCService extends Service implements IMDCService, Device
         
         private transient Intent intent;
         
-        private Set<Name> domains = new LinkedHashSet<Name>();
+        private Set<Name> domains;
         
-        private Context context;
+        private MDCService service;
         
         
-        protected BrowseOperation(Context context, Intent intent, String[] domains)
+        protected BrowseOperation(MDCService service, Intent intent, String[] domains)
         {
-            this.context = context;
+            this.service = service;
             this.intent = intent;
             intent.addCategory(CATEGORY_SERVICE_DISCOVERY);
             if (domains != null)
@@ -194,13 +194,7 @@ public class MDCService extends Service implements IMDCService, Device
                 }
             } else
             {
-                try
-                {
-                    addDomain(new Name("."));
-                } catch (Exception e)
-                {
-                    Log.e(LOG_TAG, "Error adding domain \".\" to Browse Operation.");
-                }
+                domains = null;
             }
         }
         
@@ -231,17 +225,21 @@ public class MDCService extends Service implements IMDCService, Device
         
         public void addDomain(Name domain)
         {
-            domains.add(domain);
+            if (domain != null)
+            {
+                if (domains == null)
+                {
+                    domains = new LinkedHashSet<Name>();
+                }
+                domains.add(domain);
+            }
         }
         
         
         public void addDomain(String domain)
         throws TextParseException
         {
-            if (domain != null)
-            {
-                domains.add(new Name(domain.endsWith(".") ? domain : domain + "."));
-            }
+            addDomain(new Name(domain.endsWith(".") ? domain : domain + "."));
         }
         
         
@@ -301,35 +299,14 @@ public class MDCService extends Service implements IMDCService, Device
                 {
                     if (service.getName().subdomain(domain))
                     {
-                        broadcastIntent(service, discovered, (Intent) this.intent.clone());
+                        this.service.broadcastIntent(service, discovered, (Intent) this.intent.clone());
                         break;
                     }
                 }
             } else
             {
-                broadcastIntent(service, discovered, (Intent) this.intent.clone());
+                this.service.broadcastIntent(service, discovered, (Intent) this.intent.clone());
             }
-        }
-        
-        
-        private void broadcastIntent(ServiceInstance service, boolean discovered, Intent intent)
-        {
-            Log.i(LOG_TAG, "Broadcasting Intent + \"" + intent + "\"");
-            
-            intent.setAction(discovered ? ACTION_SERVICE_DISCOVERED : ACTION_SERVICE_REMOVED);
-            intent.putExtra(EXTRA_SERVICE_DISCOVERED, discovered);
-            intent.putExtra(EXTRA_SERVICE_REMOVED, !discovered);
-            intent.putExtra(EXTRA_SERVICE, service);
-            
-            context.sendOrderedBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY, new BroadcastReceiver()
-            {
-                @Override
-                public void onReceive(Context context, Intent intent)
-                {
-                    Log.i(LOG_TAG, "Ordered Broadcast Result");
-                }
-                
-            }, null, Activity.RESULT_OK, null, null);
         }
     }
     
@@ -384,6 +361,13 @@ public class MDCService extends Service implements IMDCService, Device
         
         
         @Override
+        public void query(String subType, String[] domains)
+        throws RemoteException
+        {
+            MDCService.this.query(subType, domains);
+        }
+        /*
+        @Override
         public Intent browse(Intent intent, String[] domains)
         throws RemoteException
         {
@@ -397,7 +381,7 @@ public class MDCService extends Service implements IMDCService, Device
         {
             return MDCService.this.stopBrowse(intent);
         }
-        
+        */
         
         @Override
         @SuppressWarnings("rawtypes")
@@ -602,30 +586,36 @@ public class MDCService extends Service implements IMDCService, Device
                     {
                         if (registeredCapabilities != null && registeredCapabilities.size() > 0)
                         {
-                            synchronized (registeredCapabilities)
+                            try
                             {
-                                for (Entry<String, java.util.Map<String, RegistrationInformation>> entry : registeredCapabilities.entrySet())
+                                synchronized (registeredCapabilities)
                                 {
-                                    for (java.util.Map.Entry<String, RegistrationInformation> domainEntry : entry.getValue().entrySet())
+                                    String[] keys1 = registeredCapabilities.keySet().toArray(new String[0]);
+                                    for (String ucn : keys1)
                                     {
-                                        String ucn = entry.getKey();
-                                        String domain = domainEntry.getKey();
-                                        Capability capability = null;
-                                        try
+                                        String[] keys2 = registeredCapabilities.keySet(ucn).toArray(new String[0]);
+                                        for (String domain :keys2)
                                         {
-                                            if ((capability = unregister(ucn, domain)) == null)
+                                            Capability capability = null;
+                                            try
                                             {
-                                                Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\".");
-                                            } else
+                                                if ((capability = unregister(ucn, domain)) == null)
+                                                {
+                                                    Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\".");
+                                                } else
+                                                {
+                                                    Log.i(LOG_TAG, "Unregistered Capabaility \"" + capability.getUCN() + "\".");
+                                                }
+                                            } catch (Exception e)
                                             {
-                                                Log.i(LOG_TAG, "Unregistered Capabaility \"" + capability.getUCN() + "\".");
+                                                Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\" - " + e.getMessage(), e);
                                             }
-                                        } catch (Exception e)
-                                        {
-                                            Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\" - " + e.getMessage(), e);
                                         }
                                     }
                                 }
+                            } catch (Exception e)
+                            {
+                                Log.e(LOG_TAG, "Error unregistering Capabilities - " + e.getMessage(), e);
                             }
                         }
                         
@@ -698,7 +688,7 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public IBinder onBind(Intent intent)
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onBind()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onBind() <-----");
         return mBinder;
     }
     
@@ -706,14 +696,64 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public void onCreate()
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onCreate()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onCreate() <-----");
         super.onCreate();
-        
-        showProgress(true);
-        initNotification();
         
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
         
+        try
+        {
+            Intent startIntent = new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class);
+            startService(startIntent);
+            if (!bindService(startIntent, soapServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
+            {
+                Log.e(LOG_TAG, "-----> Could NOT bind to SOAP service using action \"" + SOAPServerService.class.getName() + "\" and Package \"net.posick.ws\" <-----");
+                try
+                {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                    startActivity(intent);
+                } catch (android.content.ActivityNotFoundException anfe)
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
+                }
+                
+                displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                return;
+            }
+        } catch (Exception e)
+        {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            Toast toast = Toast.makeText(null, "Could NOT bind to service \"" + SOAPServerService.class.getName() + "\".\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        
+        ComponentName service = new ComponentName(this, MDCService.class);
+        PackageManager pm = this.getPackageManager();
+        pm.setComponentEnabledSetting(service,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentTitle("MDC 4 Android")
+                    .setContentText("Implementation of SMPTE ST2071 Media & Device Conrol standard");
+        
+        Intent notifyIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(notifyIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
+        notificationBuilder.setContentIntent(pendingIntent);
+        
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification = notificationBuilder.build();
+        notificationManager.notify(NOTIFICATION_ID, notification);
+        startForeground(NOTIFICATION_ID, notification);
+
+        /*
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null)
         {
@@ -738,35 +778,37 @@ public class MDCService extends Service implements IMDCService, Device
         {
             Log.e(LOG_TAG, "ConnectivityManager could not be acquired!");
         }
-        
-        showProgress(false);
+        */
     }
     
     
-    protected void initNotification()
+    protected void broadcastIntent(ServiceInstance service, boolean discovered, Intent intent)
     {
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("MDC 4 Android")
-                .setContentText("Implementation of SMPTE ST2071 Media & Device Conrol standard");
-        Intent notifyIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(notifyIntent);
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(pendingIntent);
+        Log.i(LOG_TAG, "Broadcasting Intent + \"" + intent + "\"");
         
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = notificationBuilder.build();
-        notificationManager.notify(NOTIFICATION_ID, notification);
-        startForeground(NOTIFICATION_ID, notification);
+        intent.setAction(discovered ? ACTION_SERVICE_DISCOVERED : ACTION_SERVICE_REMOVED);
+        intent.addCategory(MDCService.CATEGORY_SERVICE_DISCOVERY);
+        intent.putExtra(EXTRA_SERVICE_DISCOVERED, discovered);
+        intent.putExtra(EXTRA_SERVICE_REMOVED, !discovered);
+        intent.putExtra(EXTRA_SERVICE, service);
+        
+        sendBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
+    }
+    
+
+    @Override
+    public void onRebind(Intent intent)
+    {
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onRebind() <-----");
+        super.onRebind(intent);
+        startNetwork();
     }
 
 
     @Override
     public void onDestroy()
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onDestroy()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onDestroy() <-----");
         stopNetwork();
         super.onDestroy();
     }
@@ -775,7 +817,7 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public void onLowMemory()
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onLowMemory()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onLowMemory() <-----");
         super.onLowMemory();
     }
 
@@ -784,7 +826,7 @@ public class MDCService extends Service implements IMDCService, Device
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public void onTrimMemory(int level)
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onTrimMemory()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onTrimMemory() <-----");
         super.onTrimMemory(level);
     }
 
@@ -792,7 +834,7 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public boolean onUnbind(Intent intent)
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onUnbind()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onUnbind() <-----");
         return super.onUnbind(intent);
     }
 
@@ -801,7 +843,7 @@ public class MDCService extends Service implements IMDCService, Device
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public void onTaskRemoved(Intent rootIntent)
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onTaskRemoved()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onTaskRemoved() <-----");
         super.onTaskRemoved(rootIntent);
     }
 
@@ -809,28 +851,34 @@ public class MDCService extends Service implements IMDCService, Device
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".onStartCommand()");
+        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onStartCommand() <-----");
         
-        showProgress(true);
-        
-        super.onStartCommand(intent, flags, startId);
-        
-        if (intent != null)
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connMgr != null)
         {
-            if (intent.hasExtra(EXTRA_CONNECT_TO_NETWORK))
+            NetworkInfo info = connMgr.getActiveNetworkInfo();
+            Log.i(LOG_TAG, "Network Connectivity Changed - " + (info != null ? "Connected to \"" + info.getTypeName() + "/" + info.getSubtypeName() + "\"." : "NOT Connected to any network."));
+            if (info != null)
             {
-                boolean connected = intent.getBooleanExtra(EXTRA_CONNECT_TO_NETWORK, false);
-                if (connected)
+                switch (info.getState())
                 {
-                    startNetwork();
-                } else
-                {
-                    stopNetwork();
+                    case CONNECTED:
+                    case CONNECTING:
+                        startNetwork();
+                        break;
+                    case DISCONNECTED:
+                    case DISCONNECTING:
+                    case SUSPENDED:
+                    case UNKNOWN:
+                        stopNetwork();
+                        break;
                 }
             }
+        } else
+        {
+            Log.e(LOG_TAG, "-----> ConnectivityManager could not be acquired! <-----");
         }
         
-        showProgress(false);
         return START_STICKY;
     }
     
@@ -996,7 +1044,6 @@ public class MDCService extends Service implements IMDCService, Device
                 
                 MulticastDNSService.setDefaultQuerier(querier);
                 service = new MulticastDNSService();
-                service.setQuerier(querier);
             } catch (IOException e)
             {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -1005,37 +1052,10 @@ public class MDCService extends Service implements IMDCService, Device
                 throw re;
             }
             
-            try
-            {
-                if (!bindService(new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class), soapServiceConnection, Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT | Context.BIND_NOT_FOREGROUND | Context.BIND_ABOVE_CLIENT))
-                {
-                    Log.e(LOG_TAG, "-----> Could NOT bind to SOAP service using action \"" + SOAPServerService.class.getName() + "\" and Package \"net.posick.ws\" <-----");
-                    try
-                    {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                        startActivity(intent);
-                    } catch (android.content.ActivityNotFoundException anfe)
-                    {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
-                    }
-                    
-                    displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                    errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                    return;
-                }
-            } catch (Exception e)
-            {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                Toast toast = Toast.makeText(null, "Could NOT bind to service \"" + SOAPServerService.class.getName() + "\".\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-            
             Intent intent = new Intent().addCategory(CATEGORY_SERVICE_DISCOVERY);
             try
             {
-                browseIntent = browse(intent, null);
+                browseIntent = browse(intent, deviceInfo.getDomains().toArray(new String[0]));
             } catch (Exception e)
             {
                 Log.e(LOG_TAG, "Error registering general Service Discovery Intent - " + e.getMessage(), e);
@@ -1067,7 +1087,7 @@ public class MDCService extends Service implements IMDCService, Device
         }
     }
     
-    
+    /*
     protected void setProgress(double progress)
     {
         if (localBroadcaster != null)
@@ -1089,6 +1109,7 @@ public class MDCService extends Service implements IMDCService, Device
             localBroadcaster.sendBroadcast(intent);
         }
     }
+    */
     
     
     protected synchronized void stopNetwork()
@@ -1348,6 +1369,70 @@ public class MDCService extends Service implements IMDCService, Device
     }
     
     
+    @Override
+    public void query(String subType, String[] domains)
+    throws RemoteException
+    {
+        String[] browseDomains = domains;
+        if (browseDomains == null || browseDomains.length == 0)
+        {
+            browseDomains = getDefaultBrowseDomains();
+        }
+        
+        Set<Name> names = new LinkedHashSet<Name>();
+        for (String domain : browseDomains)
+        {
+            try
+            {
+                names.add(new Name("_mdc._tcp." + domain));
+                if (subType != null)
+                {
+                    names.add(new Name(subType + "._sub._mdc._tcp." + domain));
+                }
+            } catch (Exception e)
+            {
+                Log.w(LOG_TAG, e.getMessage());
+            }
+        }
+        
+        Lookup lookup = null;
+        try
+        {
+            Intent intent = new Intent();
+            intent.setAction(ACTION_SERVICE_DISCOVERED);
+            intent.addCategory(MDCService.CATEGORY_SERVICE_DISCOVERY);
+            intent.putExtra(EXTRA_SERVICE_DISCOVERED, true);
+            intent.putExtra(EXTRA_SERVICE_REMOVED, false);
+            
+            lookup = new Lookup(names.toArray(new Name[names.size()]));
+            lookup.setQuerier(querier);
+            ServiceInstance[] services = lookup.lookupServices();
+            if (services != null && services.length > 0)
+            {
+                for (ServiceInstance service : services)
+                {
+                    intent.putExtra(EXTRA_SERVICE, service);
+                    broadcastIntent(service, true, intent);
+                }
+            }
+        } catch (IOException e)
+        {
+            Log.e(LOG_TAG, "Error executing lookup for Services.", e);
+        } finally
+        {
+            if (lookup != null)
+            {
+                try
+                {
+                    lookup.close();
+                } catch (Exception e)
+                {
+                }
+            }
+        }
+    }
+    
+    
     /**
      * Registers an Intent to be broadcast whenever a Service is discovered or
      * removed using DNS-SD and mDNS. The browse operation returns the Intent
@@ -1370,29 +1455,17 @@ public class MDCService extends Service implements IMDCService, Device
      * @return The intent that will be broadcast when Services are discovered or
      *         removed and the intent to use when stopping the browse operation.
      */
-    @Override
     public Intent browse(Intent intent, String[] domains)
-    throws RemoteException
     {
         BrowseOperation browseOp = browseIntents.get(intent);
         if (browseOp == null)
         {
             if (domains == null || domains.length == 0)
             {
-                browseOp = new BrowseOperation(getApplicationContext(), intent, getDefaultBrowseDomains());
-                for (String domain : getBrowseDomains())
-                {
-                    try
-                    {
-                        browseOp.addDomain(domain);
-                    } catch (Exception e)
-                    {
-                        Log.w(LOG_TAG, "Invalid domain name \"" + domains + "\" - " + e.getMessage(), e);
-                    }
-                }
+                browseOp = new BrowseOperation(this, intent, null);
             } else
             {
-                browseOp = new BrowseOperation(getApplicationContext(), intent, domains);
+                browseOp = new BrowseOperation(this, intent, domains);
             }
             browseIntents.put(intent, browseOp);
         }
@@ -1429,11 +1502,10 @@ public class MDCService extends Service implements IMDCService, Device
     }
     
     
-    @Override
     public boolean stopBrowse(Intent intent)
     throws RemoteException
     {
-        BrowseOperation browseOp = browseIntents.get(intent);
+        BrowseOperation browseOp = browseIntents.remove(intent);
         if (browseOp != null)
         {
             try
