@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     
-    <uses-permission android:name="@string/permission_mdc_service_discovery" />
+    <uses-permission android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
     <permission android:protectionLevel="normal" android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
     
     <uses-feature
@@ -41,54 +41,80 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         
-        <service
-            android:name="org.smpte.mdc4android.MDCService"
-            android:enabled="true"
-            android:exported="true"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name"
-            android:logo="@drawable/ic_launcher"
-            android:permission="@string/permission_mdc_service_discovery"
-            android:singleUser="false"
-            android:stopWithTask="true" >
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-            <intent-filter>
-                <category android:name="@string/category_mdc4android_mdc" />
-            </intent-filter>
+        <service android:name="org.smpte.mdc4android.MDCService"
+                 android:enabled="true"
+                 android:exported="true"
+                 android:icon="@drawable/ic_launcher"
+                 android:label="@string/app_name"
+                 android:logo="@drawable/ic_launcher"
+                 android:permission="org.smpte.mdc4android.SERVICE_DISCOVERY"
+                 android:singleUser="false"
+                 android:stopWithTask="false" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </service>
+            <intent-filter>
+                <action android:name="org.smpte.mdc4android.MDC" />
+            </intent-filter>
+            </service>
 
-        <receiver android:name="org.smpte.mdc4android.net.NetworkConnectivityReceiver" >
+        <receiver android:name="org.smpte.mdc4android.net.NetworkConnectivityReceiver"
+                  android:enabled="true"
+                  android:exported="true"
+                  android:stopWithTask="false" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="org.smpte.mdc4android.ServiceDiscoveryBroadcastReceiver" android:permission="@string/permission_mdc_service_discovery">
+        <!-- receiver android:name="org.smpte.mdc4android.ServiceDiscoveryBroadcastReceiver" 
+                  android:enabled="true"
+                  android:exported="true"
+                  android:permission="org.smpte.mdc4android.SERVICE_DISCOVERY"
+                  android:stopWithTask="false" >
             <intent-filter>
-                <action android:name="@string/action_mdc_service_discovered" />
-                <category android:name="@string/category_mdc_service_discovery" />
+                <action android:name="org.smpte.MDC_SERVICE_DISCOVERED" />
+                <category android:name="org.smpte.MDC_SERVICE_DISCOVERY" />
             </intent-filter>
             <intent-filter>
-                <action android:name="@string/action_mdc_service_removed" />
-                <category android:name="@string/category_mdc_service_discovery" />
+                <action android:name="org.smpte.MDC_SERVICE_REMOVED" />
+                <category android:name="org.smpte.MDC_SERVICE_DISCOVERY" />
             </intent-filter>
-        </receiver>
+        </receiver -->
 
-        <activity
-            android:name="org.smpte.mdc4android.MainActivity"
-            android:label="@string/title_activity_main" >
+        <activity android:name="org.smpte.mdc4android.MainActivity"
+                  android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+        
+        <service android:icon="@drawable/ic_launcher" 
+                 android:name="net.posick.ws.http.HTTPServerService" 
+                 android:logo="@drawable/ic_launcher" 
+                 android:singleUser="false" 
+                 android:exported="false" 
+                 android:label="@string/app_name" 
+                 android:enabled="true" 
+                 android:permission="net.posick.ws.REGISTER_ENDPOINT"
+                 android:stopWithTask="false" />
+        <service android:icon="@drawable/ic_launcher" 
+                 android:name="net.posick.ws.soap.SOAPServerService" 
+                 android:logo="@drawable/ic_launcher" 
+                 android:singleUser="false" 
+                 android:exported="true" 
+                 android:label="@string/app_name" 
+                 android:enabled="true" 
+                 android:permission="net.posick.ws.REGISTER_ENDPOINT" 
+                 android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        </application>
 
 </manifest>
