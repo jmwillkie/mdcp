@@ -6,6 +6,7 @@ import org.smpte.mdc4android.MDCService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -23,7 +24,15 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver
         {
             NetworkInfo info = connMgr.getActiveNetworkInfo();
             Log.i(LOG_TAG, "Network Connectivity Changed - " + (info != null ? "Connected to \"" + info.getTypeName() + "/" + info.getSubtypeName() + "\"." : "NOT Connected to any network."));
-            context.startService(new Intent(context, MDCService.class));
+            try
+            {
+                Intent startIntent = new Intent(context.createPackageContext("org.smpte.mdc4android", 0), MDCService.class);
+                startIntent.putExtra(MDCService.EXTRA_NETWORK_CONNECTIVITY_CHANGED, info != null);
+                context.startService(startIntent);
+            } catch (NameNotFoundException e)
+            {
+                Log.e(LOG_TAG, "Unable to create package context for \"org.smpte.mdc4android\" - " + e.getMessage(), e);
+            }
         } else
         {
             Log.e(LOG_TAG, "ConnectivityManager could not be acquired!");

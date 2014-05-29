@@ -94,8 +94,10 @@ public class MDCService extends Service implements IMDCService, Device
     
     public static final String EXTRA_SERVICE_REMOVED = "org.smpte.mdc4android.ServiceRemoved";
     
-    public static final String PERMISSION_MDC_SERVICE_DISCOVERY = "org.smpte.mdc4android.SERVICE_DISCOVERY";
+    public static final String EXTRA_NETWORK_CONNECTIVITY_CHANGED = "org.smpte.mdc4android.NetworkConnectivityChanged";
     
+    public static final String PERMISSION_MDC_SERVICE_DISCOVERY = "org.smpte.mdc4android.SERVICE_DISCOVERY";
+
     public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
     
     
@@ -672,6 +674,8 @@ public class MDCService extends Service implements IMDCService, Device
         {
             Thread t = new Thread(r, MDCService.class.getSimpleName() + " Cached Thread");
             t.setDaemon(true);
+            t.setPriority(Thread.MAX_PRIORITY - 1);
+            t.setContextClassLoader(MDCService.class.getClassLoader());
             return t;
         }
     });
@@ -703,7 +707,7 @@ public class MDCService extends Service implements IMDCService, Device
         
         try
         {
-            Intent startIntent = new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class);
+            Intent startIntent = new Intent(this, SOAPServerService.class);
             startService(startIntent);
             if (!bindService(startIntent, soapServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
             {
@@ -810,6 +814,10 @@ public class MDCService extends Service implements IMDCService, Device
     {
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onDestroy() <-----");
         stopNetwork();
+        if (soapServiceConnection != null)
+        {
+            unbindService(soapServiceConnection);
+        }
         super.onDestroy();
     }
     
@@ -828,6 +836,7 @@ public class MDCService extends Service implements IMDCService, Device
     {
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onTrimMemory() <-----");
         super.onTrimMemory(level);
+        System.gc();
     }
 
 
@@ -853,6 +862,39 @@ public class MDCService extends Service implements IMDCService, Device
     {
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onStartCommand() <-----");
         
+        if (intent != null)
+        {
+            String action = intent.getAction();
+            
+            if (intent.hasExtra(EXTRA_NETWORK_CONNECTIVITY_CHANGED) || 
+                "android.net.conn.CONNECTIVITY_CHANGE".equals(action))
+            {
+                onConnectivityChange();
+            } else if (MDCService.ACTION_SERVICE_DISCOVERED.equals(action))
+            {
+                ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCService.EXTRA_SERVICE);
+                BrowseOperation browseOp = browseIntents.get(browseIntent);
+                browseOp.serviceDiscovered(browseOp.id, service);
+            } else if (MDCService.ACTION_SERVICE_REMOVED.equals(action))
+            {
+                ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCService.EXTRA_SERVICE);
+                BrowseOperation browseOp = browseIntents.get(browseIntent);
+                browseOp.serviceRemoved(browseOp.id, service);
+            } else
+            {
+                onConnectivityChange();
+            }
+        } else
+        {
+            onConnectivityChange();
+        }
+        
+        return START_STICKY;
+    }
+    
+    
+    protected void onConnectivityChange()
+    {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connMgr != null)
         {
@@ -878,11 +920,9 @@ public class MDCService extends Service implements IMDCService, Device
         {
             Log.e(LOG_TAG, "-----> ConnectivityManager could not be acquired! <-----");
         }
-        
-        return START_STICKY;
     }
-    
-    
+
+
     protected void initDevice()
     {
         Set<String> domains = deviceInfo.getDomains();
@@ -997,6 +1037,11 @@ public class MDCService extends Service implements IMDCService, Device
     
     protected synchronized void startNetwork()
     {
+        if (querier != null && !querier.isOperational() && networkStarted)
+        {
+            stopNetwork();
+        }
+        
         Log.i(LOG_TAG, getClass().getSimpleName() + ".startupNetwork()");
         
         if (!networkStarted)
@@ -1051,6 +1096,37 @@ public class MDCService extends Service implements IMDCService, Device
                 re.setStackTrace(e.getStackTrace());
                 throw re;
             }
+            
+            /*
+            try
+            {
+                Intent startIntent = new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class);
+                startService(startIntent);
+                if (!bindService(startIntent, soapServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
+                {
+                    Log.e(LOG_TAG, "-----> Could NOT bind to SOAP service using action \"" + SOAPServerService.class.getName() + "\" and Package \"net.posick.ws\" <-----");
+                    try
+                    {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                        startActivity(intent);
+                    } catch (android.content.ActivityNotFoundException anfe)
+                    {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
+                    }
+                    
+                    displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                    errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
+                    return;
+                }
+            } catch (Exception e)
+            {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                Toast toast = Toast.makeText(null, "Could NOT bind to service \"" + SOAPServerService.class.getName() + "\".\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+            */
             
             Intent intent = new Intent().addCategory(CATEGORY_SERVICE_DISCOVERY);
             try
@@ -1144,12 +1220,12 @@ public class MDCService extends Service implements IMDCService, Device
                     }
                 }
             }
-            
+            /*
             if (soapServiceConnection != null)
             {
                 unbindService(soapServiceConnection);
             }
-            
+            */
             if (service != null)
             {
                 try
