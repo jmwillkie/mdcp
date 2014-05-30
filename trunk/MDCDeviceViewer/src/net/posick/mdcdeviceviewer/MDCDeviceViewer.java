@@ -18,7 +18,6 @@ public class MDCDeviceViewer extends Application
         
         Intent intent = new Intent(this, MDCDeviceViewerService.class);
         startService(intent);
-        
     }
     
     
