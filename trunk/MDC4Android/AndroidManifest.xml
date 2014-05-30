@@ -37,8 +37,6 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="19" />
 
-    <uses-feature />
-
     <application
         android:name="org.smpte.mdc4android.MDC4Android"
         android:allowBackup="true"
