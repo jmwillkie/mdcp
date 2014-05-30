@@ -212,15 +212,21 @@ public class MDCDeviceViewerService extends Service
         
         try
         {
+            Intent mdcpServiceIntent = new Intent(this, MDCService.class);
+            startService(mdcpServiceIntent);
+            
             Intent startIntent = new Intent(createPackageContext("org.smpte.mdc4android", 0), MDCService.class);
             startService(startIntent);
-            if (!bindService(startIntent, mdcServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
+            if (mdcService != null)
             {
-                Log.e(LOG_TAG, "Could NOT bind to service \"" + MDCService.class.getName() + "\". Program \"org.smpte.mdc4android\" is required!");
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=org.smpte.mdc4android"));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                startActivity(intent);
-                return;
+                if (!bindService(startIntent, mdcServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
+                {
+                    Log.e(LOG_TAG, "Could NOT bind to service \"" + MDCService.class.getName() + "\". Program \"org.smpte.mdc4android\" is required!");
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=org.smpte.mdc4android"));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                    startActivity(intent);
+                    return;
+                }
             }
         } catch (Exception e)
         {
