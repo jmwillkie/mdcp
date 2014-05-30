@@ -59,9 +59,13 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -666,6 +670,8 @@ public class MDCService extends Service implements IMDCService, Device
     protected java.util.Map<Intent, BrowseOperation> browseIntents = new LinkedHashMap<Intent, BrowseOperation>();
     
     protected Intent browseIntent;
+
+    protected WifiLock wifiLock;
     
     protected ExecutorService threadPool = Executors.newCachedThreadPool(new ThreadFactory()
     {
@@ -679,6 +685,12 @@ public class MDCService extends Service implements IMDCService, Device
             return t;
         }
     });
+
+    private WifiManager wifiManager;
+
+    private PowerManager powerManager;
+
+    private WakeLock wakeLock;
     
     
     @Override
@@ -693,10 +705,11 @@ public class MDCService extends Service implements IMDCService, Device
     public IBinder onBind(Intent intent)
     {
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onBind() <-----");
+        
         return mBinder;
     }
-    
-    
+
+
     @Override
     public void onCreate()
     {
@@ -704,6 +717,9 @@ public class MDCService extends Service implements IMDCService, Device
         super.onCreate();
         
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
+        
+        grabWakeLock(LOG_TAG);
+        grabWiFiLock(LOG_TAG);
         
         try
         {
@@ -756,33 +772,6 @@ public class MDCService extends Service implements IMDCService, Device
         Notification notification = notificationBuilder.build();
         notificationManager.notify(NOTIFICATION_ID, notification);
         startForeground(NOTIFICATION_ID, notification);
-
-        /*
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connMgr != null)
-        {
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected())
-            {
-                switch (networkInfo.getType())
-                {
-                    case ConnectivityManager.TYPE_ETHERNET:
-                    case ConnectivityManager.TYPE_WIFI:
-                        startNetwork();
-                        break;
-                    default:
-                        stopNetwork();
-                        break;
-                }
-            } else
-            {
-                stopNetwork();
-            }
-        } else
-        {
-            Log.e(LOG_TAG, "ConnectivityManager could not be acquired!");
-        }
-        */
     }
     
     
@@ -813,11 +802,17 @@ public class MDCService extends Service implements IMDCService, Device
     public void onDestroy()
     {
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onDestroy() <-----");
+        
+        releaseWakeLock();
+        releaseWiFiLock();
+        
         stopNetwork();
+        
         if (soapServiceConnection != null)
         {
             unbindService(soapServiceConnection);
         }
+        
         super.onDestroy();
     }
     
@@ -1190,7 +1185,7 @@ public class MDCService extends Service implements IMDCService, Device
     
     protected synchronized void stopNetwork()
     {
-        Log.i(LOG_TAG, getClass().getSimpleName() + ".shutdownNetwork()");
+        Log.i(LOG_TAG, getClass().getSimpleName() + ".stopNetwork()");
         
         if (networkStarted)
         {
@@ -1805,5 +1800,97 @@ public class MDCService extends Service implements IMDCService, Device
         }
         
         return capability;
+    }
+    
+    
+    protected PowerManager powerManager()
+    {
+        if (powerManager == null)
+        {
+            powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        }
+        
+        // If still null display error!
+        if (powerManager == null)
+        {
+            String message = super.getString(R.string.error_wake_lock_not_created_no_manager);
+            Log.e(LOG_TAG, message);
+            Toast toast = Toast.makeText(null, message, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        return powerManager;
+    }
+    
+    
+    protected synchronized void grabWakeLock(String tag)
+    {
+        if (wakeLock == null)
+        {
+            wakeLock = powerManager().newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
+            if (wakeLock != null)
+            {
+                wakeLock.acquire();
+            }
+        }
+    }
+    
+    
+    protected synchronized void releaseWakeLock()
+    {
+        if (wakeLock == null)
+        {
+            if (wakeLock.isHeld())
+            {
+                wakeLock.release();
+            }
+            wakeLock = null;
+        }
+    }
+    
+    
+    protected WifiManager wifiManager()
+    {
+        if (wifiManager == null)
+        {
+            wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        }
+        
+        // If still null display error!
+        if (wifiManager == null)
+        {
+            String message = super.getString(R.string.error_wifi_lock_not_created_no_manager);
+            Log.e(LOG_TAG, message);
+            Toast toast = Toast.makeText(null, message, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        return wifiManager;
+    }
+    
+    
+    protected synchronized void grabWiFiLock(String tag)
+    {
+        if (wifiLock == null)
+        {
+            wifiLock = wifiManager().createWifiLock(WifiManager.WIFI_MODE_FULL, tag);
+            if (wifiLock != null)
+            {
+                wifiLock.acquire();
+            }
+        }
+    }
+    
+    
+    protected synchronized void releaseWiFiLock()
+    {
+        if (wifiLock == null)
+        {
+            if (wifiLock.isHeld())
+            {
+                wifiLock.release();
+            }
+            wifiLock = null;
+        }
     }
 }
