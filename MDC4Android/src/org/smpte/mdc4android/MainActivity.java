@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -129,6 +131,10 @@ public class MainActivity extends Activity
     };
 
     private LocalBroadcastManager localBroadcaster;
+
+    private MenuItem stopMenuItem;
+
+    private MenuItem restartMenuItem;
     
     
     @Override
@@ -157,6 +163,9 @@ public class MainActivity extends Activity
                 textView.setText(text);
             }
         }
+        
+        Intent mdcpServiceIntent = new Intent(this, MDCService.class);
+        startService(mdcpServiceIntent);
     }
     
     
@@ -174,6 +183,27 @@ public class MainActivity extends Activity
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        stopMenuItem = menu.add(R.string.stop);
+        stopMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                Intent mdcpServiceIntent = new Intent(MainActivity.this, MDCService.class);
+                return stopService(mdcpServiceIntent);
+            }
+        });
+        restartMenuItem = menu.add(R.string.restart);
+        restartMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                Intent mdcpServiceIntent = new Intent(MainActivity.this, MDCService.class);
+                stopService(mdcpServiceIntent);
+                return startService(mdcpServiceIntent) != null;
+            }
+        });
         return true;
     }
     

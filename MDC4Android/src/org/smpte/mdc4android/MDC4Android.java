@@ -1,5 +1,7 @@
 package org.smpte.mdc4android;
 
+import net.posick.ws.http.HTTPServerService;
+import net.posick.ws.soap.SOAPServerService;
 import android.app.Application;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -16,6 +18,12 @@ public class MDC4Android extends Application
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onCreate()");
         super.onCreate();
         
+        Intent httpServiceIntent = new Intent(this, HTTPServerService.class);
+        startService(httpServiceIntent);
+        
+        Intent soapServiceIntent = new Intent(this, SOAPServerService.class);
+        startService(soapServiceIntent);
+        
         Intent mdcpServiceIntent = new Intent(this, MDCService.class);
         startService(mdcpServiceIntent);
     }
@@ -26,9 +34,6 @@ public class MDC4Android extends Application
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".onTerminate()");
         super.onTerminate();
-        
-        Intent mdcpServiceIntent = new Intent(this, MDCService.class);
-        stopService(mdcpServiceIntent);
     }
     
     
