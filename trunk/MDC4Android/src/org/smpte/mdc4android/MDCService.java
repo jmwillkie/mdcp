@@ -12,9 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import net.posick.ws.soap.ISOAPServerService;
 import net.posick.ws.soap.SOAPServerService;
@@ -42,7 +43,6 @@ import org.xbill.mDNS.MulticastDNSService;
 import org.xbill.mDNS.ServiceInstance;
 import org.xbill.mDNS.ServiceName;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -56,6 +56,7 @@ import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -81,6 +82,10 @@ public class MDCService extends Service implements IMDCService, Device
     protected static final int NOTIFICATION_ID = 20140527;
     
     public static final String MDC_URL_PROTOCOL = "mdcp";
+
+    public static final String ACTION_MDC_NETWORK_INITIALIZED = "org.smpte.mdc4android.SERVICE_NETWORK_INITIALIZED";
+
+    public static final String ACTION_MDC_NETWORK_STOPPED = "org.smpte.mdc4android.SERVICE_NETWORK_STOPPED";
     
     public static final String ACTION_SERVICE_DISCOVERED = "org.smpte.MDC_SERVICE_DISCOVERED";
     
@@ -278,6 +283,7 @@ public class MDCService extends Service implements IMDCService, Device
         @Override
         public void receiveMessage(Object id, Message message)
         {
+            Log.i(LOG_TAG, "-----> mDNS Message Received <-----\n" + message);
         }
         
         
@@ -407,7 +413,111 @@ public class MDCService extends Service implements IMDCService, Device
     };
     
     
-    protected class EndpointBroadcastReceiver extends BroadcastReceiver
+    private ServiceConnection soapServiceConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder binder)
+        {
+            Log.i(LOG_TAG, getClass().getSimpleName() + ".onServiceConnected(\"" + className.flattenToString() + "\", " + binder + ")");
+            
+            soapService = ISOAPServerService.Stub.asInterface(binder);
+            
+            try
+            {
+                while (!soapService.isOnline())
+                {
+                    try
+                    {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e)
+                    {
+                        // ignore
+                    }
+                }
+                
+                if (networkStarted)
+                {
+                    registerCapabilities();
+                }
+            } catch (Exception e)
+            {
+                Log.e(LOG_TAG, "Error registering Web Service Endpoints - " + e.getMessage(), e);
+            }
+        }
+        
+        
+        @Override
+        public void onServiceDisconnected(ComponentName className)
+        {
+            Log.i(LOG_TAG, getClass().getSimpleName() + ".onServiceDisconnected(\"" + className.flattenToString() + "\")");
+            
+            if (networkStarted)
+            {
+                unregisterCapabilities();
+            }
+            soapService = null;
+        }
+    };
+    
+    protected ISOAPServerService soapService;
+    
+    protected boolean networkStarted = false;
+
+    protected boolean startingNetwork = false;
+    
+    protected DeviceInfo deviceInfo = null;
+    
+    protected MulticastDNSQuerier querier = null;
+    
+    protected MulticastDNSService service;
+    
+    protected String udn;
+    
+    protected String name;
+    
+    protected Set<String> urls = new LinkedHashSet<String>();
+    
+    protected Set<Capability> capabilities = new LinkedHashSet<Capability>();
+    
+    protected LocalBroadcastManager localBroadcaster;
+    
+    protected TwoKeyedMap<String, String, RegistrationInformation> registeredCapabilities = new TwoKeyedMap<String, String, RegistrationInformation>();
+    
+    protected Capability deviceCapability = new Capability();
+    
+    protected java.util.Map<String, Intent> actionIntentMap;
+    
+    protected java.util.Map<Intent, BrowseOperation> browseIntents = new LinkedHashMap<Intent, BrowseOperation>();
+    
+    protected Intent browseIntent;
+
+    protected ThreadFactory serviceThreadFactory = new ThreadFactory()
+    {
+        @Override
+        public Thread newThread(Runnable r)
+        {
+            Thread t = new Thread(r, MDCService.class.getSimpleName() + " ServiceDiscovery Thread");
+            t.setDaemon(true);
+            t.setPriority(Thread.NORM_PRIORITY);
+            t.setContextClassLoader(MDCService.class.getClassLoader());
+            return t;
+        }
+    };
+    
+    protected ThreadFactory networkThreadFactory = new ThreadFactory()
+    {
+        @Override
+        public Thread newThread(Runnable r)
+        {
+            Thread t = new Thread(r, MDCService.class.getSimpleName() + " Network Thread");
+            t.setDaemon(true);
+            t.setPriority(Thread.NORM_PRIORITY);
+            t.setContextClassLoader(MDCService.class.getClassLoader());
+            return t;
+        }
+    };
+    
+    BroadcastReceiver endpointerReceiver = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
@@ -484,213 +594,21 @@ public class MDCService extends Service implements IMDCService, Device
                 }
             }
         }
-    }
-    
-    private ServiceConnection soapServiceConnection = new ServiceConnection()
-    {
-        private List<EndpointBroadcastReceiver> endpointReceivers = new ArrayList<EndpointBroadcastReceiver>();
-        
-        
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder binder)
-        {
-            Log.i(LOG_TAG, getClass().getSimpleName() + ".onServiceConnected(\"" + className.flattenToString() + "\", " + binder + ")");
-            
-            soapService = ISOAPServerService.Stub.asInterface(binder);
-            
-            try
-            {
-                while (!soapService.isOnline())
-                {
-                    try
-                    {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e)
-                    {
-                        // ignore
-                    }
-                }
-                
-                // Register Device Capability using a single URL for
-                // all device endpoints.
-                // The soapAction being different for each
-                // endpoint/method.
-                if (registeredCapabilities != null && registeredCapabilities.size() > 0)
-                {
-                    synchronized (registeredCapabilities)
-                    {
-                        for (java.util.Map.Entry<String, java.util.Map<String, RegistrationInformation>> entry : registeredCapabilities.entrySet())
-                        {
-                            java.util.Map<String, RegistrationInformation> domainMap = entry.getValue();
-                            for (java.util.Map.Entry<String, RegistrationInformation> domainEntry : domainMap.entrySet())
-                            {
-                                final String domain = domainEntry.getKey();
-                                final RegistrationInformation regInfo = domainEntry.getValue();
-                                threadPool.execute(new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        try
-                                        {
-                                            Capability capability = regInfo.getCapability();
-                                            capability.addUrls(_register(regInfo).toArray(new String[urls.size()]));
-                                            displayText("Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
-                                            
-                                            if (!domain.equals(regInfo.getDomain()))
-                                            {
-                                                Log.e(LOG_TAG, "Domain for Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" does not match its placement in the Map! Map domain: \"" + domain + "\" != RegInfo Domain: \"" + regInfo.getDomain() + "\"!");
-                                            }
-                                            Log.i(LOG_TAG, "Registered Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
-                                        } catch (Exception e)
-                                        {
-                                            Log.e(LOG_TAG, "Error registering Capability - " + e.getMessage(), e);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-                
-                IntentFilter filter = new IntentFilter();
-                try
-                {
-                    filter.addDataType(net.posick.ws.Constants.MEDIA_TYPE_SOAP);
-                    filter.addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK);
-                    for (String action : ACTIONS)
-                    {
-                        filter.addAction(action);
-                    }
-                    filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-                    EndpointBroadcastReceiver endpointReceiver = new EndpointBroadcastReceiver();
-                    if (endpointReceivers.add(endpointReceiver))
-                    {
-                        registerReceiver(endpointReceiver, filter, net.posick.ws.Constants.PERMISSION_REGISTER_ENDPOINT, null);
-                    }
-                } catch (MalformedMimeTypeException e)
-                {
-                    Log.e(LOG_TAG, "Error setting Endpoint BroadcatReceiver - Media Type \"" + net.posick.ws.Constants.MEDIA_TYPE_SOAP + "\" is invalid - " + e.getCause(), e);
-                }
-            } catch (RemoteException e)
-            {
-                Log.e(LOG_TAG, "Error registering Device Endpoints - " + e.getMessage(), e);
-            }
-        }
-        
-        
-        @Override
-        public void onServiceDisconnected(ComponentName className)
-        {
-            Log.i(LOG_TAG, getClass().getSimpleName() + ".onServiceDisconnected(\"" + className.flattenToString() + "\")");
-            threadPool.execute(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        if (registeredCapabilities != null && registeredCapabilities.size() > 0)
-                        {
-                            try
-                            {
-                                synchronized (registeredCapabilities)
-                                {
-                                    String[] keys1 = registeredCapabilities.keySet().toArray(new String[0]);
-                                    for (String ucn : keys1)
-                                    {
-                                        String[] keys2 = registeredCapabilities.keySet(ucn).toArray(new String[0]);
-                                        for (String domain :keys2)
-                                        {
-                                            Capability capability = null;
-                                            try
-                                            {
-                                                if ((capability = unregister(ucn, domain)) == null)
-                                                {
-                                                    Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\".");
-                                                } else
-                                                {
-                                                    Log.i(LOG_TAG, "Unregistered Capabaility \"" + capability.getUCN() + "\".");
-                                                }
-                                            } catch (Exception e)
-                                            {
-                                                Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\" - " + e.getMessage(), e);
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch (Exception e)
-                            {
-                                Log.e(LOG_TAG, "Error unregistering Capabilities - " + e.getMessage(), e);
-                            }
-                        }
-                        
-                        for (EndpointBroadcastReceiver endpointReceiver : endpointReceivers)
-                        {
-                            unregisterReceiver(endpointReceiver);
-                        }
-                        endpointReceivers.clear();
-                    } catch (Exception e)
-                    {
-                        Log.e(LOG_TAG, e.getMessage(), e);
-                    }
-                }
-                
-            });
-            soapService = null;
-        }
     };
-    
-    protected ISOAPServerService soapService;
-    
-    protected boolean networkStarted = false;
-    
-    protected DeviceInfo deviceInfo = null;
-    
-    protected MulticastDNSQuerier querier = null;
-    
-    protected MulticastDNSService service;
-    
-    protected String udn;
-    
-    protected String name;
-    
-    protected Set<String> urls = new LinkedHashSet<String>();
-    
-    protected Set<Capability> capabilities = new LinkedHashSet<Capability>();
-    
-    protected LocalBroadcastManager localBroadcaster;
-    
-    protected TwoKeyedMap<String, String, RegistrationInformation> registeredCapabilities = new TwoKeyedMap<String, String, RegistrationInformation>();
-    
-    protected Capability deviceCapability = new Capability();
-    
-    protected java.util.Map<String, Intent> actionIntentMap;
-    
-    protected java.util.Map<Intent, BrowseOperation> browseIntents = new LinkedHashMap<Intent, BrowseOperation>();
-    
-    protected Intent browseIntent;
 
+    protected ScheduledExecutorService serviceExecutor;
+    
+    protected ScheduledExecutorService networkExecutor;
+
+    protected WifiManager wifiManager;
+
+    protected PowerManager powerManager;
+
+    protected WakeLock wakeLock;
+    
     protected WifiLock wifiLock;
-    
-    protected ExecutorService threadPool = Executors.newCachedThreadPool(new ThreadFactory()
-    {
-        @Override
-        public Thread newThread(Runnable r)
-        {
-            Thread t = new Thread(r, MDCService.class.getSimpleName() + " Cached Thread");
-            t.setDaemon(true);
-            t.setPriority(Thread.MAX_PRIORITY - 1);
-            t.setContextClassLoader(MDCService.class.getClassLoader());
-            return t;
-        }
-    });
 
-    private WifiManager wifiManager;
-
-    private PowerManager powerManager;
-
-    private WakeLock wakeLock;
+    private boolean capabilitiesRegistered;
     
     
     @Override
@@ -716,14 +634,25 @@ public class MDCService extends Service implements IMDCService, Device
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onCreate() <-----");
         super.onCreate();
         
-        localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
-        
         grabWakeLock(LOG_TAG);
         grabWiFiLock(LOG_TAG);
         
+        serviceExecutor = Executors.newSingleThreadScheduledExecutor(serviceThreadFactory);
+        networkExecutor = Executors.newSingleThreadScheduledExecutor(networkThreadFactory);
+        
+        localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
+        
         try
         {
-            Intent startIntent = new Intent(this, SOAPServerService.class);
+            Context packageContext = this;
+            try
+            {
+                packageContext = createPackageContext("net.posick.ws", 0);
+            } catch (NameNotFoundException e)
+            {
+                Log.i(LOG_TAG, "Could not find package \"net.posick.ws\", trying in-process SOAPServerService.", e);
+            }
+            Intent startIntent = new Intent(packageContext, SOAPServerService.class);
             startService(startIntent);
             if (!bindService(startIntent, soapServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
             {
@@ -772,6 +701,8 @@ public class MDCService extends Service implements IMDCService, Device
         Notification notification = notificationBuilder.build();
         notificationManager.notify(NOTIFICATION_ID, notification);
         startForeground(NOTIFICATION_ID, notification);
+        
+        onConnectivityChange();
     }
     
     
@@ -787,15 +718,6 @@ public class MDCService extends Service implements IMDCService, Device
         
         sendBroadcast(intent, PERMISSION_MDC_SERVICE_DISCOVERY);
     }
-    
-
-    @Override
-    public void onRebind(Intent intent)
-    {
-        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onRebind() <-----");
-        super.onRebind(intent);
-        startNetwork();
-    }
 
 
     @Override
@@ -806,7 +728,23 @@ public class MDCService extends Service implements IMDCService, Device
         releaseWakeLock();
         releaseWiFiLock();
         
-        stopNetwork();
+        networkExecutor.execute(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                stopNetwork();
+            }
+        });
+        networkExecutor.shutdown();
+        serviceExecutor.shutdown();
+        
+        try
+        {
+            networkExecutor.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e)
+        { // ignore
+        }
         
         if (soapServiceConnection != null)
         {
@@ -814,41 +752,6 @@ public class MDCService extends Service implements IMDCService, Device
         }
         
         super.onDestroy();
-    }
-    
-    
-    @Override
-    public void onLowMemory()
-    {
-        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onLowMemory() <-----");
-        super.onLowMemory();
-    }
-
-
-    @Override
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public void onTrimMemory(int level)
-    {
-        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onTrimMemory() <-----");
-        super.onTrimMemory(level);
-        System.gc();
-    }
-
-
-    @Override
-    public boolean onUnbind(Intent intent)
-    {
-        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onUnbind() <-----");
-        return super.onUnbind(intent);
-    }
-
-
-    @Override
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public void onTaskRemoved(Intent rootIntent)
-    {
-        Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onTaskRemoved() <-----");
-        super.onTaskRemoved(rootIntent);
     }
 
 
@@ -861,8 +764,7 @@ public class MDCService extends Service implements IMDCService, Device
         {
             String action = intent.getAction();
             
-            if (intent.hasExtra(EXTRA_NETWORK_CONNECTIVITY_CHANGED) || 
-                "android.net.conn.CONNECTIVITY_CHANGE".equals(action))
+            if ("android.net.conn.CONNECTIVITY_CHANGE".equals(action))
             {
                 onConnectivityChange();
             } else if (MDCService.ACTION_SERVICE_DISCOVERED.equals(action))
@@ -875,13 +777,7 @@ public class MDCService extends Service implements IMDCService, Device
                 ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCService.EXTRA_SERVICE);
                 BrowseOperation browseOp = browseIntents.get(browseIntent);
                 browseOp.serviceRemoved(browseOp.id, service);
-            } else
-            {
-                onConnectivityChange();
             }
-        } else
-        {
-            onConnectivityChange();
         }
         
         return START_STICKY;
@@ -901,13 +797,27 @@ public class MDCService extends Service implements IMDCService, Device
                 {
                     case CONNECTED:
                     case CONNECTING:
-                        startNetwork();
+                        networkExecutor.execute(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                startNetwork();
+                            }
+                        });
                         break;
                     case DISCONNECTED:
                     case DISCONNECTING:
                     case SUSPENDED:
                     case UNKNOWN:
-                        stopNetwork();
+                        networkExecutor.execute(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                stopNetwork();
+                            }
+                        });
                         break;
                 }
             }
@@ -1015,8 +925,6 @@ public class MDCService extends Service implements IMDCService, Device
             capabilities.add(deviceCapability);
         }
         
-        // Registration of the Device Capability to the Service init and use
-        // _register here.
         for (String domain : deviceInfo.getDomains())
         {
             RegistrationInformation regInfo = new RegistrationInformation(PATH, domain, deviceCapability, actionIntentMap);
@@ -1030,8 +938,17 @@ public class MDCService extends Service implements IMDCService, Device
     }
     
     
-    protected synchronized void startNetwork()
+    protected void startNetwork()
     {
+        synchronized (this)
+        {
+            if (startingNetwork)
+            {
+                return;
+            }
+            startingNetwork = true;
+        }
+        
         if (querier != null && !querier.isOperational() && networkStarted)
         {
             stopNetwork();
@@ -1092,37 +1009,6 @@ public class MDCService extends Service implements IMDCService, Device
                 throw re;
             }
             
-            /*
-            try
-            {
-                Intent startIntent = new Intent(createPackageContext("net.posick.ws", 0), SOAPServerService.class);
-                startService(startIntent);
-                if (!bindService(startIntent, soapServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
-                {
-                    Log.e(LOG_TAG, "-----> Could NOT bind to SOAP service using action \"" + SOAPServerService.class.getName() + "\" and Package \"net.posick.ws\" <-----");
-                    try
-                    {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.posick.ws"));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                        startActivity(intent);
-                    } catch (android.content.ActivityNotFoundException anfe)
-                    {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=net.posick.ws")));
-                    }
-                    
-                    displayText("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                    errorOnStartupt("Could NOT bind to services \"" + ISOAPServerService.class.getName() + "\".\nnet.posick.ws.WebServicesForAndroid Required!!");
-                    return;
-                }
-            } catch (Exception e)
-            {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                Toast toast = Toast.makeText(null, "Could NOT bind to service \"" + SOAPServerService.class.getName() + "\".\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-            */
-            
             Intent intent = new Intent().addCategory(CATEGORY_SERVICE_DISCOVERY);
             try
             {
@@ -1132,6 +1018,15 @@ public class MDCService extends Service implements IMDCService, Device
                 Log.e(LOG_TAG, "Error registering general Service Discovery Intent - " + e.getMessage(), e);
             }
             
+            Intent networkStartedIntent = new Intent(ACTION_MDC_NETWORK_INITIALIZED).addCategory(CATEGORY_SERVICE_DISCOVERY);
+            sendBroadcast(networkStartedIntent, PERMISSION_MDC_SERVICE_DISCOVERY);
+            
+            if (soapService != null)
+            {
+                registerCapabilities();
+            }
+            
+            startingNetwork = false;
             networkStarted = true;
         }
     }
@@ -1158,38 +1053,19 @@ public class MDCService extends Service implements IMDCService, Device
         }
     }
     
-    /*
-    protected void setProgress(double progress)
-    {
-        if (localBroadcaster != null)
-        {
-            Intent intent = new Intent(MainActivity.MESSAGE_PROGRESS);
-            intent.putExtra(MainActivity.EXTRA_PROGRESS, progress);
-            intent.putExtra(MainActivity.MESSAGE_SHOW_PROGRESS, true);
-            localBroadcaster.sendBroadcast(intent);
-        }
-    }
-    
-    
-    protected void showProgress(boolean show)
-    {
-        if (localBroadcaster != null)
-        {
-            Intent intent = new Intent(MainActivity.MESSAGE_SHOW_PROGRESS);
-            intent.putExtra(MainActivity.MESSAGE_SHOW_PROGRESS, show);
-            localBroadcaster.sendBroadcast(intent);
-        }
-    }
-    */
-    
     
     protected synchronized void stopNetwork()
     {
         Log.i(LOG_TAG, getClass().getSimpleName() + ".stopNetwork()");
         
-        if (networkStarted)
+        if (networkStarted && !startingNetwork)
         {
             networkStarted = false;
+            
+            if (soapService != null)
+            {
+                unregisterCapabilities();
+            }
             
             if (browseIntent != null)
             {
@@ -1215,12 +1091,10 @@ public class MDCService extends Service implements IMDCService, Device
                     }
                 }
             }
-            /*
-            if (soapServiceConnection != null)
-            {
-                unbindService(soapServiceConnection);
-            }
-            */
+            
+            Intent networkStoppedIntent = new Intent(ACTION_MDC_NETWORK_STOPPED).addCategory(CATEGORY_SERVICE_DISCOVERY);
+            sendBroadcast(networkStoppedIntent, PERMISSION_MDC_SERVICE_DISCOVERY);
+            
             if (service != null)
             {
                 try
@@ -1448,6 +1322,12 @@ public class MDCService extends Service implements IMDCService, Device
         if (browseDomains == null || browseDomains.length == 0)
         {
             browseDomains = getDefaultBrowseDomains();
+        }
+        
+        if (browseDomains == null)
+        {
+            Log.e(LOG_TAG, "-----> No Browse Domains! <-----");
+            return;
         }
         
         Set<Name> names = new LinkedHashSet<Name>();
@@ -1800,6 +1680,125 @@ public class MDCService extends Service implements IMDCService, Device
         }
         
         return capability;
+    }
+    
+    
+    protected synchronized void registerCapabilities()
+    {
+        // TODO: Maybe Use thread pool here.
+        if (!capabilitiesRegistered && registeredCapabilities != null && registeredCapabilities.size() > 0)
+        {
+            synchronized (registeredCapabilities)
+            {
+                capabilitiesRegistered = true;
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            // Register Device Capability using a single URL for all device endpoints.
+                            // The soapAction being different for each endpoint/method.
+                            synchronized (registeredCapabilities)
+                            {
+                                for (java.util.Map.Entry<String, java.util.Map<String, RegistrationInformation>> entry : registeredCapabilities.entrySet())
+                                {
+                                    java.util.Map<String, RegistrationInformation> domainMap = entry.getValue();
+                                    for (java.util.Map.Entry<String, RegistrationInformation> domainEntry : domainMap.entrySet())
+                                    {
+                                        final String domain = domainEntry.getKey();
+                                        final RegistrationInformation regInfo = domainEntry.getValue();
+                                        Capability capability = regInfo.getCapability();
+                                        capability.addUrls(_register(regInfo).toArray(new String[urls.size()]));
+                                        displayText("Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
+                                        
+                                        if (!domain.equals(regInfo.getDomain()))
+                                        {
+                                            Log.e(LOG_TAG, "Domain for Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" does not match its placement in the Map! Map domain: \"" + domain + "\" != RegInfo Domain: \"" + regInfo.getDomain() + "\"!");
+                                        }
+                                        Log.i(LOG_TAG, "Registered Capability \"" + capability.getUCN() + "\" activated for path \"" + regInfo.getPath() + "\" and domain \"" + regInfo.getDomain() + "\".");
+                                    }
+                                }
+                            }
+                            
+                            IntentFilter filter = new IntentFilter();
+                            try
+                            {
+                                filter.addDataType(net.posick.ws.Constants.MEDIA_TYPE_SOAP);
+                                filter.addCategory(net.posick.ws.Constants.CATEGORY_ENDPOINT_CALLBACK);
+                                for (String action : ACTIONS)
+                                {
+                                    filter.addAction(action);
+                                }
+                                filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+                                registerReceiver(endpointerReceiver, filter, net.posick.ws.Constants.PERMISSION_REGISTER_ENDPOINT, null);
+                            } catch (MalformedMimeTypeException e)
+                            {
+                                Log.e(LOG_TAG, "Error setting Endpoint BroadcatReceiver - Media Type \"" + net.posick.ws.Constants.MEDIA_TYPE_SOAP + "\" is invalid - " + e.getCause(), e);
+                            }
+                        } catch (Exception e)
+                        {
+                            Log.e(LOG_TAG, "Error registering Capability - " + e.getMessage(), e);
+                        }
+                    }
+                }).start();
+            }
+        }
+    }
+    
+    
+    protected void unregisterCapabilities()
+    {
+        // TODO: Maybe Use thread pool here.
+        if (capabilitiesRegistered && registeredCapabilities != null && registeredCapabilities.size() > 0)
+        {
+            synchronized (registeredCapabilities)
+            {
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            synchronized (registeredCapabilities)
+                            {
+                                String[] keys1 = registeredCapabilities.keySet().toArray(new String[0]);
+                                for (String ucn : keys1)
+                                {
+                                    String[] keys2 = registeredCapabilities.keySet(ucn).toArray(new String[0]);
+                                    for (String domain :keys2)
+                                    {
+                                        Capability capability = null;
+                                        try
+                                        {
+                                            if ((capability = unregister(ucn, domain)) == null)
+                                            {
+                                                Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\".");
+                                            } else
+                                            {
+                                                Log.i(LOG_TAG, "Unregistered Capabaility \"" + capability.getUCN() + "\".");
+                                            }
+                                        } catch (Exception e)
+                                        {
+                                            Log.e(LOG_TAG, "Error unregistering Capability \"" + ucn + "\" - " + e.getMessage(), e);
+                                        }
+                                    }
+                                    
+                                    capabilitiesRegistered = true;
+                                }
+                            }
+                        } catch (Exception e)
+                        {
+                            Log.e(LOG_TAG, "Error unregistering Capabilities - " + e.getMessage(), e);
+                        }
+                        
+                        unregisterReceiver(endpointerReceiver);
+                    }
+                }).start();
+            }
+        }
     }
     
     
