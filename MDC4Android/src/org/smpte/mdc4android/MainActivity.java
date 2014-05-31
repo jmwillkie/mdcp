@@ -164,8 +164,8 @@ public class MainActivity extends Activity
             }
         }
         
-        Intent mdcpServiceIntent = new Intent(this, MDCService.class);
-        startService(mdcpServiceIntent);
+//        Intent mdcpServiceIntent = new Intent(this, MDCService.class);
+//        startService(mdcpServiceIntent);
     }
     
     

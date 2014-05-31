@@ -608,7 +608,9 @@ public class MDCService extends Service implements IMDCService, Device
     
     protected WifiLock wifiLock;
 
-    private boolean capabilitiesRegistered;
+    protected boolean capabilitiesRegistered;
+    
+    protected StringBuilder text = new StringBuilder();
     
     
     @Override
@@ -623,7 +625,7 @@ public class MDCService extends Service implements IMDCService, Device
     public IBinder onBind(Intent intent)
     {
         Log.i(LOG_TAG, "-----> " + getClass().getSimpleName() + ".onBind() <-----");
-        
+        displayText(text.toString());
         return mBinder;
     }
 
@@ -1034,6 +1036,7 @@ public class MDCService extends Service implements IMDCService, Device
     
     protected void displayText(String text)
     {
+        this.text.append(text);
         if (localBroadcaster != null)
         {
             Intent intent = new Intent(MainActivity.MESSAGE_DISPLAY_TEXT);
