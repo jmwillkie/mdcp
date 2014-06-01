@@ -1742,7 +1742,7 @@ public class MDCService extends Service implements IMDCService, Device
     public String[] resolveAddresses(String hostname)
     throws RemoteException
     {
-        List<String> addresses = new ArrayList<String>();
+        Set<String> addresses = new LinkedHashSet<String>();
         
         Lookup lookup = null;
         try
