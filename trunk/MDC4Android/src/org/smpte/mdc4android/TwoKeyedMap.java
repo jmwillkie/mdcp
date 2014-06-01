@@ -1,12 +1,16 @@
 package org.smpte.mdc4android;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class TwoKeyedMap<K1, K2, V>
+public class TwoKeyedMap<K1, K2, V> implements Serializable
 {
+    private static final long serialVersionUID = 201406011311L;
+    
+
     private LinkedHashMap<K1, Map<K2, V>> map = new LinkedHashMap<K1, Map<K2, V>>();
     
     private int size = -1;
