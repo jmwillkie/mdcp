@@ -80,6 +80,7 @@ public class MainActivity extends Activity
             } else if (MDCDeviceViewerService.ACTION_DEVICE_INFO_RECEIVED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Device Information Received for Service \"" + service.getNiceText() + "\" <-----\n" + service);
+                @SuppressWarnings("unchecked")
                 TwoKeyedMap<String, String, Object> attrs = (TwoKeyedMap<String, String, Object>) intent.getSerializableExtra(MDCDeviceViewerService.EXTRA_DEVICE_INFORMATION);
                 deviceListAdapter.addDeviceData(service.getName(), attrs);
             }

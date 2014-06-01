@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -328,9 +329,6 @@ public class MDCDeviceViewerService extends Service
         
         try
         {
-            Intent mdcpServiceIntent = new Intent(this, MDCService.class);
-            startService(mdcpServiceIntent);
-            
             Intent startIntent = new Intent(createPackageContext("org.smpte.mdc4android", 0), MDCService.class);
             startService(startIntent);
             if (mdcService == null)
@@ -344,6 +342,12 @@ public class MDCDeviceViewerService extends Service
                     return;
                 }
             }
+        } catch (NameNotFoundException e)
+        {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=org.smpte.mdc4android"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            startActivity(intent);
         } catch (Exception e)
         {
             Log.e(LOG_TAG, e.getMessage(), e);
