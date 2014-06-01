@@ -59,55 +59,6 @@ public class WebServiceUtil
         
         for (String url : urls)
         {
-            /*
-            String host;
-            String uri;
-            int port = -1;
-            int endPos = -1;
-            int portPos = -1;
-            int startPos = url.indexOf("://");
-            if (startPos >= 0)
-            {
-                startPos += 3;
-                endPos = url.indexOf('/', startPos);
-                if (endPos < 0)
-                {
-                    endPos = url.length();
-                }
-                
-                if (endPos < url.length())
-                {
-                    portPos = url.indexOf(':', startPos);
-                    if (portPos >= 0 && portPos < endPos)
-                    {
-                        host = url.substring(startPos, portPos);
-                        String temp = url.substring(portPos + 1, endPos);
-                        if (temp != null && temp.length() > 0)
-                        {
-                            port = Integer.parseInt(temp);
-                        }
-                    } else
-                    {
-                        host = url.substring(startPos, endPos);
-                    }
-                    
-                    if (endPos < url.length())
-                    {
-                        uri = url.substring(endPos);
-                    } else
-                    {
-                        uri = "";
-                    }
-                } else
-                {
-                    throw new ClientProtocolException("Invalid URL \"" + url + "\"!");
-                }
-            } else
-            {
-                throw new ClientProtocolException("Invalid URL \"" + url + "\"!");
-            }
-            */
-            
             attrs.put(url, "name", getName(httpClient, url));
         }
         
@@ -118,12 +69,19 @@ public class WebServiceUtil
     public static String getName(HttpClient httpClient, String url)
     throws ClientProtocolException, IOException
     {
+        return executeGetStringCall(httpClient, url, Device.SOAP_ACTION_NAME, "getName", "getNameResponse");
+    }
+    
+    
+    protected static String executeGetStringCall(HttpClient httpClient, String url, String soapAction, String requestName, String responseName)
+    throws ClientProtocolException, IOException
+    {
         HttpPost request = new HttpPost(url);
-        request.addHeader(SOAPAction.HTTP_HEADER_NAME, Device.SOAP_ACTION_NAME);
+        request.addHeader(SOAPAction.HTTP_HEADER_NAME, soapAction);
         
-        SOAPAction action = new SOAPAction(Device.SOAP_ACTION_NAME);
+        SOAPAction action = new SOAPAction(soapAction);
         SOAPHeader header = new SOAPHeader(action);
-        XmlElement xml = new XmlElement(new net.posick.ws.xml.Name(new net.posick.ws.xml.Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"), "getName"));
+        XmlElement xml = new XmlElement(new net.posick.ws.xml.Name(new net.posick.ws.xml.Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"), requestName));
         SOAPBody body = new SOAPBody(xml);
         SOAPEnvelope envelope = new SOAPEnvelope(header, body);
         
@@ -135,10 +93,33 @@ public class WebServiceUtil
         {
             HttpEntity entity = response.getEntity();
             String raw = EntityUtils.toString(entity);
-            XmlElement responseXml = XmlElement.parse(raw);
+            envelope = SOAPEnvelope.toSOAPEnvelope(XmlElement.parse(raw));
+            body = envelope.getBody();
+            List<XmlElement> elements = body.getChildren();
+            if (elements != null)
+            {
+                for (XmlElement element : elements)
+                {
+                    if (element.getName().getName().equals(responseName))
+                    {
+                        CharSequence value = element.getValue();
+                        if (value != null)
+                        {
+                            return value != null ? value.toString() : null;
+                        } else if (element.hasChildren())
+                        {
+                            XmlElement child = element.getFirstChild(); 
+                            if (child.getName().getName().equals("String"))
+                            {
+                                value = child.getValue();
+                                return value != null ? value.toString() : null;
+                            }
+                        }
+                    }
+                }
+            }
         }
         
-        // TODO Auto-generated method stub
         return null;
     }
 }
