@@ -69,19 +69,12 @@ public class WebServiceUtil
     public static String getName(HttpClient httpClient, String url)
     throws ClientProtocolException, IOException
     {
-        return executeGetStringCall(httpClient, url, Device.SOAP_ACTION_NAME, "getName", "getNameResponse");
-    }
-    
-    
-    protected static String executeGetStringCall(HttpClient httpClient, String url, String soapAction, String requestName, String responseName)
-    throws ClientProtocolException, IOException
-    {
         HttpPost request = new HttpPost(url);
-        request.addHeader(SOAPAction.HTTP_HEADER_NAME, soapAction);
+        request.addHeader(SOAPAction.HTTP_HEADER_NAME, Device.SOAP_ACTION_NAME);
         
-        SOAPAction action = new SOAPAction(soapAction);
+        SOAPAction action = new SOAPAction(Device.SOAP_ACTION_NAME);
         SOAPHeader header = new SOAPHeader(action);
-        XmlElement xml = new XmlElement(new net.posick.ws.xml.Name(new net.posick.ws.xml.Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"), requestName));
+        XmlElement xml = new XmlElement(new net.posick.ws.xml.Name(new net.posick.ws.xml.Namespace("device", "http://www.smpte-ra.org/schemas/st2071/2014/device"), "getName"));
         SOAPBody body = new SOAPBody(xml);
         SOAPEnvelope envelope = new SOAPEnvelope(header, body);
         
@@ -100,7 +93,7 @@ public class WebServiceUtil
             {
                 for (XmlElement element : elements)
                 {
-                    if (element.getName().getName().equals(responseName))
+                    if (element.getName().getName().equals("getNameResponse"))
                     {
                         CharSequence value = element.getValue();
                         if (value != null)
