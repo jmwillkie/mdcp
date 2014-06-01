@@ -135,6 +135,8 @@ public class MainActivity extends Activity
     private MenuItem stopMenuItem;
 
     private MenuItem restartMenuItem;
+
+    private MenuItem shutdownMenuItem;
     
     
     @Override
@@ -202,6 +204,16 @@ public class MainActivity extends Activity
                 Intent mdcpServiceIntent = new Intent(MainActivity.this, MDCService.class);
                 stopService(mdcpServiceIntent);
                 return startService(mdcpServiceIntent) != null;
+            }
+        });
+        shutdownMenuItem = menu.add(R.string.shutdown);
+        shutdownMenuItem.setOnMenuItemClickListener(new OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                Intent mdcpServiceIntent = new Intent(MDCService.ACTION_SHUTDOWN);
+                return localBroadcaster.sendBroadcast(mdcpServiceIntent);
             }
         });
         return true;
