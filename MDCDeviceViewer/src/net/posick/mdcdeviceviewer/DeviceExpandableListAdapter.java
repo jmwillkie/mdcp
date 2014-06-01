@@ -269,18 +269,16 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter
             listItemAddresses.setText(builder.toString());
             
             TextView listItemDevice = (TextView) convertView.findViewById(R.id.listItemDevice);
-            // TODO: Get Service Attributes from MDCDeviceViewerService 
             builder.setLength(0);
             TwoKeyedMap<String, String, Object> attributes = deviceData.get(service.getName());
             if (attributes != null)
             {
                 for (String key1 : attributes.keySet())
                 {
-                    builder.append(key1).append("\n");
                     for (String key2 : attributes.keySet(key1))
                     {
                         Object value = attributes.get(key1, key2);
-                        builder.append("  ").append(key2).append("=\"").append(value).append("\"\n");
+                        builder.append(key2).append("=\"").append(value).append("\"\n");
                     }                    
                 }
             }

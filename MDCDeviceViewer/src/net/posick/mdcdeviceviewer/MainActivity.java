@@ -3,6 +3,7 @@ package net.posick.mdcdeviceviewer;
 import net.posick.mdcdeviceviewer.MDCDeviceViewerService.MDCDeviceViewerServiceBinder;
 
 import org.smpte.mdc4android.MDCService;
+import org.smpte.mdc4android.TwoKeyedMap;
 import org.xbill.mDNS.ServiceInstance;
 
 import android.app.Activity;
@@ -14,11 +15,12 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-//import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
+//import android.support.v4.content.LocalBroadcastManager;
 
 public class MainActivity extends Activity
 {
@@ -43,12 +45,12 @@ public class MainActivity extends Activity
         {
             ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCDeviceViewerService.EXTRA_SERVICE);
             
-            if (MDCDeviceViewerService.SERVICE_DISCOVERED.equals(intent.getAction()))
+            if (MDCDeviceViewerService.ACTION_SERVICE_DISCOVERED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Service \"" + (service != null ? service.getName() : "<null>") + "\" DISCOVERED <-----");
                 deviceListAdapter.addService(service);
                 deviceListAdapter.notifyDataSetChanged();
-            } else if (MDCDeviceViewerService.SERVICE_REMOVED.equals(intent.getAction()))
+            } else if (MDCDeviceViewerService.ACTION_SERVICE_REMOVED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Service \"" + (service != null ? service.getName() : "<null>") + "\" REMOVED <-----");
                 deviceListAdapter.removeService(service);
@@ -64,17 +66,22 @@ public class MainActivity extends Activity
         public void onReceive(Context context, Intent intent)
         {
             Log.i(LOG_TAG, getClass().getName() + ".onReceive(" + context +", " + intent + ")");
-            ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCService.EXTRA_SERVICE);
-            if (MDCService.ACTION_SERVICE_DISCOVERED.equals(intent.getAction()))
+            ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCDeviceViewerService.EXTRA_SERVICE);
+            if (MDCDeviceViewerService.ACTION_SERVICE_DISCOVERED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Service Discovered <-----\n" + service);
                 deviceListAdapter.addService(service);
                 deviceListAdapter.notifyDataSetChanged();
-            } else if (MDCService.ACTION_SERVICE_REMOVED.equals(intent.getAction()))
+            } else if (MDCDeviceViewerService.ACTION_SERVICE_DISCOVERED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Service Removed <-----\n" + service);
                 deviceListAdapter.removeService(service);
                 deviceListAdapter.notifyDataSetChanged();
+            } else if (MDCDeviceViewerService.ACTION_DEVICE_INFO_RECEIVED.equals(intent.getAction()))
+            {
+                Log.i(LOG_TAG, "-----> Device Information Received for Service \"" + service.getNiceText() + "\" <-----\n" + service);
+                TwoKeyedMap<String, String, Object> attrs = (TwoKeyedMap<String, String, Object>) intent.getSerializableExtra(MDCDeviceViewerService.EXTRA_DEVICE_INFORMATION);
+                deviceListAdapter.addDeviceData(service.getName(), attrs);
             }
         }
     };
@@ -83,11 +90,9 @@ public class MainActivity extends Activity
     
     private DeviceExpandableListAdapter deviceListAdapter = new DeviceExpandableListAdapter(this, null);
 
-//    private LocalBroadcastManager localBroadcaster;
+    private LocalBroadcastManager localBroadcaster;
     
     private MDCDeviceViewerService mdcDeviceViewerService = null;
-    
-//    private BroadcastReceiver discoveryReceiver = new ServiceDiscoveryBroadcastReceiver(deviceListAdapter);
     
     private IntentFilter serviceDiscoveredFilter = null;
     
@@ -122,11 +127,10 @@ public class MainActivity extends Activity
         deviceList = (ExpandableListView) findViewById(R.id.deviceList);
         deviceList.setAdapter(deviceListAdapter);
         
-        /*
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
-        localBroadcaster.registerReceiver(discoveryReceiver, new IntentFilter(MDCDeviceViewerService.SERVICE_DISCOVERED));
-        localBroadcaster.registerReceiver(discoveryReceiver, new IntentFilter(MDCDeviceViewerService.SERVICE_REMOVED));
-        */
+        localBroadcaster.registerReceiver(browseReceiver, new IntentFilter(MDCDeviceViewerService.ACTION_SERVICE_DISCOVERED));
+        localBroadcaster.registerReceiver(browseReceiver, new IntentFilter(MDCDeviceViewerService.ACTION_SERVICE_REMOVED));
+        localBroadcaster.registerReceiver(browseReceiver, new IntentFilter(MDCDeviceViewerService.ACTION_DEVICE_INFO_RECEIVED));
         
         if (!bindService(new Intent(this, MDCDeviceViewerService.class), serviceConnection, Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT | Context.BIND_NOT_FOREGROUND | Context.BIND_ABOVE_CLIENT))
         {
@@ -152,21 +156,13 @@ public class MainActivity extends Activity
         if (serviceDiscoveredFilter == null)
         {
             serviceDiscoveredFilter = initFilter(MDCService.ACTION_SERVICE_DISCOVERED);
-            Intent result = registerReceiver(browseReceiver, serviceDiscoveredFilter, MDCService.PERMISSION_MDC_SERVICE_DISCOVERY, null);
-            if (result != null)
-            {
-                browseReceiver.onReceive(this, result);
-            }
+            localBroadcaster.registerReceiver(browseReceiver, serviceDiscoveredFilter);
         }
         
         if (serviceRemovedFilter == null)
         {
             serviceRemovedFilter = initFilter(MDCService.ACTION_SERVICE_REMOVED);
-            Intent result = registerReceiver(browseReceiver, serviceRemovedFilter, MDCService.PERMISSION_MDC_SERVICE_DISCOVERY, null);
-            if (result != null)
-            {
-                browseReceiver.onReceive(this, result);
-            }
+            localBroadcaster.registerReceiver(browseReceiver, serviceRemovedFilter);
         }
     }
     
@@ -175,7 +171,7 @@ public class MainActivity extends Activity
     {
         if (serviceDiscoveredFilter != null || serviceRemovedFilter != null)
         {
-            unregisterReceiver(browseReceiver);
+            localBroadcaster.unregisterReceiver(browseReceiver);
             serviceRemovedFilter = serviceDiscoveredFilter = null;
         }
     }

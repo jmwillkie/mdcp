@@ -1,6 +1,5 @@
 package net.posick.mdcdeviceviewer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,7 +9,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.ClientProtocolException;
 import org.smpte.mdc4android.IMDCService;
 import org.smpte.mdc4android.MDCService;
 import org.smpte.mdc4android.TwoKeyedMap;
@@ -37,11 +35,15 @@ public class MDCDeviceViewerService extends Service
 {
     protected static final String LOG_TAG = MDCDeviceViewer.LOG_TAG;
 
-    public static final String SERVICE_DISCOVERED = "net.posick.mdcdeviceviewer.SERVICE_DISCOVERED";
+    public static final String ACTION_SERVICE_DISCOVERED = "net.posick.mdcdeviceviewer.SERVICE_DISCOVERED";
 
-    public static final String SERVICE_REMOVED = "net.posick.mdcdeviceviewer.SERVICE_REMOVED";
+    public static final String ACTION_SERVICE_REMOVED = "net.posick.mdcdeviceviewer.SERVICE_REMOVED";
+    
+    public static final String ACTION_DEVICE_INFO_RECEIVED = "net.posick.mdcdeviceviewer.DEVICE_INFO_RECEIVED";
 
     public static final String EXTRA_SERVICE = "net.posick.mdcdeviceviewer.SERVICE";
+
+    public static final String EXTRA_DEVICE_INFORMATION = "net.posick.mdcdeviceviewer.DEVICE_INFO";
 
     static final int DEFAULT_SCHEDULED_THREAD_PRIORITY = Thread.NORM_PRIORITY;
     
@@ -96,6 +98,7 @@ public class MDCDeviceViewerService extends Service
             {
                 Log.i(LOG_TAG, "-----> Service Discovered <-----\n" + service);
                 cache.put(service.getName(), service);
+                localBroadcaster.sendBroadcast(intent);
                 scheduledExecutor.schedule(new Runnable()
                 {
                     @Override
@@ -105,11 +108,13 @@ public class MDCDeviceViewerService extends Service
                         {
                             try
                             {
-                                deviceAttrs.put(service.getName(), WebServiceUtil.callDeviceWebService(resolveNames(WebServiceUtil.toURLs(service))));
-                            } catch (ClientProtocolException e)
-                            {
-                                Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
-                            } catch (IOException e)
+                                TwoKeyedMap<String, String, Object> attributes = WebServiceUtil.callDeviceWebService(resolveNames(WebServiceUtil.toURLs(service)));
+                                if (attributes != null)
+                                {
+                                    deviceAttrs.put(service.getName(), attributes);
+                                    deviceInfoRetrieved(service, attributes);
+                                }
+                            } catch (Exception e)
                             {
                                 Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
                             }
@@ -121,6 +126,7 @@ public class MDCDeviceViewerService extends Service
             {
                 Log.i(LOG_TAG, "-----> Service Removed <-----\n" + service);
                 cache.remove(service.getName());
+                localBroadcaster.sendBroadcast(intent);
                 deviceAttrs.remove(service.getName());
                 serviceRemoved(service);
             }
@@ -165,7 +171,6 @@ public class MDCDeviceViewerService extends Service
         @Override
         public void run()
         {
-            // TODO Auto-generated method stub
             for (ServiceInstance service : cache.values())
             {
                 synchronized (deviceAttrs)
@@ -174,11 +179,13 @@ public class MDCDeviceViewerService extends Service
                     {
                         try
                         {
-                            deviceAttrs.put(service.getName(), WebServiceUtil.callDeviceWebService(resolveNames(WebServiceUtil.toURLs(service))));
-                        } catch (ClientProtocolException e)
-                        {
-                            Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
-                        } catch (IOException e)
+                            TwoKeyedMap<String, String, Object> attributes = WebServiceUtil.callDeviceWebService(resolveNames(WebServiceUtil.toURLs(service)));
+                            if (attributes != null)
+                            {
+                                deviceAttrs.put(service.getName(), attributes);
+                                deviceInfoRetrieved(service, attributes);
+                            }
+                        } catch (Exception e)
                         {
                             Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
                         }
@@ -232,7 +239,7 @@ public class MDCDeviceViewerService extends Service
     {
         if (localBroadcaster != null)
         {
-            Intent intent = new Intent(SERVICE_DISCOVERED);
+            Intent intent = new Intent(ACTION_SERVICE_DISCOVERED);
             intent.putExtra(EXTRA_SERVICE, service);
             localBroadcaster.sendBroadcast(intent);
         }
@@ -243,8 +250,20 @@ public class MDCDeviceViewerService extends Service
     {
         if (localBroadcaster != null)
         {
-            Intent intent = new Intent(SERVICE_REMOVED);
+            Intent intent = new Intent(ACTION_SERVICE_REMOVED);
             intent.putExtra(EXTRA_SERVICE, service);
+            localBroadcaster.sendBroadcast(intent);
+        }
+    }
+
+
+    protected void deviceInfoRetrieved(ServiceInstance service, TwoKeyedMap<String, String, Object> attributes)
+    {
+        if (localBroadcaster != null)
+        {
+            Intent intent = new Intent(ACTION_DEVICE_INFO_RECEIVED);
+            intent.putExtra(EXTRA_SERVICE, service);
+            intent.putExtra(EXTRA_DEVICE_INFORMATION, attributes);
             localBroadcaster.sendBroadcast(intent);
         }
     }
@@ -368,7 +387,7 @@ public class MDCDeviceViewerService extends Service
         }
     }
 
-    
+    // TODO
     protected List<String> resolveNames(List<String> urls)
     {
         List<String> newURLs = new ArrayList<String>();
