@@ -27,6 +27,8 @@ import org.smpte.mdc4android.mdcf.Map;
 import org.smpte.mdc4android.net.DeviceInfo;
 import org.smpte.mdc4android.net.NetworkUtils;
 import org.smpte.mdc4android.xml.XmlUtils;
+import org.xbill.DNS.AAAARecord;
+import org.xbill.DNS.ARecord;
 import org.xbill.DNS.Message;
 import org.xbill.DNS.Name;
 import org.xbill.DNS.Record;
@@ -90,6 +92,8 @@ public class MDCService extends Service implements IMDCService, Device
     public static final String ACTION_SERVICE_DISCOVERED = "org.smpte.MDC_SERVICE_DISCOVERED";
     
     public static final String ACTION_SERVICE_REMOVED = "org.smpte.MDC_SERVICE_REMOVED";
+
+    public static final String ACTION_SHUTDOWN = "org.smpte.mdc4android.SHUTDOWN";
     
     public static final String CATEGORY_SERVICE_DISCOVERY = "org.smpte.MDC_SERVICE_DISCOVERY";
     
@@ -104,6 +108,8 @@ public class MDCService extends Service implements IMDCService, Device
     public static final String EXTRA_SERVICE_REMOVED = "org.smpte.mdc4android.ServiceRemoved";
     
     public static final String EXTRA_NETWORK_CONNECTIVITY_CHANGED = "org.smpte.mdc4android.NetworkConnectivityChanged";
+    
+    public static final String EXTRA_SHUTDOWN = "org.smpte.mdc4android.Shutdown";
     
     public static final String PERMISSION_MDC_SERVICE_DISCOVERY = "org.smpte.mdc4android.SERVICE_DISCOVERY";
 
@@ -410,6 +416,15 @@ public class MDCService extends Service implements IMDCService, Device
         {
             return MDCService.this.unregister(ucn, domain);
         }
+
+
+        @Override
+        public String[] resolveAddresses(String hostname)
+        throws RemoteException
+        {
+            // TODO Auto-generated method stub
+            return MDCService.this.resolveAddresses(hostname);
+        }
     };
     
     
@@ -595,6 +610,23 @@ public class MDCService extends Service implements IMDCService, Device
             }
         }
     };
+    
+    protected BroadcastReceiver commandReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if (intent != null)
+            {
+                String action = intent.getAction();
+                if (ACTION_SHUTDOWN.equals(action))
+                {
+                    shutdown = true;
+                    stopSelf();
+                }
+            }
+        }
+    };
 
     protected ScheduledExecutorService serviceExecutor;
     
@@ -611,6 +643,8 @@ public class MDCService extends Service implements IMDCService, Device
     protected boolean capabilitiesRegistered;
     
     protected StringBuilder text = new StringBuilder();
+
+    protected boolean shutdown;
     
     
     @Override
@@ -642,7 +676,10 @@ public class MDCService extends Service implements IMDCService, Device
         serviceExecutor = Executors.newSingleThreadScheduledExecutor(serviceThreadFactory);
         networkExecutor = Executors.newSingleThreadScheduledExecutor(networkThreadFactory);
         
+        shutdown = false;
+        
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
+        localBroadcaster.registerReceiver(commandReceiver, new IntentFilter(ACTION_SHUTDOWN));
         
         try
         {
@@ -751,6 +788,20 @@ public class MDCService extends Service implements IMDCService, Device
         if (soapServiceConnection != null)
         {
             unbindService(soapServiceConnection);
+        }
+        
+        if (shutdown && soapService != null)
+        {
+            Context packageContext = this;
+            try
+            {
+                packageContext = createPackageContext("net.posick.ws", 0);
+            } catch (NameNotFoundException e)
+            {
+                Log.i(LOG_TAG, "Could not find package \"net.posick.ws\", trying in-process SOAPServerService.", e);
+            }
+            Intent startIntent = new Intent(packageContext, SOAPServerService.class);
+            stopService(startIntent);
         }
         
         super.onDestroy();
@@ -1641,12 +1692,13 @@ public class MDCService extends Service implements IMDCService, Device
             RegistrationInformation regInfo = registeredCapabilities.remove(ucn, domain);
             if (regInfo != null)
             {
+                MulticastDNSService service = this.service;
                 for (ServiceInstance instance : regInfo.getDiscoverableServices())
                 {
                     try
                     {
                         service.unregister(instance);
-                    } catch (IOException e)
+                    } catch (Exception e)
                     {
                         Log.e(LOG_TAG, "Error unregistering discoverable service - " + e.getMessage(), e);
                     }
@@ -1683,6 +1735,54 @@ public class MDCService extends Service implements IMDCService, Device
         }
         
         return capability;
+    }
+    
+    
+    @Override
+    public String[] resolveAddresses(String hostname)
+    throws RemoteException
+    {
+        List<String> addresses = new ArrayList<String>();
+        
+        Lookup lookup = null;
+        try
+        {
+            lookup = new Lookup(hostname);
+            Record[] records = lookup.lookupRecords();
+            if (records != null && records.length > 0)
+            {
+                for (Record record : records)
+                {
+                    switch (record.getType())
+                    {
+                        case Type.A:
+                            addresses.add(((ARecord) record).getAddress().getHostAddress());
+                            break;
+                        case Type.AAAA:
+                            addresses.add(((AAAARecord) record).getAddress().getHostAddress());
+                            break;
+                    }
+                }
+            }
+        } catch (Exception e)
+        {
+            RuntimeException re = new RuntimeException(e.getMessage());
+            re.setStackTrace(e.getStackTrace());
+            throw re;
+        } finally
+        {
+            if (lookup != null)
+            {
+                try
+                {
+                    lookup.close();
+                } catch (IOException e)
+                { // Ignore
+                }
+            }
+        }
+        
+        return addresses.toArray(new String[addresses.size()]);
     }
     
     

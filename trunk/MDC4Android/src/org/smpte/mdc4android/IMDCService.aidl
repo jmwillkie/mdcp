@@ -38,4 +38,7 @@ interface IMDCService
     
 
     Capability unregister(in String ucn, in String domain);
+    
+    
+    String[] resolveAddresses(in String hostname);
 }

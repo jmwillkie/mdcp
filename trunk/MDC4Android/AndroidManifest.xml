@@ -34,7 +34,7 @@
         android:required="false" />
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="19" />
 
     <application
@@ -60,7 +60,7 @@
             <intent-filter>
                 <action android:name="org.smpte.mdc4android.MDC" />
             </intent-filter>
-            </service>
+        </service>
 
         <receiver android:name="org.smpte.mdc4android.net.NetworkConnectivityReceiver"
                   android:enabled="true"

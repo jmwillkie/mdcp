@@ -588,6 +588,45 @@ public class NetworkUtils
     }
 
 
+    public static String extractHostname(String url)
+    throws MalformedURLException
+    {
+        String host;
+        int endPos = -1;
+        int portPos = -1;
+        int startPos = url.indexOf("://");
+        if (startPos >= 0)
+        {
+            startPos += 3;
+            endPos = url.indexOf('/', startPos);
+            if (endPos < 0)
+            {
+                endPos = url.length();
+            }
+            
+            if (endPos < url.length())
+            {
+                portPos = url.indexOf(':', startPos);
+                if (portPos >= 0 && portPos < endPos)
+                {
+                    host = url.substring(startPos, portPos);
+                } else
+                {
+                    host = url.substring(startPos, endPos);
+                }
+                
+                return host;
+            } else
+            {
+                throw new MalformedURLException("Invalid URL \"" + url + "\"!");
+            }
+        } else
+        {
+            throw new MalformedURLException("Invalid URL \"" + url + "\"!");
+        }
+    }
+
+
     /**
      * Returns the DNS PTR name for the ucn or null if the ucn is not valid.
      * 
