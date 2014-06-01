@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.smpte.mdc4android.TwoKeyedMap;
 import org.xbill.DNS.Name;
 import org.xbill.mDNS.ServiceInstance;
 import org.xbill.mDNS.ServiceName;
@@ -27,6 +28,8 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter
     private Context context;
     
     private LinkedHashMap<ServiceName, ServiceInstance> data = new LinkedHashMap<ServiceName, ServiceInstance>();
+    
+    private LinkedHashMap<ServiceName, TwoKeyedMap<String, String, Object>> deviceData = new LinkedHashMap<ServiceName, TwoKeyedMap<String, String, Object>>();
     
     private List<ServiceName> groupIndex = new ArrayList<ServiceName>();
     
@@ -116,11 +119,18 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter
             if (name.equals(groupIndex.get(index)))
             {
                 groupIndex.remove(index);
+                deviceData.remove(name);
                 return data.remove(name);
             }
         }
         
         return null;
+    }
+    
+    
+    public void addDeviceData(ServiceName name, TwoKeyedMap<String, String, Object> map)
+    {
+        deviceData.put(name, map);
     }
     
     
@@ -228,7 +238,7 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter
             String rn = (String) service.getTextAttributes().get("rn");
             Name hostname = service.getHost();
             InetAddress[] addresses = service.getAddresses();
-            List<String> urls = toURLs(service);
+            List<String> urls = WebServiceUtil.toURLs(service);
             
             TextView listItemType = (TextView) convertView.findViewById(R.id.listItemType);
             listItemType.setText(rn != null ? rn.startsWith("urn:smpte:udn:") ? "Device" : rn.startsWith("urn:smpte:udn:") ? "Service" : "Unknown" : "Unknown");
@@ -257,33 +267,27 @@ public class DeviceExpandableListAdapter extends BaseExpandableListAdapter
                 builder.append(address.getHostAddress() + "\n");
             }
             listItemAddresses.setText(builder.toString());
+            
+            TextView listItemDevice = (TextView) convertView.findViewById(R.id.listItemDevice);
+            // TODO: Get Service Attributes from MDCDeviceViewerService 
+            builder.setLength(0);
+            TwoKeyedMap<String, String, Object> attributes = deviceData.get(service.getName());
+            if (attributes != null)
+            {
+                for (String key1 : attributes.keySet())
+                {
+                    builder.append(key1).append("\n");
+                    for (String key2 : attributes.keySet(key1))
+                    {
+                        Object value = attributes.get(key1, key2);
+                        builder.append("  ").append(key2).append("=\"").append(value).append("\"\n");
+                    }                    
+                }
+            }
+            listItemDevice.setText(builder.toString());
         }
         
         return convertView;
-    }
-    
-    
-    private List<String> toURLs(ServiceInstance service)
-    {
-        List<String> urls = new ArrayList<String>();
-        
-        int port = service.getPort();
-        InetAddress[] addresses = service.getAddresses();
-        Name hostname = service.getHost();
-        String path = (String) service.getTextAttributes().get("path");
-        String protocol = (String) service.getTextAttributes().get("proto");
-        String portString = (port > 0 && port != 80 ? ":" + port : "");
-        
-        urls.add(protocol + "//" + hostname + portString + "/" + path);
-        if (addresses != null && addresses.length > 0)
-        {
-            for (InetAddress address : addresses)
-            {
-                urls.add(protocol + "//" + address.getHostAddress() + portString + "/" + path);
-            }
-        }
-        
-        return urls;
     }
 
 

@@ -199,5 +199,38 @@
             android:textStyle="normal"
             android:typeface="sans"
             android:text="URLs" />
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/list_item_alternate_background_color"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
+        
+        <TextView
+            android:id="@+id/listItemLabelDevice"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:text="Device:" />
+    
+        <TextView
+            android:id="@+id/listItemDevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="@dimen/list_item_vertical_margin"
+            android:textSize="@dimen/list_item_text_size"
+            android:textColor="@color/list_item_text_color"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:text="Device" />
         </LinearLayout>
-</LinearLayout>
+    </LinearLayout>

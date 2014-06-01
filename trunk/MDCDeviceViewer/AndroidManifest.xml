@@ -16,7 +16,7 @@
     <uses-permission android:name="org.smpte.mdc4android.SERVICE_DISCOVERY" />
     
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="19" />
 
     <application

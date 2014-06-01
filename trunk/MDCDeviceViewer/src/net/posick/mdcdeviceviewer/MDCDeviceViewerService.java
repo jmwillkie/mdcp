@@ -1,10 +1,21 @@
 package net.posick.mdcdeviceviewer;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.http.client.ClientProtocolException;
 import org.smpte.mdc4android.IMDCService;
 import org.smpte.mdc4android.MDCService;
+import org.smpte.mdc4android.TwoKeyedMap;
+import org.smpte.mdc4android.net.NetworkUtils;
+import org.xbill.DNS.Options;
 import org.xbill.mDNS.ServiceInstance;
 import org.xbill.mDNS.ServiceName;
 
@@ -31,6 +42,16 @@ public class MDCDeviceViewerService extends Service
     public static final String SERVICE_REMOVED = "net.posick.mdcdeviceviewer.SERVICE_REMOVED";
 
     public static final String EXTRA_SERVICE = "net.posick.mdcdeviceviewer.SERVICE";
+
+    static final int DEFAULT_SCHEDULED_THREAD_PRIORITY = Thread.NORM_PRIORITY;
+    
+    static final int CORE_THREADS_SCHEDULED_EXECUTOR = 1;
+
+    static final int MAX_THREADS_SCHEDULED_EXECUTOR = Integer.MAX_VALUE;
+    
+    static final int TTL_THREADS_SCHEDULED_EXECUTOR = 10000;
+    
+    static final TimeUnit THREAD_TTL_TIME_UNIT = TimeUnit.MILLISECONDS;
     
     
     private IMDCService mdcService;
@@ -42,6 +63,10 @@ public class MDCDeviceViewerService extends Service
     private IntentFilter serviceRemovedFilter = null;
     
     private Map<ServiceName, ServiceInstance> cache = new LinkedHashMap<ServiceName, ServiceInstance>();
+
+    private Map<ServiceName, TwoKeyedMap<String, String, Object>> deviceAttrs = new HashMap<ServiceName, TwoKeyedMap<String, String, Object>>();
+
+    private ScheduledThreadPoolExecutor scheduledExecutor;
     
     
     // Binder given to clients
@@ -66,16 +91,37 @@ public class MDCDeviceViewerService extends Service
         public void onReceive(Context context, Intent intent)
         {
             Log.i(LOG_TAG, getClass().getName() + ".onReceive(" + context +", " + intent + ")");
-            ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCService.EXTRA_SERVICE);
+            final ServiceInstance service = (ServiceInstance) intent.getSerializableExtra(MDCService.EXTRA_SERVICE);
             if (MDCService.ACTION_SERVICE_DISCOVERED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Service Discovered <-----\n" + service);
                 cache.put(service.getName(), service);
+                scheduledExecutor.schedule(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        synchronized (deviceAttrs)
+                        {
+                            try
+                            {
+                                deviceAttrs.put(service.getName(), WebServiceUtil.callDeviceWebService(resolveNames(WebServiceUtil.toURLs(service))));
+                            } catch (ClientProtocolException e)
+                            {
+                                Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
+                            } catch (IOException e)
+                            {
+                                Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
+                            }
+                        }
+                    }
+                }, 1, TimeUnit.SECONDS);
                 serviceDiscovered(service);
             } else if (MDCService.ACTION_SERVICE_REMOVED.equals(intent.getAction()))
             {
                 Log.i(LOG_TAG, "-----> Service Removed <-----\n" + service);
                 cache.remove(service.getName());
+                deviceAttrs.remove(service.getName());
                 serviceRemoved(service);
             }
         }
@@ -89,44 +135,85 @@ public class MDCDeviceViewerService extends Service
         {
             Log.i(LOG_TAG, getClass().getSimpleName() + ".onServiceConnected(\"" + className.flattenToString() + "\", " + binder + ")");
             
-            if (mdcService == null)
+            mdcService = IMDCService.Stub.asInterface(binder);
+            new Thread(new Runnable()
             {
-                mdcService = IMDCService.Stub.asInterface(binder);
-                new Thread(new Runnable()
+                public void run()
                 {
-                    public void run()
+                    try
                     {
-                        try
-                        {
-                            mdcService.query(null, (String[]) null);
-                        } catch (RemoteException e)
-                        {
-                            String message = "Error Starting Service Discovery Browse - " + e.getMessage();
-                            Log.e(LOG_TAG, message, e);
-                        }
+                        mdcService.query(null, (String[]) null);
+                    } catch (RemoteException e)
+                    {
+                        String message = "Error Starting Service Discovery Browse - " + e.getMessage();
+                        Log.e(LOG_TAG, message, e);
                     }
-                }).start();
-            }
+                }
+            }).start();
         }
 
 
         @Override
         public void onServiceDisconnected(ComponentName name)
         {
-            if (mdcService != null)
+            mdcService = null;
+        }
+    };
+
+    private Runnable deviceInterogator = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            // TODO Auto-generated method stub
+            for (ServiceInstance service : cache.values())
             {
-                /*
-                try
+                synchronized (deviceAttrs)
                 {
-                    mdcService.stopBrowse(browseIntent);
-                } catch (RemoteException e)
-                {
-                    String message = "Error Stopping Service Discovery Browse - " + e.getMessage();
-                    Log.e(LOG_TAG, message, e);
+                    if (!deviceAttrs.containsKey(service.getName()))
+                    {
+                        try
+                        {
+                            deviceAttrs.put(service.getName(), WebServiceUtil.callDeviceWebService(resolveNames(WebServiceUtil.toURLs(service))));
+                        } catch (ClientProtocolException e)
+                        {
+                            Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
+                        } catch (IOException e)
+                        {
+                            Log.w(LOG_TAG, "Could not execute Device Web Services.", e);
+                        }
+                    }
                 }
-                */
-                mdcService = null;
             }
+        }
+    };
+
+    private ThreadFactory scheduleThreadFactory = new ThreadFactory()
+    {
+        public Thread newThread(Runnable r)
+        {
+            Thread t = new Thread(r, "mDNS Scheduled Thread");
+            t.setDaemon(true);
+            
+            int threadPriority = DEFAULT_SCHEDULED_THREAD_PRIORITY;
+            try
+            {
+                String value = Options.value("mdns_scheduled_thread_priority");
+                if (value == null || value.length() == 0)
+                {
+                    value = Options.value("mdns_thread_priority");
+                }
+                if (value != null && value.length() == 0)
+                {
+                    threadPriority = Integer.parseInt(value);
+                }
+            } catch (Exception e)
+            {
+                // ignore
+            }
+            t.setPriority(threadPriority);
+            t.setContextClassLoader(this.getClass().getClassLoader());
+            return t;
         }
     };
     
@@ -176,6 +263,16 @@ public class MDCDeviceViewerService extends Service
     {
         super.onCreate();
         
+        System.setProperty("sun.net.spi.nameservice.provider.1", "mdns,dns,sun");
+        
+        scheduledExecutor = (ScheduledThreadPoolExecutor) java.util.concurrent.Executors.newScheduledThreadPool(CORE_THREADS_SCHEDULED_EXECUTOR, scheduleThreadFactory );
+        scheduledExecutor.setCorePoolSize(CORE_THREADS_SCHEDULED_EXECUTOR);
+        scheduledExecutor.setMaximumPoolSize(MAX_THREADS_SCHEDULED_EXECUTOR);
+        scheduledExecutor.setKeepAliveTime(TTL_THREADS_SCHEDULED_EXECUTOR, THREAD_TTL_TIME_UNIT);
+        scheduledExecutor.allowCoreThreadTimeOut(true);
+        
+        scheduledExecutor.scheduleWithFixedDelay(deviceInterogator, 5, 5, TimeUnit.SECONDS);
+        
         localBroadcaster = LocalBroadcastManager.getInstance(getApplicationContext());
         
         if (serviceDiscoveredFilter == null)
@@ -217,7 +314,7 @@ public class MDCDeviceViewerService extends Service
             
             Intent startIntent = new Intent(createPackageContext("org.smpte.mdc4android", 0), MDCService.class);
             startService(startIntent);
-            if (mdcService != null)
+            if (mdcService == null)
             {
                 if (!bindService(startIntent, mdcServiceConnection, Context.BIND_IMPORTANT | Context.BIND_ABOVE_CLIENT))
                 {
@@ -245,6 +342,9 @@ public class MDCDeviceViewerService extends Service
     @Override
     public void onDestroy()
     {
+        scheduledExecutor.shutdownNow();
+        scheduledExecutor = null;
+        
         if (mdcService != null)
         {
             unbindService(mdcServiceConnection);
@@ -266,5 +366,38 @@ public class MDCDeviceViewerService extends Service
         {
             serviceDiscovered(entry.getValue());
         }
+    }
+
+    
+    protected List<String> resolveNames(List<String> urls)
+    {
+        List<String> newURLs = new ArrayList<String>();
+        
+        if (urls != null && urls.size() > 0)
+        {
+            for (String url : urls)
+            {
+                if (mdcService != null)
+                {
+                    try
+                    {
+                        String hostname = NetworkUtils.extractHostname(url);
+                        String[] addresses = mdcService.resolveAddresses(hostname);
+                        if (addresses != null && addresses.length > 0)
+                        {
+                            for (String address : addresses)
+                            {
+                                newURLs.add(NetworkUtils.replaceHostname(url, address));
+                            }
+                        }
+                    } catch (Exception e)
+                    {
+                        Log.e(LOG_TAG, "Could not resolve hostname for URL \"" + url + "\"!", e);
+                    }
+                }
+            }
+        }
+        
+        return newURLs;
     }
 }
